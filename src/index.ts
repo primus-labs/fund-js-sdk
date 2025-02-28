@@ -1,110 +1,32 @@
-import { ethers } from 'ethers';
-import { PrimusZKTLS } from "@primuslabs/zktls-js-sdk";
-import { appSign } from './api'
-import { CONTRACTADDRESS, TEST_APP_ID} from "./config/constants";
-import { Attestation, TipRecipientInfo,TipToken  } from './index.d'
-import Contract from './classes/Contract';
-import abiJson from './config/abi.json'
+import {ethers} from 'ethers';
+import {Attestation, ClaimTipParam, claimTipParam, TipParam, TipRecipientInfo, TipToken} from './index.d'
+import {Tip} from "classes/Tip";
 
-class Tip {
-  private _attestLoading: boolean;
-  private zktlssdk: PrimusZKTLS;
-  private tipContract: ethers.Contract;
-  private padoExtensionVersion: string;
+class PrimusTipClient {
+    private _tip: Tip | undefined;
 
-  constructor() {
-    this._attestLoading = false
-    this.padoExtensionVersion = ''
-  }
+    constructor() {
 
-  init(wallet: ethers.Wallet, appId: string, appSecret?: string): Promise<string | boolean> {
-    this.tipContract = new Contract(wallet, CONTRACTADDRESS, abiJson)
-    this.zktlssdk = new PrimusZKTLS();
-    this._initZktlssdk();
-  }
-  async _initZktlssdk() {
-    const extensionVersionFromSdk = await this.zktlssdk.init(
-      TEST_APP_ID
-    );
-  }
-  async tip(tipToken: TipToken, tipRecipientInfo: TipRecipientInfo) {
-    try {
-      await this.tipContract.call('tip', [tipToken, tipRecipientInfo])
-    } catch (e) {
     }
-  }
 
-  async tipBatch(tipToken: TipToken, tipRecipientInfoList: TipRecipientInfo[]) { 
-    try {
-      await this.tipContract.call('tipBatch', [tipToken, tipRecipientInfoList])
-    } catch (e) {
+    async init(wallet: ethers.Wallet, appId: string, appSecret?: string) {
+        this._tip = new Tip();
+        await this._tip.init(wallet, appId, appSecret);
     }
-  }
 
-  async attest(templateId: string , attConditions: any[]) {
-    if (!this.zktlssdk?.padoExtensionVersion) {
-      return;
-    }
-    if (this._attestLoading) {
-      return;
-    }
-   
-    this._attestLoading = true
 
-    const attRequest = await this.zktlssdk.generateRequestParams(
-      templateId
-    );
-    if (attConditions) {
-      attRequest.setAttConditions(attConditions);
-    }
-    const signParams = attRequest.toJsonString();
-    console.log("signParams", signParams);
-    let appSignRc, appSignResult;
-    try {
-      const { rc, result } = await appSign(signParams);
-      appSignRc = rc;
-      appSignResult = result;
-    } catch (e) {
-    //  "AxiosError"
-    }
-    try {
-      if (appSignRc === 0) {
-        const formatAttestParams = {
-          attRequest: {
-            ...JSON.parse(signParams),
-          },
-          appSignature: appSignResult.appSignature,
-        };
-        const att = await this.zktlssdk.startAttestation(
-          JSON.stringify(formatAttestParams)
-        );
-        console.log("attestation", att);
-      }
-    } catch (error: any) {
-      console.log(error);
-      if (error.code) {
-       
-      }
-    } finally {
-      this._attestLoading = false
-    }
-  }
+    async tip(tipParam: TipParam) {
 
-  async claimBySource(idSource:string, attestation: Attestation) {
-    try {
-      await this.tipContract.call('claimBySource', [idSource, attestation])
-    } catch (e) {
     }
-  }
 
-  async claimByMultiSource(idSourceList:string[], attestationList: Attestation[]) {
-    try {
-      await this.tipContract.call('claimByMultiSource', [idSourceList, attestationList])
-    } catch (e) {
+    async attest(templateId: string, attConditions: any[]) {
+
     }
-  }
 
-  // tipperWithdraw() { }
+    async claimBySource(claimTipParam: ClaimTipParam[]) {
+
+    }
+
 }
 
-export { Tip };
+export {PrimusTipClient};
