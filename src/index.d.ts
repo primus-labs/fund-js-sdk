@@ -50,5 +50,5 @@ export type TipParam = {
 
 export type ClaimTipParam = {
     idSource: string;
-    attestationList: Attestation;
+    attestation: Attestation;
 }

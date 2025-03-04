@@ -15,9 +15,12 @@ class Tip {
         this._attestLoading = false
     }
 
-    async init(wallet: ethers.Wallet, appId: string, appSecret?: string) {
+    async init(provider: any, appId: string, appSecret?: string) {
         console.log(`Init client with appId:${appId} appSecret:${appSecret}`)
-        this.tipContract = new Contract(wallet, CONTRACTADDRESS, abiJson).contractInstance
+        this.tipContract = new Contract(provider, CONTRACTADDRESS, abiJson).contractInstance;
+        if(!this.tipContract){
+            throw new Error('Init contract failed!')
+        }
         this.zkTlsSdk = new PrimusZKTLS();
         await this.zkTlsSdk.init(
             TEST_APP_ID
