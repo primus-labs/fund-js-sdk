@@ -11,10 +11,10 @@ class PrimusTipClient {
 
     }
 
-    async init(provider: any, appId: string, appSecret?: string) {
+    async init(provider: any, appId: string) {
         this._tip = new Tip();
-        //TODO new ethers.providers.Web3Provider(provider)?
-        await this._tip.init(new ethers.providers.Web3Provider(provider), appId, appSecret);
+        // new ethers.providers.Web3Provider(provider)
+        await this._tip.init(new ethers.providers.Web3Provider(provider), appId);
     }
 
 
@@ -32,8 +32,8 @@ class PrimusTipClient {
 
     }
 
-    async attest(templateId: string, attConditions: any[]): Promise<Attestation | undefined> {
-        return this._tip?.attest(templateId, attConditions);
+    async attest(templateId: string, attConditions: any[], genAppSignature:  (signParams:string)=> Promise<string>): Promise<Attestation | undefined> {
+        return this._tip?.attest(templateId, attConditions,genAppSignature);
     }
 
     async claimBySource(claimTipParam: ClaimTipParam[]) {

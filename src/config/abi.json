@@ -1,360 +1,951 @@
 [
   {
-    "inputs": [],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "anonymous": false,
+    "type": "function",
+    "name": "addBatchIdSource",
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "recipient",
-        "type": "address"
+        "name": "sourceName_",
+        "type": "string[]",
+        "internalType": "string[]"
       },
       {
-        "indexed": false,
-        "internalType": "string",
-        "name": "url",
-        "type": "string"
+        "name": "url_",
+        "type": "string[]",
+        "internalType": "string[]"
+      },
+      {
+        "name": "jsonPath_",
+        "type": "string[]",
+        "internalType": "string[]"
       }
     ],
-    "name": "AttestationSubmitted",
-    "type": "event"
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
-    "anonymous": false,
+    "type": "function",
+    "name": "addIdSource",
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "uint8",
-        "name": "version",
-        "type": "uint8"
+        "name": "sourceName_",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "url_",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "jsonPath_",
+        "type": "string",
+        "internalType": "string"
       }
     ],
-    "name": "Initialized",
-    "type": "event"
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
-    "anonymous": false,
+    "type": "function",
+    "name": "claimByMultiSource",
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "previousOwner",
-        "type": "address"
+        "name": "idSources",
+        "type": "string[]",
+        "internalType": "string[]"
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "newOwner",
-        "type": "address"
-      }
-    ],
-    "name": "OwnershipTransferred",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_origenPrimus",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_primusAddress",
-        "type": "address"
-      }
-    ],
-    "name": "SetPrimusZKTLS",
-    "type": "event"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "attestationsOfAddress",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "recipient",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "url",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "data",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "attConditions",
-        "type": "string"
-      },
-      {
-        "internalType": "uint64",
-        "name": "timestamp",
-        "type": "uint64"
-      },
-      {
-        "internalType": "string",
-        "name": "additionParams",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "recipient",
-        "type": "address"
-      }
-    ],
-    "name": "getAttestationByRecipient",
-    "outputs": [
-      {
+        "name": "att",
+        "type": "tuple[]",
+        "internalType": "struct Attestation[]",
         "components": [
           {
-            "internalType": "address",
             "name": "recipient",
-            "type": "address"
+            "type": "address",
+            "internalType": "address"
           },
           {
-            "internalType": "string",
-            "name": "url",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "data",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "attConditions",
-            "type": "string"
-          },
-          {
-            "internalType": "uint64",
-            "name": "timestamp",
-            "type": "uint64"
-          },
-          {
-            "internalType": "string",
-            "name": "additionParams",
-            "type": "string"
-          }
-        ],
-        "internalType": "struct BlindBoxAttestation[]",
-        "name": "",
-        "type": "tuple[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_primusZKTLS",
-        "type": "address"
-      }
-    ],
-    "name": "initialize",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "owner",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "primusZKTLS",
-    "outputs": [
-      {
-        "internalType": "contract IPrimusZKTLS",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "renounceOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_primusZKTLS",
-        "type": "address"
-      }
-    ],
-    "name": "setPrimusZKTLS",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "recipient",
-            "type": "address"
-          },
-          {
-            "components": [
-              {
-                "internalType": "string",
-                "name": "url",
-                "type": "string"
-              },
-              {
-                "internalType": "string",
-                "name": "header",
-                "type": "string"
-              },
-              {
-                "internalType": "string",
-                "name": "method",
-                "type": "string"
-              },
-              {
-                "internalType": "string",
-                "name": "body",
-                "type": "string"
-              }
-            ],
-            "internalType": "struct AttNetworkRequest",
             "name": "request",
-            "type": "tuple"
-          },
-          {
+            "type": "tuple",
+            "internalType": "struct AttNetworkRequest",
             "components": [
               {
-                "internalType": "string",
-                "name": "keyName",
-                "type": "string"
-              },
-              {
-                "internalType": "string",
-                "name": "parseType",
-                "type": "string"
-              },
-              {
-                "internalType": "string",
-                "name": "parsePath",
-                "type": "string"
-              }
-            ],
-            "internalType": "struct AttNetworkResponseResolve[]",
-            "name": "reponseResolve",
-            "type": "tuple[]"
-          },
-          {
-            "internalType": "string",
-            "name": "data",
-            "type": "string"
-          },
-          {
-            "internalType": "string",
-            "name": "attConditions",
-            "type": "string"
-          },
-          {
-            "internalType": "uint64",
-            "name": "timestamp",
-            "type": "uint64"
-          },
-          {
-            "internalType": "string",
-            "name": "additionParams",
-            "type": "string"
-          },
-          {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "attestorAddr",
-                "type": "address"
-              },
-              {
-                "internalType": "string",
                 "name": "url",
-                "type": "string"
+                "type": "string",
+                "internalType": "string"
+              },
+              {
+                "name": "header",
+                "type": "string",
+                "internalType": "string"
+              },
+              {
+                "name": "method",
+                "type": "string",
+                "internalType": "string"
+              },
+              {
+                "name": "body",
+                "type": "string",
+                "internalType": "string"
               }
-            ],
-            "internalType": "struct Attestor[]",
-            "name": "attestors",
-            "type": "tuple[]"
+            ]
           },
           {
-            "internalType": "bytes[]",
+            "name": "reponseResolve",
+            "type": "tuple[]",
+            "internalType": "struct AttNetworkResponseResolve[]",
+            "components": [
+              {
+                "name": "keyName",
+                "type": "string",
+                "internalType": "string"
+              },
+              {
+                "name": "parseType",
+                "type": "string",
+                "internalType": "string"
+              },
+              {
+                "name": "parsePath",
+                "type": "string",
+                "internalType": "string"
+              }
+            ]
+          },
+          {
+            "name": "data",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "attConditions",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "additionParams",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "attestors",
+            "type": "tuple[]",
+            "internalType": "struct Attestor[]",
+            "components": [
+              {
+                "name": "attestorAddr",
+                "type": "address",
+                "internalType": "address"
+              },
+              {
+                "name": "url",
+                "type": "string",
+                "internalType": "string"
+              }
+            ]
+          },
+          {
             "name": "signatures",
-            "type": "bytes[]"
+            "type": "bytes[]",
+            "internalType": "bytes[]"
           }
-        ],
-        "internalType": "struct Attestation",
-        "name": "_attestation",
-        "type": "tuple"
+        ]
       }
     ],
-    "name": "submitAttestation",
     "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
+    "stateMutability": "payable"
   },
   {
+    "type": "function",
+    "name": "claimBySource",
     "inputs": [
       {
-        "internalType": "address",
-        "name": "newOwner",
-        "type": "address"
+        "name": "idSource",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "att",
+        "type": "tuple",
+        "internalType": "struct Attestation",
+        "components": [
+          {
+            "name": "recipient",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "request",
+            "type": "tuple",
+            "internalType": "struct AttNetworkRequest",
+            "components": [
+              {
+                "name": "url",
+                "type": "string",
+                "internalType": "string"
+              },
+              {
+                "name": "header",
+                "type": "string",
+                "internalType": "string"
+              },
+              {
+                "name": "method",
+                "type": "string",
+                "internalType": "string"
+              },
+              {
+                "name": "body",
+                "type": "string",
+                "internalType": "string"
+              }
+            ]
+          },
+          {
+            "name": "reponseResolve",
+            "type": "tuple[]",
+            "internalType": "struct AttNetworkResponseResolve[]",
+            "components": [
+              {
+                "name": "keyName",
+                "type": "string",
+                "internalType": "string"
+              },
+              {
+                "name": "parseType",
+                "type": "string",
+                "internalType": "string"
+              },
+              {
+                "name": "parsePath",
+                "type": "string",
+                "internalType": "string"
+              }
+            ]
+          },
+          {
+            "name": "data",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "attConditions",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "additionParams",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "attestors",
+            "type": "tuple[]",
+            "internalType": "struct Attestor[]",
+            "components": [
+              {
+                "name": "attestorAddr",
+                "type": "address",
+                "internalType": "address"
+              },
+              {
+                "name": "url",
+                "type": "string",
+                "internalType": "string"
+              }
+            ]
+          },
+          {
+            "name": "signatures",
+            "type": "bytes[]",
+            "internalType": "bytes[]"
+          }
+        ]
       }
     ],
-    "name": "transferOwnership",
     "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "claimFee",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "feeRecipient",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getTipRecords",
+    "inputs": [
+      {
+        "name": "tipRecipient",
+        "type": "tuple",
+        "internalType": "struct TipRecipient",
+        "components": [
+          {
+            "name": "idSource",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "id",
+            "type": "string",
+            "internalType": "string"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple[]",
+        "internalType": "struct TipRecord[]",
+        "components": [
+          {
+            "name": "amount",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "tipToken",
+            "type": "tuple",
+            "internalType": "struct TipToken",
+            "components": [
+              {
+                "name": "tokenType",
+                "type": "uint32",
+                "internalType": "uint32"
+              },
+              {
+                "name": "tokenAddress",
+                "type": "address",
+                "internalType": "address"
+              }
+            ]
+          },
+          {
+            "name": "timestamp",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "tipper",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "nftIds",
+            "type": "uint256[]",
+            "internalType": "uint256[]"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "idSourceCache",
+    "inputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "url",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "jsonPath",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "initialize",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "primusZKTLS_",
+        "type": "address",
+        "internalType": "contract IPrimusZKTLS"
+      },
+      {
+        "name": "feeRecipient_",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "claimFee_",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "owner",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "primusZKTLS",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IPrimusZKTLS"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "renounceOwnership",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setClaimFee",
+    "inputs": [
+      {
+        "name": "claimFee_",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setFeeRecipient",
+    "inputs": [
+      {
+        "name": "feeRecipient_",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setPrimusZKTLS",
+    "inputs": [
+      {
+        "name": "primusZKTLS_",
+        "type": "address",
+        "internalType": "contract IPrimusZKTLS"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setWithdrawDelay",
+    "inputs": [
+      {
+        "name": "delay",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "tip",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "tuple",
+        "internalType": "struct TipToken",
+        "components": [
+          {
+            "name": "tokenType",
+            "type": "uint32",
+            "internalType": "uint32"
+          },
+          {
+            "name": "tokenAddress",
+            "type": "address",
+            "internalType": "address"
+          }
+        ]
+      },
+      {
+        "name": "recipient",
+        "type": "tuple",
+        "internalType": "struct TipRecipientInfo",
+        "components": [
+          {
+            "name": "idSource",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "id",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "amount",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "nftIds",
+            "type": "uint256[]",
+            "internalType": "uint256[]"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "tipBatch",
+    "inputs": [
+      {
+        "name": "token",
+        "type": "tuple",
+        "internalType": "struct TipToken",
+        "components": [
+          {
+            "name": "tokenType",
+            "type": "uint32",
+            "internalType": "uint32"
+          },
+          {
+            "name": "tokenAddress",
+            "type": "address",
+            "internalType": "address"
+          }
+        ]
+      },
+      {
+        "name": "recipients",
+        "type": "tuple[]",
+        "internalType": "struct TipRecipientInfo[]",
+        "components": [
+          {
+            "name": "idSource",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "id",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "amount",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "nftIds",
+            "type": "uint256[]",
+            "internalType": "uint256[]"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
+    "name": "tipperWithdraw",
+    "inputs": [
+      {
+        "name": "tipRecipients",
+        "type": "tuple[]",
+        "internalType": "struct TipRecipient[]",
+        "components": [
+          {
+            "name": "idSource",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "id",
+            "type": "string",
+            "internalType": "string"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "transferOwnership",
+    "inputs": [
+      {
+        "name": "newOwner",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "withdrawDelay",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "AddIdSource",
+    "inputs": [
+      {
+        "name": "_sourceName",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "_url",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "_jsonPath",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ClaimEvent",
+    "inputs": [
+      {
+        "name": "recipient",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "idSource",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "id",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "tokenAddr",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "ClaimFeeSet",
+    "inputs": [
+      {
+        "name": "fee",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "FeeCollected",
+    "inputs": [
+      {
+        "name": "payer",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "token",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "FeeRecipientChanged",
+    "inputs": [
+      {
+        "name": "oldRecipient",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "newRecipient",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "Initialized",
+    "inputs": [
+      {
+        "name": "version",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "OwnershipTransferred",
+    "inputs": [
+      {
+        "name": "previousOwner",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "newOwner",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "RebateBalance",
+    "inputs": [
+      {
+        "name": "recipient",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "SetPrimusZKTLS",
+    "inputs": [
+      {
+        "name": "primusZKTLS",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "TipEvent",
+    "inputs": [
+      {
+        "name": "idSource",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "id",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "WithdrawDelayChanged",
+    "inputs": [
+      {
+        "name": "oldDelay",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "newDelay",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "WithdrawEvent",
+    "inputs": [
+      {
+        "name": "tipper",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "tokenAddr",
+        "type": "address",
+        "indexed": true,
+        "internalType": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "InvalidInitialization",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "NotInitializing",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "OwnableInvalidOwner",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "OwnableUnauthorizedAccount",
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address",
+        "internalType": "address"
+      }
+    ]
+  },
+  {
+    "type": "error",
+    "name": "ReentrancyGuardReentrantCall",
+    "inputs": []
   }
 ]

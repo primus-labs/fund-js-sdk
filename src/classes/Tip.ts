@@ -1,34 +1,49 @@
 import {ethers} from 'ethers';
 import {PrimusZKTLS} from "@primuslabs/zktls-js-sdk";
-import {appSign} from '../api'
-import {CONTRACTADDRESS, TEST_APP_ID} from "../config/constants";
+import {TIP_CONTRACTS} from "../config/constants";
 import {Attestation, TipRecipientInfo, TipToken} from '../index.d'
 import Contract from './Contract';
 import abiJson from '../config/abi.json'
+import erc20Abi from '../config/erc20Abi.json'
 
 class Tip {
     private _attestLoading: boolean;
     private zkTlsSdk!: PrimusZKTLS;
     private tipContract!: ethers.Contract;
+    private provider!: ethers.providers.Web3Provider;
 
     constructor() {
         this._attestLoading = false
     }
 
-    async init(provider: any, appId: string, appSecret?: string) {
-        console.log(`Init client with appId:${appId} appSecret:${appSecret}`)
-        this.tipContract = new Contract(provider, CONTRACTADDRESS, abiJson).contractInstance;
-        if(!this.tipContract){
+    getZkTlsSdk(): PrimusZKTLS {
+        return this.zkTlsSdk;
+    }
+
+    async init(provider: any, appId: string) {
+        console.log(`Init client with appId:${appId}`)
+        const network = await provider.getNetwork();
+        const chainId = network.chainId;
+        const tipContractAddress = TIP_CONTRACTS[chainId];
+        if(!tipContractAddress){
+            throw new Error(`Unsupported chainId:${chainId}`);
+        }
+        this.tipContract = new Contract(provider, tipContractAddress, abiJson).contractInstance;
+        if (!this.tipContract) {
             throw new Error('Init contract failed!')
         }
+        this.provider = provider;
         this.zkTlsSdk = new PrimusZKTLS();
         await this.zkTlsSdk.init(
-            TEST_APP_ID
+            appId
         );
     }
 
     async tip(tipToken: TipToken, tipRecipientInfo: TipRecipientInfo) {
         try {
+            const tipRecipientInfos = [];
+            tipRecipientInfos[0] = tipRecipientInfo;
+            await this.approve(tipToken, tipRecipientInfos)
             await this.tipContract.call('tip', [tipToken, tipRecipientInfo], {value: tipRecipientInfo.amount})
         } catch (e) {
             console.log(e)
@@ -37,13 +52,42 @@ class Tip {
 
     async tipBatch(tipToken: TipToken, tipRecipientInfoList: TipRecipientInfo[]) {
         try {
+            await this.approve(tipToken, tipRecipientInfoList)
             await this.tipContract.call('tipBatch', [tipToken, tipRecipientInfoList])
         } catch (e) {
             console.log(e)
         }
     }
 
-    async attest(templateId: string, attConditions: any[]): Promise<Attestation | undefined> {
+    private async approve(tipToken: TipToken, tipRecipientInfoList: TipRecipientInfo[]) {
+        try {
+            const signer = this.provider.getSigner();
+            const address = await signer.getAddress();
+            const erc20Contract = new Contract(this.provider, tipToken.tokenAddress, erc20Abi).contractInstance;
+
+            const allowance = await erc20Contract.call("allowance", [address, this.tipContract.address]);
+            const decimals = await erc20Contract.call("decimals", []);
+
+            // Compute total amount
+            const totalAmount: bigint = tipRecipientInfoList.reduce((acc, cur) => acc + BigInt(cur.amount), 0n);
+            const requiredAllowance = totalAmount * (10n ** BigInt(decimals));
+
+            if (allowance < requiredAllowance) {
+                const tx = await erc20Contract.approve(this.tipContract.address, requiredAllowance);
+                // Wait for the transaction to be mined
+                await tx.wait();
+                console.log(`Approved: ${requiredAllowance.toString()}`);
+                return;
+            }
+            console.log(`Already approved: ${allowance.toString()}`);
+        } catch (e) {
+            console.error('Approval failed:', e);
+            throw e;
+        }
+    }
+
+
+    async attest(templateId: string, attConditions: any[], genAppSignature: (signParams: string) => Promise<string>): Promise<Attestation | undefined> {
         if (!this.zkTlsSdk?.padoExtensionVersion) {
             return;
         }
@@ -53,37 +97,29 @@ class Tip {
 
         this._attestLoading = true
 
-        const attRequest = await this.zkTlsSdk.generateRequestParams(
+        const attRequest = this.zkTlsSdk.generateRequestParams(
             templateId
         );
         if (attConditions) {
             attRequest.setAttConditions(attConditions);
         }
         const signParams = attRequest.toJsonString();
-        console.log("signParams", signParams);
-        let appSignRc, appSignResult;
-        try {
-            const {rc, result} = await appSign(signParams);
-            appSignRc = rc;
-            appSignResult = result;
-        } catch (e) {
-            //  "AxiosError"
+        const signature = await genAppSignature(signParams);
+        if (!signature) {
+            throw new Error('appSignature is empty!')
         }
         try {
-            if (appSignRc === 0) {
-                const formatAttestParams = {
-                    attRequest: {
-                        ...JSON.parse(signParams),
-                    },
-                    appSignature: appSignResult.appSignature,
-                };
-                const att = await this.zkTlsSdk.startAttestation(
-                    JSON.stringify(formatAttestParams)
-                );
-                console.log("attestation", att);
-                return att;
-            }
-            return;
+            const formatAttestParams = {
+                attRequest: {
+                    ...JSON.parse(signParams),
+                },
+                appSignature: signature,
+            };
+            const att = await this.zkTlsSdk.startAttestation(
+                JSON.stringify(formatAttestParams)
+            );
+            console.log("attestation", att);
+            return att;
         } catch (error: any) {
             console.log(error);
             if (error.code) {

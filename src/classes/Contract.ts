@@ -12,13 +12,6 @@ class Contract {
   constructor(provider: any, address: string, abiJson: any) {
     this.contractAddress = address;
     this.provider = provider;
-    this._initContractInstance(abiJson);
-    return this.contractInstance;
-  }
-
-  _initContractInstance(abiJson: any): void {
-    // let providerT = new ethers.providers.Web3Provider(this.wallet);
-    // let signer = providerT.getSigner();
     this.contractInstance = new ethers.Contract(this.contractAddress, abiJson, this.provider);
   }
 
