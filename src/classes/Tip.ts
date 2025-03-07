@@ -25,10 +25,10 @@ class Tip {
         const network = await provider.getNetwork();
         const chainId = network.chainId;
         const tipContractAddress = TIP_CONTRACTS[chainId];
-        if(!tipContractAddress){
+        if (!tipContractAddress) {
             throw new Error(`Unsupported chainId:${chainId}`);
         }
-        this.tipContract = new Contract(provider, tipContractAddress, abiJson).contractInstance;
+        this.tipContract = new Contract(provider.getSigner(), tipContractAddress, abiJson).contractInstance;
         if (!this.tipContract) {
             throw new Error('Init contract failed!')
         }
@@ -44,7 +44,7 @@ class Tip {
             const tipRecipientInfos = [];
             tipRecipientInfos[0] = tipRecipientInfo;
             await this.approve(tipToken, tipRecipientInfos)
-            await this.tipContract.call('tip', [tipToken, tipRecipientInfo], {value: tipRecipientInfo.amount})
+            await this.tipContract.tip(tipToken, tipRecipientInfo, {value: tipRecipientInfo.amount})
         } catch (e) {
             console.log(e)
         }
@@ -63,10 +63,10 @@ class Tip {
         try {
             const signer = this.provider.getSigner();
             const address = await signer.getAddress();
-            const erc20Contract = new Contract(this.provider, tipToken.tokenAddress, erc20Abi).contractInstance;
+            const erc20Contract = new ethers.Contract(tipToken.tokenAddress, erc20Abi, signer);
 
-            const allowance = await erc20Contract.call("allowance", [address, this.tipContract.address]);
-            const decimals = await erc20Contract.call("decimals", []);
+            const allowance = await erc20Contract.allowance(address, this.tipContract.address);
+            const decimals = await erc20Contract.decimals();
 
             // Compute total amount
             const totalAmount: bigint = tipRecipientInfoList.reduce((acc, cur) => acc + BigInt(cur.amount), 0n);

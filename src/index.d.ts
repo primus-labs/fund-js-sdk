@@ -31,7 +31,10 @@ declare global {
 }
 
 // start
-export type TokenType = 'erc20' | 'native' | 'nft'
+//
+// ERC20_TYPE = 0;
+// NATIVE_TYPE = 1;
+export type TokenType = 0 | 1
 export type TipToken = {
     tokenType: TokenType;
     tokenAddress: string;
