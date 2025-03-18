@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/utils.ts","./src/api/index.ts","./src/classes/contract.ts","./src/classes/tip.ts","./src/config/constants.ts","./src/utils/request.ts"],"errors":true,"version":"5.7.3"}
+{"root":["./src/index.ts","./src/utils.ts","./src/classes/contract.ts","./src/classes/erc20contract.ts","./src/classes/tip.ts","./src/config/constants.ts"],"version":"5.7.2"}

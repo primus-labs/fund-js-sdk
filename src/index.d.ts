@@ -37,12 +37,12 @@ declare global {
 export type TokenType = 0 | 1
 export type TipToken = {
     tokenType: TokenType;
-    tokenAddress: string;
+    tokenAddress?: string;
 }
 export type  TipRecipientInfo = {
     idSource: string;// The platform of the account.
     id: string;// The unique identifier of the account.
-    amount: bigint;// The amount of token when token is erc20 and native.
+    amount: string;// The amount of token when token is erc20 and native.
     nftIds: bigint[];// The nft token ids when token is nft.
 }
 
@@ -53,5 +53,7 @@ export type TipParam = {
 
 export type ClaimTipParam = {
     idSource: string;
+    id: string;
     attestation: Attestation;
+    tipIndex?: number;
 }

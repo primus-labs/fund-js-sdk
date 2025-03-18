@@ -3,44 +3,9 @@
     "type": "function",
     "name": "addBatchIdSource",
     "inputs": [
-      {
-        "name": "sourceName_",
-        "type": "string[]",
-        "internalType": "string[]"
-      },
-      {
-        "name": "url_",
-        "type": "string[]",
-        "internalType": "string[]"
-      },
-      {
-        "name": "jsonPath_",
-        "type": "string[]",
-        "internalType": "string[]"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "addIdSource",
-    "inputs": [
-      {
-        "name": "sourceName_",
-        "type": "string",
-        "internalType": "string"
-      },
-      {
-        "name": "url_",
-        "type": "string",
-        "internalType": "string"
-      },
-      {
-        "name": "jsonPath_",
-        "type": "string",
-        "internalType": "string"
-      }
+      { "name": "sourceName_", "type": "string[]", "internalType": "string[]" },
+      { "name": "url_", "type": "string[]", "internalType": "string[]" },
+      { "name": "jsonPath_", "type": "string[]", "internalType": "string[]" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -49,46 +14,22 @@
     "type": "function",
     "name": "claimByMultiSource",
     "inputs": [
-      {
-        "name": "idSources",
-        "type": "string[]",
-        "internalType": "string[]"
-      },
+      { "name": "idSources", "type": "string[]", "internalType": "string[]" },
       {
         "name": "att",
         "type": "tuple[]",
         "internalType": "struct Attestation[]",
         "components": [
-          {
-            "name": "recipient",
-            "type": "address",
-            "internalType": "address"
-          },
+          { "name": "recipient", "type": "address", "internalType": "address" },
           {
             "name": "request",
             "type": "tuple",
             "internalType": "struct AttNetworkRequest",
             "components": [
-              {
-                "name": "url",
-                "type": "string",
-                "internalType": "string"
-              },
-              {
-                "name": "header",
-                "type": "string",
-                "internalType": "string"
-              },
-              {
-                "name": "method",
-                "type": "string",
-                "internalType": "string"
-              },
-              {
-                "name": "body",
-                "type": "string",
-                "internalType": "string"
-              }
+              { "name": "url", "type": "string", "internalType": "string" },
+              { "name": "header", "type": "string", "internalType": "string" },
+              { "name": "method", "type": "string", "internalType": "string" },
+              { "name": "body", "type": "string", "internalType": "string" }
             ]
           },
           {
@@ -96,11 +37,7 @@
             "type": "tuple[]",
             "internalType": "struct AttNetworkResponseResolve[]",
             "components": [
-              {
-                "name": "keyName",
-                "type": "string",
-                "internalType": "string"
-              },
+              { "name": "keyName", "type": "string", "internalType": "string" },
               {
                 "name": "parseType",
                 "type": "string",
@@ -113,21 +50,13 @@
               }
             ]
           },
-          {
-            "name": "data",
-            "type": "string",
-            "internalType": "string"
-          },
+          { "name": "data", "type": "string", "internalType": "string" },
           {
             "name": "attConditions",
             "type": "string",
             "internalType": "string"
           },
-          {
-            "name": "timestamp",
-            "type": "uint64",
-            "internalType": "uint64"
-          },
+          { "name": "timestamp", "type": "uint64", "internalType": "uint64" },
           {
             "name": "additionParams",
             "type": "string",
@@ -143,18 +72,10 @@
                 "type": "address",
                 "internalType": "address"
               },
-              {
-                "name": "url",
-                "type": "string",
-                "internalType": "string"
-              }
+              { "name": "url", "type": "string", "internalType": "string" }
             ]
           },
-          {
-            "name": "signatures",
-            "type": "bytes[]",
-            "internalType": "bytes[]"
-          }
+          { "name": "signatures", "type": "bytes[]", "internalType": "bytes[]" }
         ]
       }
     ],
@@ -165,46 +86,22 @@
     "type": "function",
     "name": "claimBySource",
     "inputs": [
-      {
-        "name": "idSource",
-        "type": "string",
-        "internalType": "string"
-      },
+      { "name": "idSource", "type": "string", "internalType": "string" },
       {
         "name": "att",
         "type": "tuple",
         "internalType": "struct Attestation",
         "components": [
-          {
-            "name": "recipient",
-            "type": "address",
-            "internalType": "address"
-          },
+          { "name": "recipient", "type": "address", "internalType": "address" },
           {
             "name": "request",
             "type": "tuple",
             "internalType": "struct AttNetworkRequest",
             "components": [
-              {
-                "name": "url",
-                "type": "string",
-                "internalType": "string"
-              },
-              {
-                "name": "header",
-                "type": "string",
-                "internalType": "string"
-              },
-              {
-                "name": "method",
-                "type": "string",
-                "internalType": "string"
-              },
-              {
-                "name": "body",
-                "type": "string",
-                "internalType": "string"
-              }
+              { "name": "url", "type": "string", "internalType": "string" },
+              { "name": "header", "type": "string", "internalType": "string" },
+              { "name": "method", "type": "string", "internalType": "string" },
+              { "name": "body", "type": "string", "internalType": "string" }
             ]
           },
           {
@@ -212,11 +109,7 @@
             "type": "tuple[]",
             "internalType": "struct AttNetworkResponseResolve[]",
             "components": [
-              {
-                "name": "keyName",
-                "type": "string",
-                "internalType": "string"
-              },
+              { "name": "keyName", "type": "string", "internalType": "string" },
               {
                 "name": "parseType",
                 "type": "string",
@@ -229,21 +122,13 @@
               }
             ]
           },
-          {
-            "name": "data",
-            "type": "string",
-            "internalType": "string"
-          },
+          { "name": "data", "type": "string", "internalType": "string" },
           {
             "name": "attConditions",
             "type": "string",
             "internalType": "string"
           },
-          {
-            "name": "timestamp",
-            "type": "uint64",
-            "internalType": "uint64"
-          },
+          { "name": "timestamp", "type": "uint64", "internalType": "uint64" },
           {
             "name": "additionParams",
             "type": "string",
@@ -259,18 +144,10 @@
                 "type": "address",
                 "internalType": "address"
               },
-              {
-                "name": "url",
-                "type": "string",
-                "internalType": "string"
-              }
+              { "name": "url", "type": "string", "internalType": "string" }
             ]
           },
-          {
-            "name": "signatures",
-            "type": "bytes[]",
-            "internalType": "bytes[]"
-          }
+          { "name": "signatures", "type": "bytes[]", "internalType": "bytes[]" }
         ]
       }
     ],
@@ -279,28 +156,89 @@
   },
   {
     "type": "function",
+    "name": "claimBySourceAndTipIndex",
+    "inputs": [
+      { "name": "idSource", "type": "string", "internalType": "string" },
+      {
+        "name": "att",
+        "type": "tuple",
+        "internalType": "struct Attestation",
+        "components": [
+          { "name": "recipient", "type": "address", "internalType": "address" },
+          {
+            "name": "request",
+            "type": "tuple",
+            "internalType": "struct AttNetworkRequest",
+            "components": [
+              { "name": "url", "type": "string", "internalType": "string" },
+              { "name": "header", "type": "string", "internalType": "string" },
+              { "name": "method", "type": "string", "internalType": "string" },
+              { "name": "body", "type": "string", "internalType": "string" }
+            ]
+          },
+          {
+            "name": "reponseResolve",
+            "type": "tuple[]",
+            "internalType": "struct AttNetworkResponseResolve[]",
+            "components": [
+              { "name": "keyName", "type": "string", "internalType": "string" },
+              {
+                "name": "parseType",
+                "type": "string",
+                "internalType": "string"
+              },
+              {
+                "name": "parsePath",
+                "type": "string",
+                "internalType": "string"
+              }
+            ]
+          },
+          { "name": "data", "type": "string", "internalType": "string" },
+          {
+            "name": "attConditions",
+            "type": "string",
+            "internalType": "string"
+          },
+          { "name": "timestamp", "type": "uint64", "internalType": "uint64" },
+          {
+            "name": "additionParams",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "attestors",
+            "type": "tuple[]",
+            "internalType": "struct Attestor[]",
+            "components": [
+              {
+                "name": "attestorAddr",
+                "type": "address",
+                "internalType": "address"
+              },
+              { "name": "url", "type": "string", "internalType": "string" }
+            ]
+          },
+          { "name": "signatures", "type": "bytes[]", "internalType": "bytes[]" }
+        ]
+      },
+      { "name": "index", "type": "uint32", "internalType": "uint32" }
+    ],
+    "outputs": [],
+    "stateMutability": "payable"
+  },
+  {
+    "type": "function",
     "name": "claimFee",
     "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "stateMutability": "view"
   },
   {
     "type": "function",
     "name": "feeRecipient",
     "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
     "stateMutability": "view"
   },
   {
@@ -312,16 +250,8 @@
         "type": "tuple",
         "internalType": "struct TipRecipient",
         "components": [
-          {
-            "name": "idSource",
-            "type": "string",
-            "internalType": "string"
-          },
-          {
-            "name": "id",
-            "type": "string",
-            "internalType": "string"
-          }
+          { "name": "idSource", "type": "string", "internalType": "string" },
+          { "name": "id", "type": "string", "internalType": "string" }
         ]
       }
     ],
@@ -331,11 +261,7 @@
         "type": "tuple[]",
         "internalType": "struct TipRecord[]",
         "components": [
-          {
-            "name": "amount",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
+          { "name": "amount", "type": "uint256", "internalType": "uint256" },
           {
             "name": "tipToken",
             "type": "tuple",
@@ -353,21 +279,9 @@
               }
             ]
           },
-          {
-            "name": "timestamp",
-            "type": "uint64",
-            "internalType": "uint64"
-          },
-          {
-            "name": "tipper",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "nftIds",
-            "type": "uint256[]",
-            "internalType": "uint256[]"
-          }
+          { "name": "timestamp", "type": "uint64", "internalType": "uint64" },
+          { "name": "tipper", "type": "address", "internalType": "address" },
+          { "name": "nftIds", "type": "uint256[]", "internalType": "uint256[]" }
         ]
       }
     ],
@@ -376,24 +290,10 @@
   {
     "type": "function",
     "name": "idSourceCache",
-    "inputs": [
-      {
-        "name": "",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
+    "inputs": [{ "name": "", "type": "string", "internalType": "string" }],
     "outputs": [
-      {
-        "name": "url",
-        "type": "string",
-        "internalType": "string"
-      },
-      {
-        "name": "jsonPath",
-        "type": "string",
-        "internalType": "string"
-      }
+      { "name": "url", "type": "string", "internalType": "string" },
+      { "name": "jsonPath", "type": "string", "internalType": "string" }
     ],
     "stateMutability": "view"
   },
@@ -401,26 +301,14 @@
     "type": "function",
     "name": "initialize",
     "inputs": [
-      {
-        "name": "owner",
-        "type": "address",
-        "internalType": "address"
-      },
+      { "name": "owner", "type": "address", "internalType": "address" },
       {
         "name": "primusZKTLS_",
         "type": "address",
         "internalType": "contract IPrimusZKTLS"
       },
-      {
-        "name": "feeRecipient_",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "claimFee_",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+      { "name": "feeRecipient_", "type": "address", "internalType": "address" },
+      { "name": "claimFee_", "type": "uint256", "internalType": "uint256" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -429,13 +317,7 @@
     "type": "function",
     "name": "owner",
     "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
+    "outputs": [{ "name": "", "type": "address", "internalType": "address" }],
     "stateMutability": "view"
   },
   {
@@ -443,11 +325,7 @@
     "name": "primusZKTLS",
     "inputs": [],
     "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "contract IPrimusZKTLS"
-      }
+      { "name": "", "type": "address", "internalType": "contract IPrimusZKTLS" }
     ],
     "stateMutability": "view"
   },
@@ -462,11 +340,7 @@
     "type": "function",
     "name": "setClaimFee",
     "inputs": [
-      {
-        "name": "claimFee_",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+      { "name": "claimFee_", "type": "uint256", "internalType": "uint256" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -475,11 +349,7 @@
     "type": "function",
     "name": "setFeeRecipient",
     "inputs": [
-      {
-        "name": "feeRecipient_",
-        "type": "address",
-        "internalType": "address"
-      }
+      { "name": "feeRecipient_", "type": "address", "internalType": "address" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -501,11 +371,7 @@
     "type": "function",
     "name": "setWithdrawDelay",
     "inputs": [
-      {
-        "name": "delay",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
+      { "name": "delay", "type": "uint256", "internalType": "uint256" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -519,11 +385,7 @@
         "type": "tuple",
         "internalType": "struct TipToken",
         "components": [
-          {
-            "name": "tokenType",
-            "type": "uint32",
-            "internalType": "uint32"
-          },
+          { "name": "tokenType", "type": "uint32", "internalType": "uint32" },
           {
             "name": "tokenAddress",
             "type": "address",
@@ -536,26 +398,10 @@
         "type": "tuple",
         "internalType": "struct TipRecipientInfo",
         "components": [
-          {
-            "name": "idSource",
-            "type": "string",
-            "internalType": "string"
-          },
-          {
-            "name": "id",
-            "type": "string",
-            "internalType": "string"
-          },
-          {
-            "name": "amount",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "nftIds",
-            "type": "uint256[]",
-            "internalType": "uint256[]"
-          }
+          { "name": "idSource", "type": "string", "internalType": "string" },
+          { "name": "id", "type": "string", "internalType": "string" },
+          { "name": "amount", "type": "uint256", "internalType": "uint256" },
+          { "name": "nftIds", "type": "uint256[]", "internalType": "uint256[]" }
         ]
       }
     ],
@@ -571,11 +417,7 @@
         "type": "tuple",
         "internalType": "struct TipToken",
         "components": [
-          {
-            "name": "tokenType",
-            "type": "uint32",
-            "internalType": "uint32"
-          },
+          { "name": "tokenType", "type": "uint32", "internalType": "uint32" },
           {
             "name": "tokenAddress",
             "type": "address",
@@ -588,26 +430,10 @@
         "type": "tuple[]",
         "internalType": "struct TipRecipientInfo[]",
         "components": [
-          {
-            "name": "idSource",
-            "type": "string",
-            "internalType": "string"
-          },
-          {
-            "name": "id",
-            "type": "string",
-            "internalType": "string"
-          },
-          {
-            "name": "amount",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "nftIds",
-            "type": "uint256[]",
-            "internalType": "uint256[]"
-          }
+          { "name": "idSource", "type": "string", "internalType": "string" },
+          { "name": "id", "type": "string", "internalType": "string" },
+          { "name": "amount", "type": "uint256", "internalType": "uint256" },
+          { "name": "nftIds", "type": "uint256[]", "internalType": "uint256[]" }
         ]
       }
     ],
@@ -623,16 +449,8 @@
         "type": "tuple[]",
         "internalType": "struct TipRecipient[]",
         "components": [
-          {
-            "name": "idSource",
-            "type": "string",
-            "internalType": "string"
-          },
-          {
-            "name": "id",
-            "type": "string",
-            "internalType": "string"
-          }
+          { "name": "idSource", "type": "string", "internalType": "string" },
+          { "name": "id", "type": "string", "internalType": "string" }
         ]
       }
     ],
@@ -643,11 +461,7 @@
     "type": "function",
     "name": "transferOwnership",
     "inputs": [
-      {
-        "name": "newOwner",
-        "type": "address",
-        "internalType": "address"
-      }
+      { "name": "newOwner", "type": "address", "internalType": "address" }
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
@@ -656,39 +470,8 @@
     "type": "function",
     "name": "withdrawDelay",
     "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
+    "outputs": [{ "name": "", "type": "uint256", "internalType": "uint256" }],
     "stateMutability": "view"
-  },
-  {
-    "type": "event",
-    "name": "AddIdSource",
-    "inputs": [
-      {
-        "name": "_sourceName",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      },
-      {
-        "name": "_url",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      },
-      {
-        "name": "_jsonPath",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      }
-    ],
-    "anonymous": false
   },
   {
     "type": "event",
@@ -713,6 +496,12 @@
         "internalType": "string"
       },
       {
+        "name": "tipper",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
         "name": "tokenAddr",
         "type": "address",
         "indexed": false,
@@ -723,63 +512,6 @@
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "ClaimFeeSet",
-    "inputs": [
-      {
-        "name": "fee",
-        "type": "uint256",
-        "indexed": true,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "FeeCollected",
-    "inputs": [
-      {
-        "name": "payer",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "token",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      },
-      {
-        "name": "amount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "FeeRecipientChanged",
-    "inputs": [
-      {
-        "name": "oldRecipient",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "newRecipient",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
       }
     ],
     "anonymous": false
@@ -818,38 +550,6 @@
   },
   {
     "type": "event",
-    "name": "RebateBalance",
-    "inputs": [
-      {
-        "name": "recipient",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "amount",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "SetPrimusZKTLS",
-    "inputs": [
-      {
-        "name": "primusZKTLS",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
     "name": "TipEvent",
     "inputs": [
       {
@@ -863,25 +563,12 @@
         "type": "string",
         "indexed": false,
         "internalType": "string"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "WithdrawDelayChanged",
-    "inputs": [
-      {
-        "name": "oldDelay",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
       },
       {
-        "name": "newDelay",
-        "type": "uint256",
+        "name": "tipper",
+        "type": "address",
         "indexed": false,
-        "internalType": "uint256"
+        "internalType": "address"
       }
     ],
     "anonymous": false
@@ -911,41 +598,21 @@
     ],
     "anonymous": false
   },
-  {
-    "type": "error",
-    "name": "InvalidInitialization",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "NotInitializing",
-    "inputs": []
-  },
+  { "type": "error", "name": "InvalidInitialization", "inputs": [] },
+  { "type": "error", "name": "NotInitializing", "inputs": [] },
   {
     "type": "error",
     "name": "OwnableInvalidOwner",
     "inputs": [
-      {
-        "name": "owner",
-        "type": "address",
-        "internalType": "address"
-      }
+      { "name": "owner", "type": "address", "internalType": "address" }
     ]
   },
   {
     "type": "error",
     "name": "OwnableUnauthorizedAccount",
     "inputs": [
-      {
-        "name": "account",
-        "type": "address",
-        "internalType": "address"
-      }
+      { "name": "account", "type": "address", "internalType": "address" }
     ]
   },
-  {
-    "type": "error",
-    "name": "ReentrancyGuardReentrantCall",
-    "inputs": []
-  }
+  { "type": "error", "name": "ReentrancyGuardReentrantCall", "inputs": [] }
 ]
