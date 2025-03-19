@@ -13,7 +13,7 @@ The workflow for integrating and using the fund SDK and contract is as follows:
 
 1. **Create Project**: Create a Project on the [Primus Develop Hub](https://dev.primuslabs.xyz/) to obtain a paired appID and appSecret, which are required to use the fund SDK.
 2. **Install the SDK**: Complete the installation of the Primus fund SDK. Refer to the [Installation Guide](./install.md) for detailed instructions.
-3. **Configure Parameters**: Ensure that all key parameters required for the fund contract to execute are all configured correctly. Refer to the [example](./example.md) for guidance.
+3. **Configure Parameters**: Ensure that all key parameters required for the fund contract to execute are all configured correctly. Refer to the [example](./Example.md) for guidance.
 4. **Execute the Transaction**: Invoke the fund SDK via your DApp or project to complete the transaction with the fund contract.
 5. **Execute Business Logic**: Upon successful initiation of the fund contract, you can execute the relevant business logic, such as notifying receivers to claim their tokens or triggering other operations.
 
