@@ -157,7 +157,6 @@ class Tip {
             }
 
             this._attestLoading = true
-            // TODO
 
             const attRequest = this.zkTlsSdk.generateRequestParams(
                 templateId,

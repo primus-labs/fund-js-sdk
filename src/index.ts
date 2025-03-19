@@ -35,6 +35,10 @@ class PrimusTip {
                     const error = new Error('tipRecipientInfo is empty');
                     reject(error)
                 }
+                
+                tipRecipientInfo.map(i => {
+                    i.nftIds = []
+                })
                 if (tipRecipientInfo.length === 1) {
                     const result = await this._tip?.tip(tipToken, tipRecipientInfo[0]);
                     resolve(result);
