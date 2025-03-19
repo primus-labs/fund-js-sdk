@@ -1,7 +1,7 @@
 
 ## Overview
 
-To onboard more users into crypto, Primus has developed a fund contract powered by zkTLS that allows you to send crypto directly to anyone’s social account.
+To onboard more Web2 users into crypto, Primus has developed a fund contract powered by zkTLS that allows you to send crypto directly to anyone’s social account.
 
 For any DApps or projects, simply integrate with Primus fund SDK, set key parameters such as the token amount, the receivers’ social accounts, and a configurable processing deadline. Submit this transaction to the fund contract, and everything will be handled automatically.
 
@@ -23,7 +23,7 @@ The Primus fund contract is compatible with multiple blockchains. Currently, sup
 
 | Testnet | Mainnet  |
 | ------- | -------- |
-| MON     | Ethereum |
+| Monad Testnet    | Ethereum |
 | Sepolia |          |
 
 On each blockchain, both native tokens and ERC-20 tokens are supported. ERC-721 support will be available soon.
