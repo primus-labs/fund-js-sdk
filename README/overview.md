@@ -1,44 +1,36 @@
 
 ## Overview
 
-When integrating the tipping solution with your DApp (especially  **web-based DApps** DApps), you can use the Primus Tip SDK.
+To onboard more users into crypto, Primus has developed a fund contract powered by zkTLS that allows you to send crypto directly to anyone’s social account.
 
-With the Tip SDK, donors can send tips to specific users, and the recipients can claim the tips after verifying their identity. For example, influencers with many fans can tip their followers. The followers generate proof, verify their identity, and then claim the tip. To verify the user's identity, follow these simple steps:
+For any DApps or projects, simply integrate with Primus fund SDK, set key parameters such as the token amount, the receivers’ social accounts, and a configurable processing deadline. Submit this transaction to the fund contract, and everything will be handled automatically.
 
-- **Install Primus Extension**: [Primus Extension](https://chromewebstore.google.com/detail/pado/oeiomhmbaapihbilkfkhmlajkeegnjhe)
-
-- **Create a Template**: Use the [Primus Develop Hub](https://dev.primuslabs.xyz) to easily set up a data verification template. This template includes the target data items, allowing you to test the verification process.
-
-- **Create a Project**: Use the [Primus Develop Hub](https://dev.primuslabs.xyz) to obtain a paired appID and appSecret.
-
-For more details on creating templates and setting up your project, refer to the [Developer Hub](https://docs.primuslabs.xyz/data-verification/developer-hub).
+When users want to claim their tokens, they simply need to prove ownership of the social account to gain the right to claim the tokens. For more details on verification and claiming, please refer to the [Receiver Guide](./receiver-guide.md).
 
 ### How to Integrate
 
-Here's a simplified flow of how Primus Tip SDK integrates with a web-based DApp:
+The workflow for integrating and using the fund SDK and contract is as follows:
 
-**1. Install Primus Extension:** [Primus Extension](https://chromewebstore.google.com/detail/pado/oeiomhmbaapihbilkfkhmlajkeegnjhe)
+1. **Create Project**: Create a Project on the [Primus Develop Hub](https://dev.primuslabs.xyz/) to obtain a paired appID and appSecret, which are required to use the fund SDK.
+2. **Install the SDK**: Complete the installation of the Primus fund SDK. Refer to the [Installation Guide](./install.md) for detailed instructions.
+3. **Configure Parameters**: Ensure that all key parameters required for the fund contract to execute are all configured correctly. Refer to the [example](./example.md) for guidance.
+4. **Execute the Transaction**: Invoke the fund SDK via your DApp or project to complete the transaction with the fund contract.
+5. **Execute Business Logic**: Upon successful initiation of the fund contract, you can execute the relevant business logic, such as notifying receivers to claim their tokens or triggering other operations.
 
-**2. Create/Search Template:** Login to the [Primus Develop Hub](https://dev.primuslabs.xyz) to create or search for a Template containing the data you need to verify. This is a key step in integrating the Tip SDK into your DApp.
+### Supported Blockchains and Tokens
 
-**3. Create Project:** Create a Project on the [Primus Develop Hub](https://dev.primuslabs.xyz) to obtain a paired appID and appSecret, which are required to use the Tip SDK.
+The Primus fund contract is compatible with multiple blockchains. Currently, support is available for the testnets and mainnets listed below. More blockchains will be added in the future.
 
-**4. Tip :** Donors send tips to specific users. Refer to the [production example](./production.md) for guidance.
+| Testnet | Mainnet  |
+| ------- | -------- |
+| MON     | Ethereum |
+| Sepolia |          |
 
-**5. Verify :** Recipients verifying their identity. Refer to the [production example](./production.md) for guidance.
-
-**6. Claim :** Recipients claim the tips. Refer to the [production example](./production.md) for guidance.
-
-### Quick Start for Beginners
-
-1. [Installation](./install.md) Get the SDK set up in your project.
-
-2. [Production Example](./production.md) Understand how to use the Tip SDK.
-
+On each blockchain, both native tokens and ERC-20 tokens are supported. ERC-721 support will be available soon.
 
 ### Stay Connected
 
 Keep up with the latest Primus developments:
 
-- Star our [GitHub Repository](https://github.com/primus-labs/zktls-js-sdk)
+- Star our [GitHub Repository](https://github.com/primus-labs/fund-js-sdk)
 - Join our [Discord Community](https://discord.gg/AYGSqCkZTz)
