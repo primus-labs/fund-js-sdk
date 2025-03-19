@@ -25,6 +25,8 @@ Integration in a production environment involves configuring some [customized pa
 
   // Initialize parameters, the init function is recommended to be called when the page is initialized.
   const primusTip = new PrimusTip();
+  console.log("supportedChainIds=", primusTip.supportedChainIds); // [10143]
+  console.log("supportedDataSourceIds=", primusTip.supportedDataSourceIds); // ['x', 'tiktok']
   const appId = "YOUR_APPID";
   const provider = YOUR_WALLET_PROVIDER
   const initTipResult = await primusTip.init(provider, appId);
@@ -40,12 +42,17 @@ Integration in a production environment involves configuring some [customized pa
         tokenAddress: "0x",
       };
       // Support multiple recipients.
-      // The unit of "amount": If you want to tip 1 token, please pass "1".
+      // The unit of "amount": If you want to tip 1 token, pass "1". If you want to tip 0.1 tokens, pass "0.1".
       const tipRecipientInfo = [
         {
           idSource: "x",
           id: "xUserName",
           amount: "1",
+        },
+        {
+          idSource: "tiktok",
+          id: "tiktokUserName",
+          amount: "0.1",
         },
       ];
       const tipParams = {
@@ -55,7 +62,7 @@ Integration in a production environment involves configuring some [customized pa
       const tipRes = await tipSdk.tip(tipParams);
 
       // 2. Generate attestation request.
-      const attTemplateID = "YOUR_TEMPLATEID";
+      const dataSourceID = "x";
       const userAddress = "YOUR_USER_ADDRESS";
       // signFn will accept sign parameters and return a signature.
       const signFn = async (signParams) => {
@@ -68,7 +75,7 @@ Integration in a production environment involves configuring some [customized pa
         const signature = responseJson.signResult;
         return signature
       } 
-      const attestation = await tipSdk.attest(attTemplateID, userAddress, signFn);
+      const attestation = await tipSdk.attest(dataSourceID, userAddress, signFn);
       console.log("attestation=", attestation);
 
       // 3. claim the tip process.
@@ -147,9 +154,9 @@ Obtain a paired appID and appSecret from [Primus Develop Hub](https://dev.primus
 ```
 ##### 1. tipToken
  
-Donors can tip with native coins or ERC-20 tokens. For ERC-20 tokens, the token address must also be provided.
+Donors can tip with native tokens or ERC-20 tokens. For ERC-20 tokens, the token address must also be provided.
 
-For native coins
+For native tokens
 
 ```javascript
   const tipToken = {
@@ -187,12 +194,12 @@ We support tipping multiple users at once. The information of the recipient incl
 
 #### Attest
 ```javascript
-  const attestation = await tipSdk.attest(attTemplateID, userAddress, signFn);
+  const attestation = await tipSdk.attest(dataSourceID, userAddress, signFn);
 ```
 
-##### 1. attTemplateID
+##### 1. dataSourceID
 
-Use the [Primus Develop Hub](https://dev.primuslabs.xyz) to easily set up a data verification template.
+Select one from `primusTip.supportedChainIds`.
 
 ##### 2.userAddress
   

@@ -19,19 +19,20 @@ class Tip {
         return this.zkTlsSdk;
     }
 
-    async init(provider: any, appId: string) {
+    async init(provider: any, appId: string, chainId: number) {
         return new Promise(async (resolve, reject) => {
             try {
-                console.log(`Init client with appId:${appId}`)
                 const network = await provider.getNetwork();
-                const chainId = network.chainId;
+                const providerChainId = network.chainId;
+                console.log('init provider', provider, network)
+                if (providerChainId !== chainId) {
+                    reject(`Please connect to the chain with ID ${chainId} first.`)
+                }
                 const tipContractAddress = TIP_CONTRACTS[chainId];
                 if (!tipContractAddress) {
-                    const error = new Error(`Unsupported chainId:${chainId}`)
-                    reject(error)
+                    reject(`Unsupported chainId:${chainId}`)
                 }
                 this.tipContract = new Contract(provider, tipContractAddress, abiJson);
-                console.log("this.tipContract", this.tipContract )
                 this.provider = provider;
                 this.zkTlsSdk = new PrimusZKTLS();
                 const extensionVersion = await this.zkTlsSdk.init(
@@ -56,10 +57,11 @@ class Tip {
                     await this.approve(tipToken, tipRecipientInfos)
                     const erc20Contract = new ethers.Contract(tipToken.tokenAddress, erc20Abi,  this.provider);
                     decimals = await erc20Contract.decimals();
-                } 
+                }
+
                 
                 const tokenAmount = ethers.utils.parseUnits(tipRecipientInfo.amount.toString(), decimals)
-                console.log('classes-Tip-tip4',tokenAmount)
+                console.log('classes-Tip-tip',tokenAmount)
                 const newTipRecipientInfo = { ...tipRecipientInfo, amount: tokenAmount }
             
                 if (tipToken.tokenType === 0) {
@@ -118,7 +120,7 @@ class Tip {
             try {
                 const signer = this.provider.getSigner();
                 const address = await signer.getAddress();
-                const erc20Contract = new ethers.Contract(tipToken.tokenAddress, erc20Abi, signer);
+                const erc20Contract = new ethers.Contract(tipToken.tokenAddress as string, erc20Abi, signer);
 
                 const allowance = await erc20Contract.allowance(address, this.tipContract.address);
                 console.log('allowance', allowance)
@@ -128,18 +130,20 @@ class Tip {
                 const requiredAllowance = tipRecipientInfoList.reduce((acc, cur) =>
                                             acc.add(ethers.utils.parseUnits(cur.amount.toString(), decimals)), ethers.BigNumber.from(0))
 
-                if (allowance < requiredAllowance) {
+                if (allowance.lt(requiredAllowance)) {
                     const tx = await erc20Contract.approve(this.tipContract.address, requiredAllowance);
                     // Wait for the transaction to be mined
                     await tx.wait();
                     console.log(`Approved: ${requiredAllowance.toString()}`);
-                    return;
                 } else {
                     console.log(`Already approved: ${allowance.toString()}`);
                 }
                 resolve('Approved');
-            } catch (error) {
+            } catch (error:any) {
                 console.error('Approval failed:', error);
+                if (error?.code === 'ACTION_REJECTED') {
+                    reject('user rejected transaction')
+                }
                 reject(error);
             }
         });
@@ -148,12 +152,10 @@ class Tip {
     async attest(templateId: string, address: string, genAppSignature: (signParams: string) => Promise<string>): Promise<Attestation | undefined> {
         return new Promise(async (resolve, reject) => {
             if (!this.zkTlsSdk?.padoExtensionVersion) {
-                const error = new Error(`Uninitialized!`)
-                reject(error)
+                reject(`Uninitialized!`)
             }
             if (this._attestLoading) {
-                const error = new Error(`Under proof!`)
-                reject(error)
+                reject(`Under proof!`)
             }
 
             this._attestLoading = true
@@ -166,8 +168,7 @@ class Tip {
             const signParams = attRequest.toJsonString();
             const signature = await genAppSignature(signParams);
             if (!signature) {
-                const error = new Error(`appSignature is empty!`)
-                reject(error)
+                reject(`appSignature is empty!`)
             }
             try {
                 const formatAttestParams = {
@@ -198,8 +199,7 @@ class Tip {
                 console.log('tipRecords', tipRecords)
                 const recordCount = tipRecords.length
                 if (tipRecords <= 0) {
-                    const error = new Error(`No tipping records.`)
-                    reject(error)
+                    reject(`No tipping records.`)
                 } else {
                     const totalFee = claimFee.mul(recordCount)
                     console.log('totalFee', totalFee)
@@ -207,7 +207,7 @@ class Tip {
                     resolve(txreceipt)
                 }
             } catch (error) {
-                console.error('claimBySource', error)
+                console.log('claimBySource', error)
                 reject(error)
             }
         });
@@ -217,8 +217,7 @@ class Tip {
         return new Promise(async (resolve, reject) => {
             try {
                 if (idSourceList.length !== idList.length || idSourceList.length !== attestationList.length) {
-                  const error = new Error(`idSourceList, idList, attestationList length must be equal.`)
-                  reject(error)
+                  reject(`idSourceList, idList, attestationList length must be equal.`)
                 }
 
                 const claimFee = await this.tipContract.callMethod('claimFee', [])
@@ -234,8 +233,7 @@ class Tip {
                 }
                 
                 if (recordCount <= 0) {
-                    const error = new Error(`No tipping records.`)
-                    reject(error)
+                    reject(`No tipping records.`)
                 } else {
                     const totalFee = claimFee.mul(recordCount)
                     console.log('totalFee', totalFee)
