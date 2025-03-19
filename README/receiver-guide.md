@@ -14,45 +14,43 @@ Before you begin, ensure you have the following:
 #### Frontend Implementation
 
 ```javascript
-  import { PrimusTip } from "@primuslabs/tip-js-sdk";
+import { PrimusTip } from "@primuslabs/tip-js-sdk";
 
-  // Initialize parameters. The init function is recommended to be called when the page is initialized.
-  const primusTip = new PrimusTip();
-  console.log("supportedChainIds=", primusTip.supportedChainIds); // [10143]
-  console.log("supportedDataSourceIds=", primusTip.supportedDataSourceIds); // ['x', 'tiktok']
-  const appId = "YOUR_APPID";
-  const provider = YOUR_WALLET_PROVIDER // For MetaMask, use window.ethereum; for Wagmi, use useAccount().connector.getProvider(). Other wallet types, such as AA wallets or AI agents, will be supported in the future.
-  const initTipResult = await primusTip.init(provider, appId);
-  console.log("primusTip initTipResult=", initTipResult);
+// Initialize parameters. The init function is recommended to be called when the page is initialized.
+const primusTip = new PrimusTip();
+console.log("supportedChainIds=", primusTip.supportedChainIds); // [10143]
+console.log("supportedDataSourceIds=", primusTip.supportedDataSourceIds); // ['x', 'tiktok']
+const appId = "YOUR_APPID";
+const provider = YOUR_WALLET_PROVIDER // For MetaMask, use window.ethereum; for Wagmi, use useAccount().connector.getProvider(). Other wallet types, such as AA wallets or AI agents, will be supported in the future.
+const initTipResult = await primusTip.init(provider, appId);
+console.log("primusTip initTipResult=", initTipResult);
 
-		export async function primusTip() {
-		try {
- 			// 1. Generate account ownership verification.
-      const dataSourceID = "x";
-      const userAddress = "YOUR_USER_ADDRESS";
-      // Request backend signature using appSecret.
-      const signFn = async (signParams) => {
-        // Get signed resopnse from backend.
-        const response = await fetch(`http://YOUR_URL:PORT?YOUR_CUSTOM_PARAMETER`, {
+export async function primusTip() {
+  try {
+    // 1. Generate account ownership verification.
+    const dataSourceID = "x";
+    const userAddress = "YOUR_USER_ADDRESS";
+    // Request backend signature using appSecret.
+    const signFn = async (signParams) => {
+      // Get signed resopnse from backend.
+      const response = await fetch(`http://YOUR_URL:PORT?YOUR_CUSTOM_PARAMETER`, {
           method: 'POST',
           body: JSON.stringify(signParams),
-        });
-        const responseJson = await response.json();
-        const signature = responseJson.signResult;
-        return signature
-      } 
-      const attestation = await tipSdk.attest(dataSourceID, userAddress, signFn);
-      console.log("attestation=", attestation);
+      });
+      const responseJson = await response.json();
+      const signature = responseJson.signResult;
+      return signature
+    } 
+    const attestation = await tipSdk.attest(dataSourceID, userAddress, signFn);
+    console.log("attestation=", attestation);
 
-      // 2. Submit the attestation and claim the token.
-      const receipt = { idSource: "x", id: "xUserName", attestation};
-      const claimRes = await tipSdk.claimBySource(receipt);
-      
-    } catch(error) {
+    // 2. Submit the attestation and claim the token.
+    const receipt = { idSource: "x", id: "xUserName", attestation};
+    const claimRes = await tipSdk.claimBySource(receipt);
+  } catch(error) {
       console.error("Error:", error);
-    }
-    
   }
+}
 ```
 
 #### Backend Implementation
