@@ -1,4 +1,4 @@
-# tip-js-sdk
+# fund-js-sdk
 
 ## [Overview](./README/overview.md) 
 

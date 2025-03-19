@@ -1,11 +1,11 @@
 {
-  "name": "@primuslabs/tip-js-sdk",
+  "name": "@primuslabs/fund-js-sdk",
   "version": "0.1.0",
   "author": "Primus Labs <dev@primuslabs.org>",
-  "description": "Primus tip js sdk",
+  "description": "Primus fund js sdk",
   "repository": {
     "type": "git",
-    "url": "https://github.com/primus-labs/tip-js-sdk.git"
+    "url": "https://github.com/primus-labs/fund-js-sdk.git"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
