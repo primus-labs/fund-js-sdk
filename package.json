@@ -49,7 +49,7 @@
     ]
   },
   "dependencies": {
-    "@primuslabs/zktls-js-sdk": "^0.2.9",
+    "@primuslabs/zktls-js-sdk": "^0.2.10",
     "axios": "^1.8.1",
     "ethers": "^5.7.2"
   }

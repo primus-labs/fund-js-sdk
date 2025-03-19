@@ -223,15 +223,12 @@ class Tip {
 
                 const claimFee = await this.tipContract.callMethod('claimFee', [])
                 console.log('claimFee', claimFee)
-
-                const tipRecords = await this.tipContract.callMethod('getTipRecords', [{ idSource, id }])
-                console.log('tipRecords', tipRecords)
-
                 
                 let allTipRecords = [];
                 let recordCount = 0;
                 for (const [index, value] of idSourceList.entries()) {
-                    const tipRecords = await this.tipContract.callMethod('getTipRecords', [{ value, idList[index] }])
+                    const tipRecords = await this.tipContract.callMethod('getTipRecords', [{ idSource: value, id: idList[index] }])
+                    console.log(`${value}-${idList[index]} tipRecords`, tipRecords)
                     allTipRecords.push(...tipRecords)
                     recordCount += tipRecords.length;
                 }

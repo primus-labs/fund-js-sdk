@@ -23,17 +23,17 @@ Here's a simplified flow of how Primus Tip SDK integrates with a web-based DApp:
 
 **3. Create Project:** Create a Project on the [Primus Develop Hub](https://dev.primuslabs.xyz) to obtain a paired appID and appSecret, which are required to use the Tip SDK.
 
-**4. Tip :** Donors send tips to specific users. Refer to the [production example](./production) for guidance.
+**4. Tip :** Donors send tips to specific users. Refer to the [production example](./production.md) for guidance.
 
-**5. Verify :** Recipients verifying their identity. Refer to the [production example](./production) for guidance.
+**5. Verify :** Recipients verifying their identity. Refer to the [production example](./production.md) for guidance.
 
-**6. Claim :** Recipients claim the tips. Refer to the [production example](./production) for guidance.
+**6. Claim :** Recipients claim the tips. Refer to the [production example](./production.md) for guidance.
 
 ### Quick Start for Beginners
 
-1. [Installation](./install) Get the SDK set up in your project.
+1. [Installation](./install.md) Get the SDK set up in your project.
 
-2. [Production Example](./production) Understand how to use the Tip SDK.
+2. [Production Example](./production.md) Understand how to use the Tip SDK.
 
 
 ### Stay Connected

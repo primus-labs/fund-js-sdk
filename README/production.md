@@ -12,7 +12,7 @@ Before you begin, ensure you have the following:
 
 - [Primus Extension](https://chromewebstore.google.com/detail/pado/oeiomhmbaapihbilkfkhmlajkeegnjhe) installed.
 - A paired appId and appSecret, along with a selected Template ID. These can be obtained from the [Primus Developer Hub](https://dev.primuslabs.xyz)
-- The SDK installed. For installation instructions, refer to the [Installation Guide](./install).
+- The SDK installed. For installation instructions, refer to the [Installation Guide](./install.md).
 
 ### Frontend Implementation
 

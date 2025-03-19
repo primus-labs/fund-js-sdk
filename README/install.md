@@ -47,7 +47,7 @@ import { PrimusTip } from "@primuslabs/tip-js-sdk"
 Congratulations! You've successfully installed the Primus zkTLS SDK. Here's what you can do next:
 
 
-1. **Real-World Usage**: Check out the [Production Example](./production) to learn how to use the SDK in a real-world application and create your first proof request.
+1. **Real-World Usage**: Check out the [Production Example](./production.md) to learn how to use the SDK in a real-world application and create your first proof request.
 
 
 If you need further support, feel free to reach out through our [community on Discord](https://discord.gg/AYGSqCkZTz).
