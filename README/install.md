@@ -1,7 +1,7 @@
 
-## Installing the Primus zkTLS SDK
+## Installing the Primus Fund SDK
 
-Welcome to the first step in integrating Primus Tip SDK into your project! This guide will walk you through the installation process and help you get started quickly.
+This is the first step in integrating Primus Fund SDK into your project. This guide will walk you through the installation process and help you get started quickly.
 
 ### Prerequisites
 
@@ -19,35 +19,31 @@ Open your terminal and navigate to your project directory. Then run one of the f
 - Using npm:
 
 ```
-npm install --save @primuslabs/tip-js-sdk
+npm install --save @primuslabs/fund-js-sdk
 ```
 
 - Using yarn:
 
 ```
-yarn add --save @primuslabs/tip-js-sdk
+yarn add --save @primuslabs/fund-js-sdk
 ```
 
-This command will download and install the Primus Tip SDK and its dependencies into your project.
+This command will download and install the Primus Fund SDK and its dependencies into your project.
 
 #### 2. Verify Installation
 
-To ensure the SDK was installed correctly, you can check your `package.json` file. You should see `primuslabs/tip-js-sdk` listed in the `dependencies` section.
+To ensure the SDK was installed correctly, you can check your `package.json` file. You should see `primuslabs/fund-js-sdk` listed in the `dependencies` section.
 
 ### Importing the SDK
 
 After installation, you can import the SDK in your JavaScript or TypeScript files. Here's how:
 
 ```javascript
-import { PrimusTip } from "@primuslabs/tip-js-sdk"
+import { PrimusTip } from "@primuslabs/fund-js-sdk"
 ```
 
 ### Next Steps
 
-Congratulations! You've successfully installed the Primus zkTLS SDK. Here's what you can do next:
-
-
-1. **Real-World Usage**: Check out the [Production Example](./production.md) to learn how to use the SDK in a real-world application and create your first proof request.
-
+After successfully installing Primus Fund SDK, you can refer to the [Example](./example.md) to learn how to set key parameters and complete the transaction with the fund contract.
 
 If you need further support, feel free to reach out through our [community on Discord](https://discord.gg/AYGSqCkZTz).
