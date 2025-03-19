@@ -20,18 +20,18 @@ Supports sending native tokens or ERC-20 tokens. For ERC-20 tokens, the token's 
 For native tokens
 
 ```javascript
-  const tipToken = {
-    tokenType: 1,
-  };
+const tipToken = {
+  tokenType: 1,
+};
 ```
 
 For ERC-20 tokens
 
 ```javascript
-  const tipToken = {
-    tokenType: 0,
-    tokenAddress: "0x",
-  };
+const tipToken = {
+  tokenType: 0,
+  tokenAddress: "0x",
+};
 ```
 
 #### Receiver's Information
@@ -53,18 +53,18 @@ Below is a list of currently supported platforms and corresponding user identifi
 The SDK supports configuring multiple receivers’ information across different social platforms.
 
 ```javascript
-    const tipRecipientInfo = [
-      {
-        idSource: "x",
-        id: "xUserName",
-        amount: "1",
-      },
-      {
-        idSource: "tiktok",
-        id: "tiktokUserName",
-        amount: "0.1",
-      },
-    ];
+const tipRecipientInfo = [
+  {
+    idSource: "x",
+    id: "xUserName",
+    amount: "1",
+  },
+  {
+    idSource: "tiktok",
+    id: "tiktokUserName",
+    amount: "0.1",
+  },
+];
 ```
 
 
@@ -112,11 +112,9 @@ Integration involves configuring [customized parameters](#customized-parameters)
       };
       // Send transaction to the fund contract.
       const tipRes = await tipSdk.tip(tipParams);
-      
-      } catch(error) {
+    } catch(error) {
       console.error("Error:", error);
     }
-    
   }
 ```
 
