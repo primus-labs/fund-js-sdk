@@ -1,23 +1,25 @@
 ## Example
 
-This guide will walk you through the fundamental steps to integrate the Primus Fund SDK and complete a transaction process with the fund contract.
+This guide will walk you through the fundamental steps to integrate the Primus Fund SDK and complete a transaction to the fund contract.
 
-:::Note Integration requires configuration of specific SDK parameters. :::
+:::note
+Integration requires configuring specific SDK parameters.
+:::
 
 ### Prerequisites
 
 Before you begin, ensure you have the following:
 
-- A paired appId and appSecret. These can be obtained from the [Primus Developer Hub](https://dev.primuslabs.xyz/)
-- The SDK is installed. For installation instructions, refer to the [Installation Guide](./install.md).
+- A paired appId and appSecret, which can be obtained from the [Primus Developer Hub](https://dev.primuslabs.xyz/)
+- The Fund SDK installed. For installation instructions, refer to the [Installation Guide](./install.md).
 
 ### Customized Parameters
 
 #### Token Type
 
-Supports sending native tokens or ERC-20 tokens. For ERC-20 tokens, the token's contract address must be provided.
+The SDK supports sending **native tokens** or **ERC-20 tokens**. For ERC-20 tokens, the token's contract address must be provided.
 
-For native tokens
+For native tokens:
 
 ```javascript
 const tipToken = {
@@ -25,7 +27,7 @@ const tipToken = {
 };
 ```
 
-For ERC-20 tokens
+For ERC-20 tokens:
 
 ```javascript
 const tipToken = {
@@ -36,13 +38,13 @@ const tipToken = {
 
 #### Receiver's Information
 
-To send crypto directly to a receiver's social account, the following three information are required:
+To send crypto directly to a receiver's social account, the following information is required:
 
- -  Social platform: The name of the social platform supported by the Fund SDK.
- -  User identifier: The user’s unique identifier on the platforms (e.g., a Twitter handle).
- -  Token amount: Specify the amount of tokens to send. For example, to send 1 token, enter 1; to send 0.1 token, enter 0.1, and so on. Different amounts can be set for each user.
+ -  **Social platform**: The name of the social platform supported by the Fund SDK.
+ -  **User identifier**: The user’s unique identifier on the platform (e.g., a Twitter handle).
+ -  **Token amount**: The number of tokens to send. For example, to send 1 token, enter 1; to send 0.1 token, enter 0.1, and so on. Different amounts can be set for each user.
 
-Below is a list of currently supported platforms and corresponding user identifier formats. This list will continue to expand.
+Below is a list of currently supported platforms and their corresponding user identifier formats. This list will continue to expand.
 
 | Social Platform | User Identifier |
 | --------------- | --------------- |
@@ -50,7 +52,7 @@ Below is a list of currently supported platforms and corresponding user identifi
 | TikTok          | Username        |
 | Google Account  | Email address   |
 
-The SDK supports configuring multiple receivers’ information across different social platforms.
+The SDK supports configuring multiple receivers across different social platforms.
 
 ```javascript
 const tipRecipientInfo = [
@@ -71,8 +73,10 @@ const tipRecipientInfo = [
 ### Frontend Implementation
 
 :::note
-Integration involves configuring [customized parameters](#customized-parameters). The example provides default configurations for these parameters, which can be adjusted to suit your requirements.
+Integration involves configuring [customized parameters](#customized-parameters). The example below provides default configurations for these parameters, which can be adjusted to suit your requirements.
 :::
+
+For fund users:
 
 ```javascript
   import { PrimusTip } from "@primuslabs/tip-js-sdk";
@@ -117,4 +121,6 @@ Integration involves configuring [customized parameters](#customized-parameters)
     }
   }
 ```
+
+For refunding unclaimed tokens:
 
