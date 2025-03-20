@@ -76,7 +76,7 @@ const tipRecipientInfo = [
 Integration involves configuring [customized parameters](#customized-parameters). The example below provides default configurations for these parameters, which can be adjusted to suit your requirements.
 :::
 
-For fund users:
+**For fund users**:
 
 ```javascript
   import { PrimusTip } from "@primuslabs/tip-js-sdk";
@@ -122,7 +122,7 @@ For fund users:
   }
 ```
 
-For refunding unclaimed tokens:
+**For refunding unclaimed tokens**:
 
 In the current version, the fund contract has a 30-day processing period. If the funded tokens are not claimed within this period, you can initiate a refund transaction to return all unclaimed tokens to your original sending wallet address.
 
