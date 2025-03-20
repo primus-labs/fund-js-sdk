@@ -9,7 +9,7 @@ Before you begin, ensure you have the following:
 - An appSecret that matches the appID set during the funding stage. 
 - The Fund SDK installed. For installation instructions, refer to the [Installation Guide](./install.md).
 - Integrated wallet services. In this version, MetaMask and Wagmi are supported. Users must connect their wallets before verifying their social accounts and claiming tokens. The claimed tokens will be sent to the address that completes an attestation proving ownership of the social account. Support for AA wallets and AI agent-supported wallets will be added in the future.
-- Prompt users to install the [Primus Extension](https://chromewebstore.google.com/detail/primus-prev-pado/oeiomhmbaapihbilkfkhmlajkeegnjhe?pli=1) before initiating the social account ownership attestation process.
+- Prompt users to install the [Primus Extension](https://chromewebstore.google.com/detail/primus-prev-pado/oeiomhmbaapihbilkfkhmlajkeegnjhe?pli=1) before initiating the social account ownership verification process.
 
 #### Frontend Implementation
 
