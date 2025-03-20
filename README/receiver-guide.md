@@ -20,7 +20,7 @@ import { PrimusFund } from "@primuslabs/fund-js-sdk";
 const primusFund = new PrimusFund();
 console.log("supportedChainIds=", primusFund.supportedChainIds); // [10143]
 console.log("supportedSocialPlatforms=", primusFund.supportedSocialPlatforms); // ['x', 'tiktok', 'google account']
-const appId = "YOUR_APPID"; // appId is required for the claimant.
+const appId = "YOUR_APPID";
 const provider = YOUR_WALLET_PROVIDER // For MetaMask, use window.ethereum; for Wagmi, use useAccount().connector.getProvider(). Other wallet types, such as AA wallets or AI agents, will be supported in the future.
 const chainId = 10143;
 const initializationResult = await primusFund.init(provider, chainId, appId);
@@ -28,7 +28,7 @@ console.log("primusFund initializationResult=", initializationResult);
 
 export async function primusFundFn() {
   try {
-    // 1. Generate account ownership verification.
+    // 1. Generate social account ownership verification.
     const socialPlatform = "x";
     const userAddress = "YOUR_USER_ADDRESS";
     // Request backend signature using appSecret.
@@ -57,43 +57,10 @@ export async function primusFundFn() {
 
 #### Backend Implementation
 
-Here’s a basic example of how to configure and initialize the Primus Fund SDK on the backend:
+When conducting the social account ownership verification process, your paired appSecret must be used for signing. For security reasons, the appSecret should be implemented on the backend. 
 
-```javascript
-  const express = require("express");
-  const cors = require("cors");
-  const { PrimusZKTLS } = require("@primuslabs/zktls-js-sdk");
+The integration method is the same as zkTLS-js-sdk. You can refer to the [Backend Implementation](https://docs.primuslabs.xyz/data-verification/zk-tls-sdk/production#backend-implementation) for more details.
 
-  const app = express();
-  const port = "YOUR_PORT";
-
-  // Just for test, developers can modify it.
-  app.use(cors());
-
-  // Listen to the client's signature request and sign the attestation request.
-  app.get("/primus/sign", async (req, res) => {
-    const appId = "YOUR_APPID";
-    const appSecret = "YOUR_SECRET";
-
-    // Create a PrimusZKTLS object.
-    const primusFund = new PrimusZKTLS();
-
-    // Set appId and appSecret through the initialization function.
-    await primusFund.init(appId, appSecret);
-
-    // Sign the attestation request.
-    console.log("signParams=", req.query.signParams);
-    const signResult = await primusFund.sign(req.query.signParams);
-    console.log("signResult=", signResult);
-
-    // Return signed result.
-    res.json({ signResult });
-  });
-
-  app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
-  });
-```
 
 ### Claim Tokens through the Primus Extension
 
