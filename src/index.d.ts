@@ -35,7 +35,7 @@ declare global {
 // ERC20_TYPE = 0;
 // NATIVE_TYPE = 1;
 export type TokenType = 0 | 1
-export type FundToken =
+export type TokenInfo =
   | { tokenType: 0; tokenAddress: string }
   | { tokenType: 1; tokenAddress?: string }; 
 
@@ -50,8 +50,8 @@ export type  RecipientInfo = RecipientBaseInfo & {
 }
 
 export type FundParam = {
-    fundToken: FundToken;
-    fundRecipientInfos: RecipientInfo[];
+    tokenInfo: TokenInfo;
+    recipientInfos: RecipientInfo[];
 }
 
 export type ClaimParam = RecipientBaseInfo & {

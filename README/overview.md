@@ -3,7 +3,7 @@
 
 To onboard more Web2 users into crypto, Primus has developed a fund process powered by **zkTLS**, enabling you to send crypto directly to anyone’s social account.
 
-For any DApps or projects, simply integrate with the **Primus Fund SDK**, set key parameters such as the token amount, the receivers’ social accounts, a unique user identifier, and a configurable processing deadline. Submit a transaction to the fund contract, and the process will be handled automatically.
+For any DApps or projects, simply integrate with the **Primus Fund SDK**, set key parameters such as the token tokenAmount, the receivers’ social accounts, a unique user identifier, and a configurable processing deadline. Submit a transaction to the fund contract, and the process will be handled automatically.
 
 When users want to claim their tokens, they simply need to prove ownership of their social account to gain the right to claim them. For more details on verification and claiming, please refer to the [Receiver Guide](./receiver-guide.md).
 

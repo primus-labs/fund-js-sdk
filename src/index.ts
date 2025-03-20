@@ -29,27 +29,28 @@ class PrimusFund {
     async fund(fundParam: FundParam) {
         return new Promise(async (resolve, reject) => {
             try {
-                const { fundToken, fundRecipientInfos } = fundParam;
+                const { tokenInfo, recipientInfos } = fundParam;
                 
-                if (!fundRecipientInfos || fundRecipientInfos.length === 0) {
-                    return reject('fundRecipientInfos is empty')
+                if (!recipientInfos || recipientInfos.length === 0) {
+                    return reject('recipientInfos is empty')
                 }
-                const hasUnsupportedSocialPlatforms = fundRecipientInfos.some(i => !this.supportedSocialPlatforms.includes(i.socialPlatform));
+                const hasUnsupportedSocialPlatforms = recipientInfos.some(i => !this.supportedSocialPlatforms.includes(i.socialPlatform.toLowerCase()));
                 if (hasUnsupportedSocialPlatforms) {
                     return reject('socialPlatform is not supported')
                 }
-                if (fundToken.tokenType === 1) {
-                    fundToken.tokenAddress = ethers.constants.AddressZero
+                if (tokenInfo.tokenType === 1) {
+                    tokenInfo.tokenAddress = ethers.constants.AddressZero
                 }
-                const newFundRecipientInfos = fundRecipientInfos.map(i => {
+                const newFundRecipientInfos = recipientInfos.map(i => {
                     i.nftIds = []
+                    i.socialPlatform = i.socialPlatform.toLowerCase()
                     return i
                 })
-                if (fundRecipientInfos.length === 1) {
-                    const result = await this._fund?.fund(fundToken, newFundRecipientInfos[0]);
+                if (recipientInfos.length === 1) {
+                    const result = await this._fund?.fund(tokenInfo, newFundRecipientInfos[0]);
                     return resolve(result);
-                } else if (fundRecipientInfos.length > 1) {
-                    const result = await this._fund?.fundBatch(fundToken, newFundRecipientInfos);
+                } else if (recipientInfos.length > 1) {
+                    const result = await this._fund?.fundBatch(tokenInfo, newFundRecipientInfos);
                     return resolve(result);
                 }
             } catch (error) {
@@ -65,8 +66,11 @@ class PrimusFund {
                 if (!recipients || recipients.length === 0) {
                     return reject('recipients is empty')
                 }
-                
-                const result = await this._fund?.refund(recipients);
+                const newRecipients = recipients.map(i => {
+                    i.socialPlatform = i.socialPlatform.toLowerCase()
+                    return i
+                })
+                const result = await this._fund?.refund(newRecipients);
                 return resolve(result);
             
             } catch (error) {
@@ -79,8 +83,9 @@ class PrimusFund {
 
     async attest(socialPlatform: string, address: string, genAppSignature: (signParams: string) => Promise<string>): Promise<Attestation | undefined> {
         return new Promise(async (resolve, reject) => {
-            try { 
-                const attestation = await this._fund?.attest(socialPlatform, address, genAppSignature);
+            try {
+                const lcSocialPlatform = socialPlatform.toLowerCase()
+                const attestation = await this._fund?.attest(lcSocialPlatform, address, genAppSignature);
                 return resolve(attestation)
             } catch (error) {
                 // console.log('fund-jssdk attest error:', error)
@@ -101,7 +106,7 @@ class PrimusFund {
             const attestations: Attestation[] = [];
         
             for (let i = 0; i < claimParamList.length ; i++) {
-                socialPlatforms[i] = claimParamList[i].socialPlatform;
+                socialPlatforms[i] = claimParamList[i].socialPlatform.toLowerCase();
                 attestations[i] = claimParamList[i].attestation;
                 userIdentifiers[i] = claimParamList[i].userIdentifier;
             }

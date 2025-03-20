@@ -39,7 +39,7 @@ To ensure the SDK was installed correctly, you can check your `package.json` fil
 After installation, you can import the SDK in your JavaScript or TypeScript files. Here's how:
 
 ```javascript
-import { PrimusTip } from "@primuslabs/fund-js-sdk"
+import { PrimusFund } from "@primuslabs/fund-js-sdk"
 ```
 
 ### Next Steps

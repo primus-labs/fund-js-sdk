@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { PrimusZKTLS } from "@primuslabs/zktls-js-sdk";
 import { Fund_CONTRACTS, DATASOURCETEMPLATEMAP } from "../config/constants";
-import { Attestation, RecipientInfo, FundToken ,RecipientBaseInfo} from '../index.d'
+import { Attestation, RecipientInfo, TokenInfo ,RecipientBaseInfo} from '../index.d'
 import Contract from './Contract';
 import abiJson from '../config/abi.json';
 import erc20Abi from '../config/erc20Abi.json';
@@ -51,33 +51,33 @@ class Fund {
         });
     }
 
-    async fund(fundToken: FundToken, fundRecipientInfo: RecipientInfo) {
+    async fund(tokenInfo: TokenInfo, recipientInfo: RecipientInfo) {
         return new Promise(async (resolve, reject) => {
             try {
-                const fundRecipientInfos = [];
-                fundRecipientInfos[0] = fundRecipientInfo;
+                const recipientInfos = [];
+                recipientInfos[0] = recipientInfo;
                 let decimals = 18
                 let params = []
                 
-                if (fundToken.tokenType === 0) {
-                    await this.approve(fundToken, fundRecipientInfos)
-                    const erc20Contract = new ethers.Contract(fundToken.tokenAddress, erc20Abi,  this.provider);
+                if (tokenInfo.tokenType === 0) {
+                    await this.approve(tokenInfo, recipientInfos)
+                    const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress, erc20Abi,  this.provider);
                     decimals = await erc20Contract.decimals();
                 }
                 
-                const tokenAmount = ethers.utils.parseUnits(fundRecipientInfo.tokenAmount.toString(), decimals)
+                const tokenAmount = ethers.utils.parseUnits(recipientInfo.tokenAmount.toString(), decimals)
                 // console.log('classes-Fund-fund',tokenAmount)
                 const newFundRecipientInfo = {
-                    idSource: fundRecipientInfo.socialPlatform,
-                    id: fundRecipientInfo.userIdentifier,
+                    idSource: recipientInfo.socialPlatform,
+                    id: recipientInfo.userIdentifier,
                     amount: tokenAmount,
                     nftIds: []
                 }
             
-                if (fundToken.tokenType === 0) {
-                    params = [fundToken, newFundRecipientInfo]
+                if (tokenInfo.tokenType === 0) {
+                    params = [tokenInfo, newFundRecipientInfo]
                 } else {
-                    params = [fundToken, newFundRecipientInfo, {value: tokenAmount} ]
+                    params = [tokenInfo, newFundRecipientInfo, {value: tokenAmount} ]
                 }
                 const result = await this.fundContract.sendTransaction('tip', params)
                 resolve(result);
@@ -98,7 +98,7 @@ class Fund {
                         id: i.userIdentifier
                     }
                 })
-                const result = await this.fundContract.sendTransaction('tipperWithdraw', newRecipients)
+                const result = await this.fundContract.sendTransaction('tipperWithdraw', [newRecipients])
                 return resolve(result);
             } catch (error) {
                 return reject(error);
@@ -106,14 +106,14 @@ class Fund {
         });
     }
 
-    async fundBatch(fundToken: FundToken, recipientInfoList: RecipientInfo[]) {
+    async fundBatch(tokenInfo: TokenInfo, recipientInfoList: RecipientInfo[]) {
         return new Promise(async (resolve, reject) => {
             try {
                 let decimals = 18
                 let params = []
-                if (fundToken.tokenType === 0) {
-                    await this.approve(fundToken, recipientInfoList)
-                    const erc20Contract = new ethers.Contract(fundToken.tokenAddress, erc20Abi,  this.provider);
+                if (tokenInfo.tokenType === 0) {
+                    await this.approve(tokenInfo, recipientInfoList)
+                    const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress, erc20Abi,  this.provider);
                     decimals = await erc20Contract.decimals();
                 }
                 
@@ -129,10 +129,10 @@ class Fund {
                     }
                 })
             
-                if (fundToken.tokenType === 0) {
-                    params = [fundToken, newRecipientInfoList]
+                if (tokenInfo.tokenType === 0) {
+                    params = [tokenInfo, newRecipientInfoList]
                 } else {
-                    params = [fundToken, newRecipientInfoList, {value: totalFormatAmount} ]
+                    params = [tokenInfo, newRecipientInfoList, {value: totalFormatAmount} ]
                 }
 
                 const result = await this.fundContract.sendTransaction('tipBatch', params)
@@ -144,12 +144,12 @@ class Fund {
             
     }
 
-    private async approve(fundToken: FundToken, recipientInfoList: RecipientInfo[]) {
+    private async approve(tokenInfo: TokenInfo, recipientInfoList: RecipientInfo[]) {
         return new Promise(async (resolve, reject) => {
             try {
                 const signer = this.provider.getSigner();
                 const address = await signer.getAddress();
-                const erc20Contract = new ethers.Contract(fundToken.tokenAddress as string, erc20Abi, signer);
+                const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress as string, erc20Abi, signer);
 
                 const allowance = await erc20Contract.allowance(address, this.fundContract.address);
                 // console.log('allowance', allowance)
@@ -225,7 +225,7 @@ class Fund {
                 const claimFee = await this.fundContract.callMethod('claimFee', [])
                 // console.log('claimFee', claimFee)]
                 const fundRecords = await this.fundContract.callMethod('getTipRecords', [{ idSource: socialPlatform, id: userIdentifier }])
-                // console.log('fundRecords', fundRecords)
+                console.log('fundRecords', fundRecords)
                 const recordCount = fundRecords.length
                 if (fundRecords <= 0) {
                     return reject(`No fund records.`)

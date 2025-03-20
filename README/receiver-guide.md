@@ -14,21 +14,22 @@ Before you begin, ensure you have the following:
 #### Frontend Implementation
 
 ```javascript
-import { PrimusTip } from "@primuslabs/tip-js-sdk";
+import { PrimusFund } from "@primuslabs/fund-js-sdk";
 
 // Initialize parameters. The init function is recommended to be called when the page is initialized.
-const primusTip = new PrimusTip();
-console.log("supportedChainIds=", primusTip.supportedChainIds); // [10143]
-console.log("supportedDataSourceIds=", primusTip.supportedDataSourceIds); // ['x', 'tiktok']
-const appId = "YOUR_APPID";
+const primusFund = new PrimusFund();
+console.log("supportedChainIds=", primusFund.supportedChainIds); // [10143]
+console.log("supportedSocialPlatforms=", primusFund.supportedSocialPlatforms); // ['x', 'tiktok', 'google account']
+const appId = "YOUR_APPID"; // appId is required for the claimant.
 const provider = YOUR_WALLET_PROVIDER // For MetaMask, use window.ethereum; for Wagmi, use useAccount().connector.getProvider(). Other wallet types, such as AA wallets or AI agents, will be supported in the future.
-const initTipResult = await primusTip.init(provider, appId);
-console.log("primusTip initTipResult=", initTipResult);
+const chainId = 10143;
+const initializationResult = await primusFund.init(provider, chainId, appId);
+console.log("primusFund initializationResult=", initializationResult);
 
-export async function primusTip() {
+export async function primusFundFn() {
   try {
     // 1. Generate account ownership verification.
-    const dataSourceID = "x";
+    const socialPlatform = "x";
     const userAddress = "YOUR_USER_ADDRESS";
     // Request backend signature using appSecret.
     const signFn = async (signParams) => {
@@ -41,12 +42,13 @@ export async function primusTip() {
       const signature = responseJson.signResult;
       return signature
     } 
-    const attestation = await tipSdk.attest(dataSourceID, userAddress, signFn);
+    const attestation = await primusFund.attest(socialPlatform, userAddress, signFn);
     console.log("attestation=", attestation);
 
     // 2. Submit the attestation and claim the token.
-    const receipt = { idSource: "x", id: "xUserName", attestation};
-    const claimRes = await tipSdk.claimBySource(receipt);
+    const receipt = { socialPlatform: "x", userIdentifier: "xUserName", attestation};
+    const claimTxReceipt = await primusFund.claim(receipt);
+    console.log("claimTxReceipt=", claimTxReceipt);
   } catch(error) {
       console.error("Error:", error);
   }
@@ -74,14 +76,14 @@ Here’s a basic example of how to configure and initialize the Primus Fund SDK 
     const appSecret = "YOUR_SECRET";
 
     // Create a PrimusZKTLS object.
-    const primusTip = new PrimusZKTLS();
+    const primusFund = new PrimusZKTLS();
 
     // Set appId and appSecret through the initialization function.
-    await primusTip.init(appId, appSecret);
+    await primusFund.init(appId, appSecret);
 
     // Sign the attestation request.
     console.log("signParams=", req.query.signParams);
-    const signResult = await primusTip.sign(req.query.signParams);
+    const signResult = await primusFund.sign(req.query.signParams);
     console.log("signResult=", signResult);
 
     // Return signed result.

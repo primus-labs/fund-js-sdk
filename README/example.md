@@ -15,14 +15,14 @@ Before you begin, ensure you have the following:
 
 ### Customized Parameters
 
-#### Token Type
+#### Token Information
 
 The SDK supports sending **native tokens** or **ERC-20 tokens**. For ERC-20 tokens, the token's contract address must be provided.
 
 For native tokens:
 
 ```javascript
-const tipToken = {
+const tokenInfo = {
   tokenType: 1,
 };
 ```
@@ -30,7 +30,7 @@ const tipToken = {
 For ERC-20 tokens:
 
 ```javascript
-const tipToken = {
+const tokenInfo = {
   tokenType: 0,
   tokenAddress: "0x",
 };
@@ -42,7 +42,7 @@ To send crypto directly to a receiver's social account, the following informatio
 
  -  **Social platform**: The name of the social platform supported by the Fund SDK.
  -  **User identifier**: The user’s unique identifier on the platform (e.g., a Twitter handle).
- -  **Token amount**: The number of tokens to send. For example, to send 1 token, enter 1; to send 0.1 token, enter 0.1, and so on. Different amounts can be set for each user.
+ -  **Token tokenAmount**: The number of tokens to send. For example, to send 1 token, enter 1; to send 0.1 token, enter 0.1, and so on. Different amounts can be set for each user.
 
 Below is a list of currently supported platforms and their corresponding user identifier formats. This list will continue to expand.
 
@@ -55,16 +55,16 @@ Below is a list of currently supported platforms and their corresponding user id
 The SDK supports configuring multiple receivers across different social platforms.
 
 ```javascript
-const tipRecipientInfo = [
+const recipientInfo = [
   {
-    idSource: "x",
-    id: "xUserName",
-    amount: "1",
+    socialPlatform: "x",
+    userIdentifier: "xUserName",
+    tokenAmount: "1",
   },
   {
-    idSource: "tiktok",
-    id: "tiktokUserName",
-    amount: "0.1",
+    socialPlatform: "tiktok",
+    userIdentifier: "tiktokUserName",
+    tokenAmount: "0.1",
   },
 ];
 ```
@@ -79,43 +79,44 @@ Integration involves configuring [customized parameters](#customized-parameters)
 **For fund users**:
 
 ```javascript
-  import { PrimusTip } from "@primuslabs/tip-js-sdk";
+  import { PrimusFund } from "@primuslabs/fund-js-sdk";
 
   // Initialize parameters. The init function is recommended to be called when the page is initialized.
-  const primusTip = new PrimusTip();
-  console.log("supportedChainIds=", primusTip.supportedChainIds); // [10143]
-  console.log("supportedDataSourceIds=", primusTip.supportedDataSourceIds); // ['x', 'tiktok'， ‘google account’]
-  const appId = "YOUR_APPID";
+  const primusFund = new PrimusFund();
+  console.log("supportedChainIds=", primusFund.supportedChainIds); // [10143]
+  console.log("supportedSocialPlatforms=", primusFund.supportedSocialPlatforms); // ['x', 'tiktok', 'google account']
+  const appId = "YOUR_APPID"; // Optional, If the claim feature (attest and claim methods) is not needed, `appId` can be omitted.
   const provider = YOUR_WALLET_PROVIDER // For MetaMask, pass `window.ethereum`; for Wagmi, pass `useAccount().connector.getProvider`; Other wallet types, such as AA wallets or AI agents, will be supported in the future.
-  const initTipResult = await primusTip.init(provider, appId);
-  console.log("primusTip initTipResult=", initTipResult);
+  const chainId = 10143;
+  await primusFund.init(provider, chainId, appId);
 
-  export async function primusTip() {
+  export async function primusFundFn() {
     try {
-      // Set the token type.
-      const tipToken = {
+      // Set the token information.
+      const tokenInfo = {
         tokenType: 0,
-        tokenAddress: "0x",
+        tokenAddress: "0x", 
       };
       // Set receiver's information, multiple receivers are supported.
-      const tipRecipientInfo = [
+      const recipientInfos = [
         {
-          idSource: "x",
-          id: "xUserName",
-          amount: "1",
+          socialPlatform: "x",
+          userIdentifier: "xUserName",
+          tokenAmount: "1",
         },
         {
-          idSource: "tiktok",
-          id: "tiktokUserName",
-          amount: "0.1",
+          socialPlatform: "tiktok",
+          userIdentifier: "tiktokUserName",
+          tokenAmount: "0.1",
         },
       ];
-      const tipParams = {
-        tipToken,
-        tipRecipientInfo,
+      const fundParam = {
+        tokenInfo,
+        recipientInfos,
       };
       // Send transaction to the fund contract.
-      const tipRes = await tipSdk.tip(tipParams);
+      const fundTxReceipt = await primusFund.fund(fundParam);
+      console.log("fundTxReceipt=", fundTxReceipt)
     } catch(error) {
       console.error("Error:", error);
     }
@@ -126,4 +127,37 @@ Integration involves configuring [customized parameters](#customized-parameters)
 
 In the current version, the fund contract has a 30-day processing period. If the funded tokens are not claimed within this period, you can initiate a refund transaction to return all unclaimed tokens to your original sending wallet address.
 
+**For fund users**:
 
+```javascript
+  import { PrimusFund } from "@primuslabs/fund-js-sdk";
+
+  // Initialize parameters. The init function is recommended to be called when the page is initialized.
+  const primusFund = new PrimusFund();
+  console.log("supportedChainIds=", primusFund.supportedChainIds); // [10143]
+  console.log("supportedSocialPlatforms=", primusFund.supportedSocialPlatforms); // ['x', 'tiktok', 'google account']
+  const appId = "YOUR_APPID"; // Optional, If the claim feature (attest and claim methods) is not needed, `appId` can be omitted.
+  const provider = YOUR_WALLET_PROVIDER // For MetaMask, pass `window.ethereum`; for Wagmi, pass `useAccount().connector.getProvider`; Other wallet types, such as AA wallets or AI agents, will be supported in the future.
+  const chainId = 10143;
+  await primusFund.init(provider, chainId, appId);
+
+  export async function primusFundFn() {
+    try {
+      // Set receiver's information
+      const recipients = [
+        {
+          socialPlatform: "x",
+          userIdentifier: "xUserName"
+        },
+        {
+          socialPlatform: "tiktok",
+          userIdentifier: "tiktokUserName"
+        },
+      ];
+      const refundTxReceipt = await primusFund.refund(recipients);
+      console.log("refundTxReceipt=", refundTxReceipt)
+    } catch(error) {
+      console.error("Error:", error);
+    }
+  }
+```

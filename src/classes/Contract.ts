@@ -45,6 +45,7 @@ class Contract {
         console.log("txreceipt", txreceipt);
         resolve(txreceipt);
       } catch (error: any) {
+        console.log("sendTransaction error:", error);
         if (error?.code === 'ACTION_REJECTED') {
           return reject('user rejected transaction')
         }
@@ -54,7 +55,6 @@ class Contract {
         if (error?.data?.message === 'insufficient balance') {
           return reject(error?.data?.message)
         }
-        // console.log("sendTransaction error:", error);
         // console.log('error-message',error?.message)
         // console.log('error-reason',error?.reason)
         // console.log('error-data-message',error?.data?.message)
