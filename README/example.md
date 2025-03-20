@@ -42,13 +42,13 @@ To send crypto directly to a receiver's social account, the following informatio
 
  -  **Social platform**: The name of the social platform supported by the Fund SDK.
  -  **User identifier**: The user’s unique identifier on the platform (e.g., a Twitter handle).
- -  **Token tokenAmount**: The number of tokens to send. For example, to send 1 token, enter 1; to send 0.1 token, enter 0.1, and so on. Different amounts can be set for each user.
+ -  **Token Amount**: The number of tokens to send. For example, to send 1 token, enter 1; to send 0.1 token, enter 0.1, and so on. Different amounts can be set for each user.
 
 Below is a list of currently supported platforms and their corresponding user identifier formats. This list will continue to expand.
 
 | Social Platform | User Identifier |
 | --------------- | --------------- |
-| X               | Handle          |
+| X               | Username (handle)         |
 | TikTok          | Username        |
 | Google Account  | Email address   |
 
@@ -85,7 +85,7 @@ Integration involves configuring [customized parameters](#customized-parameters)
   const primusFund = new PrimusFund();
   console.log("supportedChainIds=", primusFund.supportedChainIds); // [10143]
   console.log("supportedSocialPlatforms=", primusFund.supportedSocialPlatforms); // ['x', 'tiktok', 'google account']
-  const appId = "YOUR_APPID"; // Optional, If the claim feature (attest and claim methods) is not needed, `appId` can be omitted.
+  const appId = "YOUR_APPID";
   const provider = YOUR_WALLET_PROVIDER // For MetaMask, pass `window.ethereum`; for Wagmi, pass `useAccount().connector.getProvider`; Other wallet types, such as AA wallets or AI agents, will be supported in the future.
   const chainId = 10143;
   await primusFund.init(provider, chainId, appId);
@@ -127,16 +127,12 @@ Integration involves configuring [customized parameters](#customized-parameters)
 
 In the current version, the fund contract has a 30-day processing period. If the funded tokens are not claimed within this period, you can initiate a refund transaction to return all unclaimed tokens to your original sending wallet address.
 
-**For fund users**:
-
 ```javascript
   import { PrimusFund } from "@primuslabs/fund-js-sdk";
 
   // Initialize parameters. The init function is recommended to be called when the page is initialized.
   const primusFund = new PrimusFund();
   console.log("supportedChainIds=", primusFund.supportedChainIds); // [10143]
-  console.log("supportedSocialPlatforms=", primusFund.supportedSocialPlatforms); // ['x', 'tiktok', 'google account']
-  const appId = "YOUR_APPID"; // Optional, If the claim feature (attest and claim methods) is not needed, `appId` can be omitted.
   const provider = YOUR_WALLET_PROVIDER // For MetaMask, pass `window.ethereum`; for Wagmi, pass `useAccount().connector.getProvider`; Other wallet types, such as AA wallets or AI agents, will be supported in the future.
   const chainId = 10143;
   await primusFund.init(provider, chainId, appId);
@@ -147,7 +143,7 @@ In the current version, the fund contract has a 30-day processing period. If the
       const recipients = [
         {
           socialPlatform: "x",
-          userIdentifier: "xUserName"
+          userIdentifier: "xHandle"
         },
         {
           socialPlatform: "tiktok",
