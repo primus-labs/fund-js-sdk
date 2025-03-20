@@ -1,111 +1,130 @@
 import { ethers } from 'ethers';
-import { Attestation, ClaimTipParam, TipParam } from './index.d'
-import { Tip } from "./classes/Tip";
+import { Attestation, ClaimParam, FundParam, RecipientBaseInfo } from './index.d'
+import { Fund } from "./classes/Fund";
+import { SUPPORTEDCHAINIDS, SUPPORTEDSOCIALPLATFORMS } from './config/constants'
 
 export * from './index.d'
 
-class PrimusTip {
-    private _tip: Tip | undefined;
-    public supportedChainIds: number[] = [10143];
-    public supportedDataSourceIds: string[] = ['x', 'tiktok'];
-    private _dataSourceTemplateMap: {[propName:string]: string} = {
-        x: 'ff90cc7c-a382-4d31-ad3e-20fb403c191a',
-        tiktok: '7bf88aa3-0b01-429a-8aad-e880e25272c1'
-    };
-    constructor() {
+class PrimusFund {
+    public supportedChainIds = SUPPORTEDCHAINIDS;
+    public supportedSocialPlatforms = SUPPORTEDSOCIALPLATFORMS;
+    private _fund: Fund | undefined;
 
-    }
-
-    async init(provider: any, appId: string, chainId: number) {
+    async init(provider: any, chainId: number, appId?: string) {
         return new Promise(async (resolve, reject) => {
             try {
-                this._tip = new Tip();
-                const result = await this._tip.init(new ethers.providers.Web3Provider(provider), appId, chainId);
-                resolve(result);
+                if (!this.supportedChainIds.includes(chainId)) {
+                    return reject('chainId is not supported')
+                }
+                this._fund = new Fund();
+                const result = await this._fund.init(new ethers.providers.Web3Provider(provider), chainId, appId );
+                return resolve(result);
             } catch (error) {
-                reject(error);
+                return reject(error);
             }
         });
     }
 
 
-    async tip(tipParam: TipParam) {
+    async fund(fundParam: FundParam) {
         return new Promise(async (resolve, reject) => {
             try {
-                const { tipToken, tipRecipientInfo } = tipParam;
+                const { fundToken, fundRecipientInfos } = fundParam;
                 
-                if (!tipRecipientInfo || tipRecipientInfo.length === 0) {
-                    reject('tipRecipientInfo is empty')
+                if (!fundRecipientInfos || fundRecipientInfos.length === 0) {
+                    return reject('fundRecipientInfos is empty')
                 }
-                if (tipToken.tokenType === 1) {
-                    tipToken.tokenAddress = ethers.constants.AddressZero
+                const hasUnsupportedSocialPlatforms = fundRecipientInfos.some(i => !this.supportedSocialPlatforms.includes(i.socialPlatform));
+                if (hasUnsupportedSocialPlatforms) {
+                    return reject('socialPlatform is not supported')
                 }
-                tipRecipientInfo.map(i => {
+                if (fundToken.tokenType === 1) {
+                    fundToken.tokenAddress = ethers.constants.AddressZero
+                }
+                const newFundRecipientInfos = fundRecipientInfos.map(i => {
                     i.nftIds = []
+                    return i
                 })
-                if (tipRecipientInfo.length === 1) {
-                    const result = await this._tip?.tip(tipToken, tipRecipientInfo[0]);
-                    resolve(result);
-                } else if (tipRecipientInfo.length > 1) {
-                    const result = await this._tip?.tipBatch(tipToken, tipRecipientInfo);
-                    resolve(result);
+                if (fundRecipientInfos.length === 1) {
+                    const result = await this._fund?.fund(fundToken, newFundRecipientInfos[0]);
+                    return resolve(result);
+                } else if (fundRecipientInfos.length > 1) {
+                    const result = await this._fund?.fundBatch(fundToken, newFundRecipientInfos);
+                    return resolve(result);
                 }
             } catch (error) {
-                console.error('tip-jssdk tip error', error)
-                reject(error);
+                // console.error('fund-jssdk fund error', error)
+                return reject(error);
             }
         });
     }
 
-    async attest(idSource: string, address: string, genAppSignature: (signParams: string) => Promise<string>): Promise<Attestation | undefined> {
+    async refund(recipients: RecipientBaseInfo[]) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                if (!recipients || recipients.length === 0) {
+                    return reject('recipients is empty')
+                }
+                
+                const result = await this._fund?.refund(recipients);
+                return resolve(result);
+            
+            } catch (error) {
+                // console.error('fund-jssdk fund error', error)
+                return reject(error);
+            }
+        });
+    }
+
+
+    async attest(socialPlatform: string, address: string, genAppSignature: (signParams: string) => Promise<string>): Promise<Attestation | undefined> {
         return new Promise(async (resolve, reject) => {
             try { 
-                const templateId = this._dataSourceTemplateMap[idSource]
-                const attestation = await this._tip?.attest(templateId, address, genAppSignature);
-                resolve(attestation)
+                const attestation = await this._fund?.attest(socialPlatform, address, genAppSignature);
+                return resolve(attestation)
             } catch (error) {
-                console.log('tip-jssdk attest error:', error)
-                reject(error)
+                // console.log('fund-jssdk attest error:', error)
+                return reject(error)
             }
         });
     }
 
-    async claimBySource(claimTipParams: ClaimTipParam[] | ClaimTipParam) {
-        const claimTipParamList = Array.isArray(claimTipParams) ? claimTipParams : [claimTipParams];
+    async claim(claimParams: ClaimParam[] | ClaimParam) {
+        const claimParamList = Array.isArray(claimParams) ? claimParams : [claimParams];
         return new Promise(async (resolve, reject) => {
-            if(!claimTipParamList || claimTipParamList?.length===0){
-               const error = new Error('claimTipParamList is empty');
-               reject(error)
+            if(!claimParamList || claimParamList?.length===0){
+               const error = new Error('claimParams is empty');
+               return reject(error)
             }
-            const idSources: string[] = [];
-            const ids: string[] = [];
+            const socialPlatforms: string[] = [];
+            const userIdentifiers: string[] = [];
             const attestations: Attestation[] = [];
         
-            for (let i = 0; i < claimTipParamList.length ; i++) {
-                idSources[i] = claimTipParamList[i].idSource;
-                attestations[i] = claimTipParamList[i].attestation;
-                ids[i] = claimTipParamList[i].id;
+            for (let i = 0; i < claimParamList.length ; i++) {
+                socialPlatforms[i] = claimParamList[i].socialPlatform;
+                attestations[i] = claimParamList[i].attestation;
+                userIdentifiers[i] = claimParamList[i].userIdentifier;
             }
             
-            if (idSources.length !== ids.length || idSources.length !== attestations.length) {
-                reject(`claimTipParamList is wrong`)
+            if (socialPlatforms.length !== userIdentifiers.length || socialPlatforms.length !== attestations.length) {
+                return reject(`claimParamList is wrong`)
             }
             try {
-                if (idSources.length === 1) {
-                    const tipIndex = claimTipParamList[0].tipIndex
-                    const result = await this._tip?.claimBySource(idSources[0],ids[0], attestations[0], tipIndex);
+                if (socialPlatforms.length === 1) {
+                    // const fundIndex = claimParamList[0].fundIndex
+                    const result = await this._fund?.claimBySource(socialPlatforms[0], userIdentifiers[0], attestations[0]);
                     resolve(result);
-                } else if (idSources.length > 1) {
-                    const result = await this._tip?.claimByMultiSource(idSources, ids, attestations);
-                    resolve(result);
+                } else if (socialPlatforms.length > 1) {
+                    const result = await this._fund?.claimByMultiSource(socialPlatforms, userIdentifiers, attestations);
+                    return resolve(result);
                 }
             } catch (error) {
-                console.log('tip-jssdk claimBySource error:', error)
-                reject(error)
+                // console.log('fund-jssdk claimBySource error:', error)
+                return reject(error)
             }
         });
     }
 
 }
 
-export { PrimusTip };
+export { PrimusFund };

@@ -35,29 +35,26 @@ declare global {
 // ERC20_TYPE = 0;
 // NATIVE_TYPE = 1;
 export type TokenType = 0 | 1
-// export type TipToken = {
-//     tokenType: TokenType;
-//     tokenAddress?: string;
-// }
-export type TipToken =
+export type FundToken =
   | { tokenType: 0; tokenAddress: string }
   | { tokenType: 1; tokenAddress?: string }; 
 
-export type  TipRecipientInfo = {
-    idSource: string;// The platform of the account.
-    id: string;// The unique identifier of the account.
-    amount: string;// The amount of token when token is erc20 and native.
+export type  RecipientBaseInfo = {
+    socialPlatform: string;// The name of the social platform.
+    userIdentifier: string;// The user’s unique identifier on the platforms.
+}
+
+export type  RecipientInfo = RecipientBaseInfo & {
+    tokenAmount: string;// The amount of the token
     nftIds?: bigint[];// The nft token ids when token is nft.
 }
 
-export type TipParam = {
-    tipToken: TipToken;
-    tipRecipientInfo: TipRecipientInfo[];
+export type FundParam = {
+    fundToken: FundToken;
+    fundRecipientInfos: RecipientInfo[];
 }
 
-export type ClaimTipParam = {
-    idSource: string;
-    id: string;
+export type ClaimParam = RecipientBaseInfo & {
     attestation: Attestation;
-    tipIndex?: number;
+    fundIndex?: number;
 }
