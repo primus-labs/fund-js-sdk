@@ -1,15 +1,15 @@
 ## Receiver Guide
 
-### Claim tokens through your DApp
+### Claim Tokens through your DApp
 
 #### Prerequisites
 
 Before you begin, ensure you have the following:
 
 - An appSecret that matches the appID set during the funding stage. 
-- The SDK installed. For installation instructions, refer to the [Installation Guide](./install.md).
-- Integrat wallet services, currently supporting MetaMask or Wagmi. Users must connect their wallets before they verifying their social accounts and claiming tokens. Support for AA wallets or AI agent-supported wallets will be added in the future.
-- A prompt the user to install the Primus extension before initiating the account verification process.
+- The Fund SDK installed. For installation instructions, refer to the [Installation Guide](./install.md).
+- Integrated wallet services. In this version, MetaMask and Wagmi are supported. Users must connect their wallets before verifying their social accounts and claiming tokens. The claimed tokens will be sent to the address that completes an attestation proving ownership of the social account. Support for AA wallets and AI agent-supported wallets will be added in the future.
+- Prompt users to install the [Primus Extension](https://chromewebstore.google.com/detail/primus-prev-pado/oeiomhmbaapihbilkfkhmlajkeegnjhe?pli=1) before initiating the social account ownership attestation process.
 
 #### Frontend Implementation
 
@@ -93,8 +93,8 @@ Here’s a basic example of how to configure and initialize the Primus Fund SDK 
   });
 ```
 
-### Claim tokens through the Primus Extension
+### Claim Tokens through the Primus Extension
 
-For users who have already installed the Primus extension, if the social account has been verified in the extension, they will receive a in-site notification. 
+For users who have already installed the Primus Extension, if the social account has already been verified within the extension, they will receive an in-site notification. 
 
-Users can claim tokens directly through the Primus extension.
+Users can claim tokens directly through the Primus Extension.
