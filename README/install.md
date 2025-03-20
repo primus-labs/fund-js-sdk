@@ -44,6 +44,6 @@ import { PrimusTip } from "@primuslabs/fund-js-sdk"
 
 ### Next Steps
 
-After successfully installing Primus Fund SDK, you can refer to the [Example](./example.md) to learn how to set key parameters and complete the transaction with the fund contract.
+After successfully installing Primus Fund SDK, you can refer to the [Example](./example.md) to learn how to set key parameters and complete the transaction to the fund contract.
 
 If you need further support, feel free to reach out through our [community on Discord](https://discord.gg/AYGSqCkZTz).
