@@ -124,3 +124,6 @@ For fund users:
 
 For refunding unclaimed tokens:
 
+In the current version, the fund contract has a 30-day processing period. If the funded tokens are not claimed within this period, you can initiate a refund transaction to return all unclaimed tokens to your original sending wallet address.
+
+
