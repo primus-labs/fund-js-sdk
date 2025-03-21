@@ -133,8 +133,8 @@ In the current version, the fund contract has a 30-day processing period. If the
   // Initialize parameters. The init function is recommended to be called when the page is initialized.
   const primusFund = new PrimusFund();
   console.log("supportedChainIds=", primusFund.supportedChainIds); // [10143]
-  const provider = YOUR_WALLET_PROVIDER // For MetaMask, pass `window.ethereum`; for Wagmi, pass `useAccount().connector.getProvider`; Other wallet types, such as AA wallets or AI agents, will be supported in the future.
   const appId = "YOUR_APPID";
+  const provider = YOUR_WALLET_PROVIDER // For MetaMask, pass `window.ethereum`; for Wagmi, pass `useAccount().connector.getProvider`; Other wallet types, such as AA wallets or AI agents, will be supported in the future.
   const chainId = 10143;
   await primusFund.init(provider, chainId, appId);
 
@@ -144,7 +144,7 @@ In the current version, the fund contract has a 30-day processing period. If the
       const recipients = [
         {
           socialPlatform: "x",
-          userIdentifier: "xHandle"
+          userIdentifier: "xUserName"
         },
         {
           socialPlatform: "tiktok",
