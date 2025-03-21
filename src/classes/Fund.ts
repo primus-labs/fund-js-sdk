@@ -197,6 +197,7 @@ class Fund {
             const signParams = attRequest.toJsonString();
             const signature = await genAppSignature(signParams);
             if (!signature) {
+                this._attestLoading = false
                 return reject(`appSignature is empty!`)
             }
             try {
@@ -211,9 +212,10 @@ class Fund {
                 );
                 // console.log("attestation", attestation);
                 this._attestLoading = false
-                resolve(attestation)
+                return resolve(attestation)
             } catch (error: any) {
                 // console.error('attest error:',error);
+                this._attestLoading = false
                 return reject(error);
             }
         });
