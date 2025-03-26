@@ -44,6 +44,11 @@ class PrimusFund {
                 const newFundRecipientInfos = recipientInfos.map(i => {
                     i.nftIds = []
                     i.socialPlatform = i.socialPlatform.toLowerCase()
+
+                    if (i.socialPlatform === "x" && i.userIdentifier.startsWith("@")) {
+                        i.userIdentifier = i.userIdentifier.slice(1);
+                    }
+                    
                     return i
                 })
                 if (recipientInfos.length === 1) {
@@ -68,6 +73,9 @@ class PrimusFund {
                 }
                 const newRecipients = recipients.map(i => {
                     i.socialPlatform = i.socialPlatform.toLowerCase()
+                    if (i.socialPlatform === "x" && i.userIdentifier.startsWith("@")) {
+                        i.userIdentifier = i.userIdentifier.slice(1);
+                    }
                     return i
                 })
                 const result = await this._fund?.refund(newRecipients);
@@ -109,6 +117,9 @@ class PrimusFund {
                 socialPlatforms[i] = claimParamList[i].socialPlatform.toLowerCase();
                 attestations[i] = claimParamList[i].attestation;
                 userIdentifiers[i] = claimParamList[i].userIdentifier;
+                if (socialPlatforms[i]=== "x" && userIdentifiers[i].startsWith("@")) {
+                    claimParamList[i].userIdentifier = claimParamList[i].userIdentifier.slice(1);
+                }
             }
             
             if (socialPlatforms.length !== userIdentifiers.length || socialPlatforms.length !== attestations.length) {
