@@ -46,7 +46,7 @@ export type  RecipientBaseInfo = {
 
 export type  RecipientInfo = RecipientBaseInfo & {
     tokenAmount: string;// The amount of the token
-    nftIds?: bigint[];// The nft token ids when token is nft.
+    nftIds?: bigint[] | [];// The nft token ids when token is nft.
 }
 
 export type FundParam = {

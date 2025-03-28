@@ -29,6 +29,7 @@ class PrimusFund {
     async fund(fundParam: FundParam) {
         return new Promise(async (resolve, reject) => {
             try {
+                debugger
                 const { tokenInfo, recipientInfos } = fundParam;
                 
                 if (!recipientInfos || recipientInfos.length === 0) {
@@ -42,14 +43,20 @@ class PrimusFund {
                     tokenInfo.tokenAddress = ethers.constants.AddressZero
                 }
                 const newFundRecipientInfos = recipientInfos.map(i => {
-                    i.nftIds = []
-                    i.socialPlatform = i.socialPlatform.toLowerCase()
+                    const formatSocialPlatform = i.socialPlatform.toLowerCase()
+                    let formatUserIdentifier = i.userIdentifier
+                   
 
                     if (i.socialPlatform === "x" && i.userIdentifier.startsWith("@")) {
-                        i.userIdentifier = i.userIdentifier.slice(1);
+                       formatUserIdentifier = i.userIdentifier.slice(1);
                     }
                     
-                    return i
+                    return {
+                        nftIds: [],
+                        socialPlatform: formatSocialPlatform,
+                        userIdentifier: formatUserIdentifier,
+                        tokenAmount: i.tokenAmount
+                    }
                 })
                 if (recipientInfos.length === 1) {
                     const result = await this._fund?.fund(tokenInfo, newFundRecipientInfos[0]);
