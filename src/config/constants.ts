@@ -13,3 +13,7 @@ export const DATASOURCETEMPLATEMAP:{[propName:string]: string} = {
     'google account': ''
 };
 export const SUPPORTEDSOCIALPLATFORMS: string[] = Object.keys(DATASOURCETEMPLATEMAP)
+export const NATIVETOKENS: Record<number, string> = {
+  1: "ETH",      // Ethereum Mainnet
+  10143: "MON",  // monad testnet
+};

@@ -1,16 +1,19 @@
 import { ethers } from 'ethers';
 import { PrimusZKTLS } from "@primuslabs/zktls-js-sdk";
-import { Fund_CONTRACTS, DATASOURCETEMPLATEMAP } from "../config/constants";
+import { Fund_CONTRACTS, DATASOURCETEMPLATEMAP, NATIVETOKENS } from "../config/constants";
 import { Attestation, RecipientInfo, TokenInfo ,RecipientBaseInfo} from '../index.d'
 import Contract from './Contract';
 import abiJson from '../config/abi.json';
 import erc20Abi from '../config/erc20Abi.json';
 
+
+const { parseUnits, formatUnits } = ethers.utils;
 class Fund {
     private _attestLoading: boolean;
     private zkTlsSdk!: PrimusZKTLS;
     private fundContract!: any;
     private provider!: ethers.providers.Web3Provider;
+    private chainId: number;
     private _dataSourceTemplateMap = DATASOURCETEMPLATEMAP;
     constructor() {
         this._attestLoading = false
@@ -35,6 +38,7 @@ class Fund {
                 }
                 this.fundContract = new Contract(provider, fundContractAddress, abiJson);
                 this.provider = provider;
+                this.chainId = chainId;
                 
                 if (appId) {
                     this.zkTlsSdk = new PrimusZKTLS();
@@ -65,7 +69,7 @@ class Fund {
                     decimals = await erc20Contract.decimals();
                 }
                 
-                const tokenAmount = ethers.utils.parseUnits(recipientInfo.tokenAmount.toString(), decimals)
+                const tokenAmount = parseUnits(recipientInfo.tokenAmount.toString(), decimals)
                 // console.log('classes-Fund-fund',tokenAmount)
                 const newFundRecipientInfo = {
                     idSource: recipientInfo.socialPlatform,
@@ -118,9 +122,9 @@ class Fund {
                 }
                 
                 let totalFormatAmount = recipientInfoList.reduce((acc, cur) =>
-                                            acc.add(ethers.utils.parseUnits(cur.tokenAmount.toString(), decimals)), ethers.BigNumber.from(0))
+                                            acc.add(parseUnits(cur.tokenAmount.toString(), decimals)), ethers.BigNumber.from(0))
                 const newRecipientInfoList = recipientInfoList.map(i => {
-                    const formatAmount = ethers.utils.parseUnits(i.tokenAmount.toString(), decimals)
+                    const formatAmount = parseUnits(i.tokenAmount.toString(), decimals)
                     return {
                         idSource: i.socialPlatform,
                         id: i.userIdentifier,
@@ -157,7 +161,7 @@ class Fund {
 
                 // Compute total amount
                 const requiredAllowance = recipientInfoList.reduce((acc, cur) =>
-                                            acc.add(ethers.utils.parseUnits(cur.tokenAmount.toString(), decimals)), ethers.BigNumber.from(0))
+                                            acc.add(parseUnits(cur.tokenAmount.toString(), decimals)), ethers.BigNumber.from(0))
 
                 if (allowance.lt(requiredAllowance)) {
                     const tx = await erc20Contract.approve(this.fundContract.address, requiredAllowance);
@@ -229,7 +233,7 @@ class Fund {
                 const fundRecords = await this.fundContract.callMethod('getTipRecords', [{ idSource: socialPlatform, id: userIdentifier }])
                 console.log('fundRecords', fundRecords)
                 const recordCount = fundRecords.length
-                if (fundRecords <= 0) {
+                if (recordCount <= 0) {
                     return reject(`No fund records.`)
                 } else {
                     const totalFee = claimFee.mul(recordCount)
@@ -277,6 +281,55 @@ class Fund {
             }
         });
     }
-}
+
+    async getTipRecords(getFundRecordsParams:RecipientBaseInfo[]) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const formatGetFundRecordsParams = getFundRecordsParams.map(item => {
+                    return {
+                        idSource: item.socialPlatform,
+                        id: item.userIdentifier
+                    }
+                })
+                const fundRecords = await this.fundContract.callMethod('getTipRecords', formatGetFundRecordsParams)
+                console.log('fundRecords', fundRecords)
+
+                let formatRecords = []
+                for (const record of fundRecords) {
+                    const { tipper, timestamp, tipToken: [tokenType, tokenAddress], amount } = record
+                    let decimals = 18
+                    let symbol = ''
+                    if (tokenType === 0) {
+                        const erc20Contract = new ethers.Contract(tokenAddress, erc20Abi,  this.provider);
+                        decimals = await erc20Contract.decimals();
+                        symbol = await erc20Contract.symbol();
+                    } else if (tokenType === 1) {
+                        symbol = NATIVETOKENS[this.chainId]
+                    }
+                    let fundToken: any = {
+                        tokenType,
+                        // tokenAmount: formatUnits(amount, decimals),
+                        decimals,
+                        symbol
+                    }
+                    if (tokenType === 0) {
+                        fundToken.tokenAddress = tokenAddress
+                    }
+                    formatRecords.push({
+                        funder: tipper,
+                        fundToken,
+                        amount: formatUnits(amount, decimals),
+                        timestamp: timestamp.toNumber() * 1000
+                    })
+                }
+                console.log('formatRecords', formatRecords)
+                return resolve(formatRecords)
+            } catch (error) {
+                // console.log('getTipRecords', error)
+                return reject(error)
+            }
+        });
+    }
+ }
 
 export { Fund };

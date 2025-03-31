@@ -4,7 +4,6 @@ import { Fund } from "./classes/Fund";
 import { SUPPORTEDCHAINIDS, SUPPORTEDSOCIALPLATFORMS } from './config/constants'
 
 export * from './index.d'
-
 class PrimusFund {
     public supportedChainIds = SUPPORTEDCHAINIDS;
     public supportedSocialPlatforms = SUPPORTEDSOCIALPLATFORMS;
@@ -29,7 +28,6 @@ class PrimusFund {
     async fund(fundParam: FundParam) {
         return new Promise(async (resolve, reject) => {
             try {
-                debugger
                 const { tokenInfo, recipientInfos } = fundParam;
                 
                 if (!recipientInfos || recipientInfos.length === 0) {
@@ -130,7 +128,7 @@ class PrimusFund {
             }
             
             if (socialPlatforms.length !== userIdentifiers.length || socialPlatforms.length !== attestations.length) {
-                return reject(`claimParamList is wrong`)
+                return reject(`claimParams is wrong`)
             }
             try {
                 if (socialPlatforms.length === 1) {
@@ -143,6 +141,37 @@ class PrimusFund {
                 }
             } catch (error) {
                 // console.log('fund-jssdk claimBySource error:', error)
+                return reject(error)
+            }
+        });
+    }
+
+    async getFundRecords(getFundRecordsParams: RecipientBaseInfo) {
+        const queryList = Array.isArray(getFundRecordsParams) ? getFundRecordsParams : [getFundRecordsParams];
+        return new Promise(async (resolve, reject) => {
+            if(!queryList || queryList?.length===0){
+               const error = new Error('getFundRecordsParams is empty');
+               return reject(error)
+            }
+            const socialPlatforms: string[] = [];
+            const userIdentifiers: string[] = [];
+        
+            for (let i = 0; i < queryList.length ; i++) {
+                socialPlatforms[i] = queryList[i].socialPlatform.toLowerCase();
+                userIdentifiers[i] = queryList[i].userIdentifier;
+                if (socialPlatforms[i]=== "x" && userIdentifiers[i].startsWith("@")) {
+                    queryList[i].userIdentifier = queryList[i].userIdentifier.slice(1);
+                }
+            }
+            
+            if (socialPlatforms.length !== userIdentifiers.length) {
+                return reject(`getFundRecordsParams is wrong`)
+            }
+            try {
+                const result = await this._fund?.getTipRecords(queryList);
+                resolve(result);
+            } catch (error) {
+                // console.log('fund-jssdk getFundRecords error:', error)
                 return reject(error)
             }
         });
