@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { PrimusZKTLS } from "@primuslabs/zktls-js-sdk";
-import { Fund_CONTRACTS, DATASOURCETEMPLATEMAP, NATIVETOKENS } from "../config/constants";
+import { Fund_CONTRACTS, DATASOURCETEMPLATEMAP, NATIVETOKENS, CHAINNAMES } from "../config/constants";
 import { Attestation, RecipientInfo, TokenInfo ,RecipientBaseInfo} from '../index.d'
 import Contract from './Contract';
 import abiJson from '../config/abi.json';
@@ -13,7 +13,7 @@ class Fund {
     private zkTlsSdk!: PrimusZKTLS;
     private fundContract!: any;
     private provider!: ethers.providers.Web3Provider;
-    private chainId: number;
+    private chainId!: number;
     private _dataSourceTemplateMap = DATASOURCETEMPLATEMAP;
     constructor() {
         this._attestLoading = false
@@ -310,7 +310,8 @@ class Fund {
                         tokenType,
                         // tokenAmount: formatUnits(amount, decimals),
                         decimals,
-                        symbol
+                        symbol,
+                        chainName: CHAINNAMES[this.chainId]
                     }
                     if (tokenType === 0) {
                         fundToken.tokenAddress = tokenAddress
