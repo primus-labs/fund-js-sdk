@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { PrimusZKTLS } from "@primuslabs/zktls-js-sdk";
-import { Fund_CONTRACTS, DATASOURCETEMPLATEMAP, NATIVETOKENS, CHAINNAMES } from "../config/constants";
-import { Attestation, RecipientInfo, TokenInfo ,RecipientBaseInfo} from '../index.d'
+import { Fund_CONTRACTS, DATASOURCETEMPLATESMAP, NATIVETOKENS, CHAINNAMES } from "../config/constants";
+import { Attestation, RecipientInfo, TokenInfo ,RecipientBaseInfo, AttestParams } from '../index.d'
 import Contract from './Contract';
 import abiJson from '../config/abi.json';
 import erc20Abi from '../config/erc20Abi.json';
@@ -14,7 +14,7 @@ class Fund {
     private fundContract!: any;
     private provider!: ethers.providers.Web3Provider;
     private chainId!: number;
-    private _dataSourceTemplateMap = DATASOURCETEMPLATEMAP;
+    private _dataSourceTemplateMap = DATASOURCETEMPLATESMAP;
     constructor() {
         this._attestLoading = false
     }
@@ -182,7 +182,7 @@ class Fund {
         });
     }
 
-    async attest(socialPlatform: string, address: string, genAppSignature: (signParams: string) => Promise<string>): Promise<Attestation | undefined> {
+    async attest(attestParams: AttestParams, genAppSignature: (signParams: string) => Promise<string>): Promise<Attestation | undefined> {
         return new Promise(async (resolve, reject) => {
             if (!this.zkTlsSdk?.padoExtensionVersion) {
                 return reject(`Uninitialized!`)
@@ -190,13 +190,23 @@ class Fund {
             if (this._attestLoading) {
                 return reject(`Under proof!`)
             }
+            const { socialPlatform, userIdentifier, address } = attestParams
 
             this._attestLoading = true
-            const templateId = this._dataSourceTemplateMap[socialPlatform]
+            const {id: templateId, field} = this._dataSourceTemplateMap[socialPlatform]
             const attRequest = this.zkTlsSdk.generateRequestParams(
                 templateId,
                 address
             );
+            attRequest.setAttConditions([
+                [
+                    {
+                        field,
+                        op: 'STREQ',
+                        value: userIdentifier,
+                    },
+                ],
+            ]);
             
             const signParams = attRequest.toJsonString();
             const signature = await genAppSignature(signParams);

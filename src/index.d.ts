@@ -58,3 +58,9 @@ export type ClaimParam = RecipientBaseInfo & {
     attestation: Attestation;
     fundIndex?: number;
 }
+
+export type AttestParams = {
+    socialPlatform: string;
+    userIdentifier: string;
+    address: string
+}

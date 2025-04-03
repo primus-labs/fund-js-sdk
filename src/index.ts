@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { Attestation, ClaimParam, FundParam, RecipientBaseInfo } from './index.d'
+import { Attestation, ClaimParam, FundParam, RecipientBaseInfo, AttestParams } from './index.d'
 import { Fund } from "./classes/Fund";
 import { SUPPORTEDCHAINIDS, SUPPORTEDSOCIALPLATFORMS } from './config/constants'
 
@@ -16,7 +16,14 @@ class PrimusFund {
                     return reject('chainId is not supported')
                 }
                 this._fund = new Fund();
-                const result = await this._fund.init(new ethers.providers.Web3Provider(provider), chainId, appId );
+                let formatProvider: any;
+                if (provider instanceof ethers.providers.JsonRpcProvider) {
+                    formatProvider = new ethers.providers.JsonRpcProvider(defaultRpcUrl);
+                } else {
+                    formatProvider = new ethers.providers.Web3Provider(provider)
+                }
+                const result = await this._fund.init(formatProvider, chainId, appId );
+                // const result = await this._fund.init(new ethers.providers.Web3Provider(provider), chainId, appId );
                 return resolve(result);
             } catch (error) {
                 return reject(error);
@@ -94,11 +101,15 @@ class PrimusFund {
     }
 
 
-    async attest(socialPlatform: string, address: string, genAppSignature: (signParams: string) => Promise<string>): Promise<Attestation | undefined> {
+    async attest(attestParams: AttestParams, genAppSignature: (signParams: string) => Promise<string>): Promise<Attestation | undefined> {
         return new Promise(async (resolve, reject) => {
             try {
+                const { socialPlatform } = attestParams
                 const lcSocialPlatform = socialPlatform.toLowerCase()
-                const attestation = await this._fund?.attest(lcSocialPlatform, address, genAppSignature);
+                const attestation = await this._fund?.attest({
+                    ...attestParams,
+                    socialPlatform: lcSocialPlatform
+                }, genAppSignature);
                 return resolve(attestation)
             } catch (error) {
                 // console.log('fund-jssdk attest error:', error)
