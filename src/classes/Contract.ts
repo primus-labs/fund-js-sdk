@@ -39,14 +39,20 @@ class Contract {
         return reject(`Method ${functionName} does not exist on the contract`)
       }
       try {
-        console.log('sendTransaction params:',...functionParams)
+        console.log('sendTransaction params:', ...functionParams)
+        debugger
         const tx = await this.contractInstance[functionName](...functionParams);
         const txreceipt = await tx.wait();
         console.log("txreceipt", txreceipt);
         resolve(txreceipt);
       } catch (error: any) {
         console.log("sendTransaction error:", error);
-        if (error?.code === 'ACTION_REJECTED') {
+        // console.log('error-message',error?.message)
+        // console.log('error-message',error?.toString()?.toLowerCase().indexOf('user rejected') > -1)
+        // console.log('error-reason',error?.reason)
+        // console.log('error-data-message', error?.data?.message)
+        const errStr = error?.toString()?.toLowerCase() || ''
+        if (error?.code === 'ACTION_REJECTED' || errStr.indexOf('user rejected') > -1 || errStr.indexOf('approval denied') > -1) {
           return reject('user rejected transaction')
         }
         if (error?.reason) {
@@ -55,9 +61,7 @@ class Contract {
         if (error?.data?.message === 'insufficient balance') {
           return reject(error?.data?.message)
         }
-        // console.log('error-message',error?.message)
-        // console.log('error-reason',error?.reason)
-        // console.log('error-data-message',error?.data?.message)
+        return reject(error)
       }
     });
   }
