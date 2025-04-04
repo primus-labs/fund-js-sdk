@@ -40,7 +40,6 @@ class Contract {
       }
       try {
         console.log('sendTransaction params:', ...functionParams)
-        debugger
         const tx = await this.contractInstance[functionName](...functionParams);
         const txreceipt = await tx.wait();
         console.log("txreceipt", txreceipt);
