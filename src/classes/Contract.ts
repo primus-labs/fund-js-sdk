@@ -59,13 +59,17 @@ class Contract {
         // console.log('error-reason',error?.reason)
         // console.log('error-data-message', error?.data?.message)
         const errStr = error?.toString()?.toLowerCase() || ''
-        if (error?.code === 'ACTION_REJECTED' || errStr.indexOf('user rejected') > -1 || errStr.indexOf('approval denied') > -1) {
+        // Signer had insufficient balance
+        
+        const errStrArr = ['user rejected', 'approval denied']
+        const isUserRejected = errStrArr.some(str => errStr.indexOf(str) > -1)
+        if (error?.code === 'ACTION_REJECTED' || isUserRejected) {
           return reject('user rejected transaction')
         }
         if (error?.reason) {
           return reject(error.reason)
         }
-        if (error?.data?.message === 'insufficient balance') {
+        if (errStr.indexOf('insufficient balance') ) {
           return reject(error?.data?.message)
         }
         return reject(error)
