@@ -26,7 +26,13 @@ class Fund {
     async init(provider: any, chainId: number, appId?: string) {
         return new Promise(async (resolve, reject) => {
             try {
-                const network = await provider.getNetwork();
+                let formatProvider: any;
+                if (provider instanceof ethers.providers.JsonRpcProvider) {
+                    formatProvider = provider;
+                } else {
+                    formatProvider = new ethers.providers.Web3Provider(provider)
+                }
+                const network = await formatProvider.getNetwork();
                 const providerChainId = network.chainId;
                 console.log('init provider', provider, network)
                 if (providerChainId !== chainId) {
@@ -38,8 +44,7 @@ class Fund {
                 }
                 this.fundContract = new Contract(provider, fundContractAddress, abiJson);
                 this.provider = provider;
-                this.chainId = chainId;
-                
+                this.chainId = chainId;           
                 if (appId) {
                     this.zkTlsSdk = new PrimusZKTLS();
                     const extensionVersion = await this.zkTlsSdk.init(

@@ -15,8 +15,16 @@ class Contract {
     }
     this.address = address;
     this.provider = provider;
-    const signer = this.provider.getSigner();
-    this.contractInstance = new ethers.Contract(this.address, abiJson, signer);
+    let formatProvider;
+    if (provider instanceof ethers.providers.JsonRpcProvider) {
+        // console.log('provider is JsonRpcProvider')
+        formatProvider = provider;
+    } else {
+        // console.log('provider is Web3Provider')
+      const web3Provider = new ethers.providers.Web3Provider(provider)
+      formatProvider = web3Provider.getSigner();
+    }
+    this.contractInstance = new ethers.Contract(this.address, abiJson, formatProvider);
   }
   // Example method to read from the contract
   async callMethod(functionName: string, functionParams: any[]) {

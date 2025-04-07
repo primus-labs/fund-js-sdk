@@ -16,14 +16,7 @@ class PrimusFund {
                     return reject('chainId is not supported')
                 }
                 this._fund = new Fund();
-                let formatProvider: any;
-                if (provider instanceof ethers.providers.JsonRpcProvider) {
-                    formatProvider = new ethers.providers.JsonRpcProvider(defaultRpcUrl);
-                } else {
-                    formatProvider = new ethers.providers.Web3Provider(provider)
-                }
-                const result = await this._fund.init(formatProvider, chainId, appId );
-                // const result = await this._fund.init(new ethers.providers.Web3Provider(provider), chainId, appId );
+                const result = await this._fund.init(provider, chainId, appId);
                 return resolve(result);
             } catch (error) {
                 return reject(error);
