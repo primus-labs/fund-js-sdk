@@ -61,17 +61,20 @@ class Contract {
         const errStr = error?.toString()?.toLowerCase() || ''
         // Signer had insufficient balance
         
-        const errStrArr = ['user rejected', 'approval denied']
-        const isUserRejected = errStrArr.some(str => errStr.indexOf(str) > -1)
+        const userRejectErrStrArr = ['user rejected', 'approval denied']
+        const isUserRejected = userRejectErrStrArr.some(str => errStr.indexOf(str) > -1)
         if (error?.code === 'ACTION_REJECTED' || isUserRejected) {
           return reject('user rejected transaction')
         }
-        if (error?.reason) {
-          return reject(error.reason)
+        
+        const insufficientBalanceErrStrArr = ['insufficient balance', 'unpredictable_gas_limit']
+        const isInsufficientBalance= insufficientBalanceErrStrArr.some(str => errStr.indexOf(str) > -1)
+        if (isInsufficientBalance) {
+          return reject('insufficient balance')
         }
-        if (errStr.indexOf('insufficient balance') ) {
-          return reject(error?.data?.message)
-        }
+        // if (error?.reason) {
+        //   return reject(error.reason)
+        // }
         return reject(error)
       }
     });
