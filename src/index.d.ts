@@ -43,7 +43,9 @@ export type  RecipientBaseInfo = {
     socialPlatform: string;// The name of the social platform.
     userIdentifier: string;// The user’s unique identifier on the platforms.
 }
-
+export type RefundParam = RecipientBaseInfo &{
+    tipTimestamp?: number; // unit: s
+}
 export type  RecipientInfo = RecipientBaseInfo & {
     tokenAmount: string;// The amount of the token
     nftIds?: bigint[] | [];// The nft token ids when token is nft.

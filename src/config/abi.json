@@ -447,10 +447,11 @@
       {
         "name": "tipRecipients",
         "type": "tuple[]",
-        "internalType": "struct TipRecipient[]",
+        "internalType": "struct TipWithdrawInfo[]",
         "components": [
           { "name": "idSource", "type": "string", "internalType": "string" },
-          { "name": "id", "type": "string", "internalType": "string" }
+          { "name": "id", "type": "string", "internalType": "string" },
+          { "name": "tipTimestamp", "type": "uint64", "internalType": "uint64" }
         ]
       }
     ],
@@ -484,6 +485,12 @@
         "internalType": "address"
       },
       {
+        "name": "claimTime",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      },
+      {
         "name": "idSource",
         "type": "string",
         "indexed": false,
@@ -512,6 +519,12 @@
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
+      },
+      {
+        "name": "tipTime",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
       }
     ],
     "anonymous": false
@@ -569,6 +582,24 @@
         "type": "address",
         "indexed": false,
         "internalType": "address"
+      },
+      {
+        "name": "tokenAddr",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "tipTime",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
       }
     ],
     "anonymous": false
@@ -578,15 +609,33 @@
     "name": "WithdrawEvent",
     "inputs": [
       {
+        "name": "withdrawTime",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      },
+      {
+        "name": "idSource",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "id",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
         "name": "tipper",
         "type": "address",
-        "indexed": true,
+        "indexed": false,
         "internalType": "address"
       },
       {
         "name": "tokenAddr",
         "type": "address",
-        "indexed": true,
+        "indexed": false,
         "internalType": "address"
       },
       {
@@ -594,6 +643,12 @@
         "type": "uint256",
         "indexed": false,
         "internalType": "uint256"
+      },
+      {
+        "name": "tipTime",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
       }
     ],
     "anonymous": false

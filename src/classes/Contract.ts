@@ -47,7 +47,7 @@ class Contract {
         return reject(`Method ${functionName} does not exist on the contract`)
       }
       try {
-        console.log('sendTransaction params:', ...functionParams)
+        console.log('sendTransaction params:', functionName, ...functionParams)
         const tx = await this.contractInstance[functionName](...functionParams);
         const txreceipt = await tx.wait();
         console.log("txreceipt", txreceipt);
@@ -67,10 +67,13 @@ class Contract {
           return reject('user rejected transaction')
         }
         
-        const insufficientBalanceErrStrArr = ['insufficient balance', 'unpredictable_gas_limit']
+        const insufficientBalanceErrStrArr = ['insufficient balance', 'unpredictable_gas_limit'] // 'unpredictable_gas_limit'
         const isInsufficientBalance= insufficientBalanceErrStrArr.some(str => errStr.indexOf(str) > -1)
         if (isInsufficientBalance) {
           return reject('insufficient balance')
+        }
+        if (errStr.indexOf('no pending withdrawals') > -1) {
+          return reject('no pending withdrawals')
         }
         // if (error?.reason) {
         //   return reject(error.reason)

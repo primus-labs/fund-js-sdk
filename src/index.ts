@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { Attestation, ClaimParam, FundParam, RecipientBaseInfo, AttestParams } from './index.d'
+import { Attestation, ClaimParam, FundParam, RecipientBaseInfo, AttestParams, RefundParam } from './index.d'
 import { Fund } from "./classes/Fund";
 import { SUPPORTEDCHAINIDS, SUPPORTEDSOCIALPLATFORMS } from './config/constants'
 
@@ -70,7 +70,7 @@ class PrimusFund {
         });
     }
 
-    async refund(recipients: RecipientBaseInfo[]) {
+    async refund(recipients: RefundParam[]) {
         return new Promise(async (resolve, reject) => {
             try {
                 if (!recipients || recipients.length === 0) {

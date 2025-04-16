@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
 import { PrimusZKTLS } from "@primuslabs/zktls-js-sdk";
 import { Fund_CONTRACTS, DATASOURCETEMPLATESMAP, NATIVETOKENS, CHAINNAMES } from "../config/constants";
-import { Attestation, RecipientInfo, TokenInfo ,RecipientBaseInfo, AttestParams } from '../index.d'
+import { Attestation, RecipientInfo, TokenInfo ,RecipientBaseInfo, AttestParams, RefundParam } from '../index.d'
 import Contract from './Contract';
 import abiJson from '../config/abi.json';
 import erc20Abi from '../config/erc20Abi.json';
@@ -70,7 +70,8 @@ class Fund {
                 
                 if (tokenInfo.tokenType === 0) {
                     await this.approve(tokenInfo, recipientInfos)
-                    const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress, erc20Abi,  this.provider);
+                    const web3Provider = new ethers.providers.Web3Provider(this.provider)
+                    const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress, erc20Abi,  web3Provider);
                     decimals = await erc20Contract.decimals();
                 }
                 
@@ -98,13 +99,14 @@ class Fund {
         
     }
 
-    async refund(recipients: RecipientBaseInfo[]) {
+    async refund(recipients: RefundParam[]) {
         return new Promise(async (resolve, reject) => {
             try {
                 const newRecipients = recipients.map(i => {
                     return {
                         idSource: i.socialPlatform,
-                        id: i.userIdentifier
+                        id: i.userIdentifier,
+                        tipTimestamp: i.tipTimestamp
                     }
                 })
                 const result = await this.fundContract.sendTransaction('tipperWithdraw', [newRecipients])
@@ -122,7 +124,8 @@ class Fund {
                 let params = []
                 if (tokenInfo.tokenType === 0) {
                     await this.approve(tokenInfo, recipientInfoList)
-                    const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress, erc20Abi,  this.provider);
+                    const web3Provider = new ethers.providers.Web3Provider(this.provider)
+                    const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress, erc20Abi,  web3Provider);
                     decimals = await erc20Contract.decimals();
                 }
                 
@@ -156,7 +159,8 @@ class Fund {
     private async approve(tokenInfo: TokenInfo, recipientInfoList: RecipientInfo[]) {
         return new Promise(async (resolve, reject) => {
             try {
-                const signer = this.provider.getSigner();
+                const web3Provider = new ethers.providers.Web3Provider(this.provider)
+                const signer = web3Provider.getSigner();
                 const address = await signer.getAddress();
                 const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress as string, erc20Abi, signer);
 
@@ -315,7 +319,8 @@ class Fund {
                     let decimals = 18
                     let symbol = ''
                     if (tokenType === 0) {
-                        const erc20Contract = new ethers.Contract(tokenAddress, erc20Abi,  this.provider);
+                        const web3Provider = new ethers.providers.Web3Provider(this.provider)
+                        const erc20Contract = new ethers.Contract(tokenAddress, erc20Abi,  web3Provider);
                         decimals = await erc20Contract.decimals();
                         symbol = await erc20Contract.symbol();
                     } else if (tokenType === 1) {
