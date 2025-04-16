@@ -46,40 +46,47 @@ class Contract {
       if (!this.contractInstance[functionName]) {
         return reject(`Method ${functionName} does not exist on the contract`)
       }
-      try {
-        console.log('sendTransaction params:', functionName, ...functionParams)
-        const tx = await this.contractInstance[functionName](...functionParams);
-        const txreceipt = await tx.wait();
-        console.log("txreceipt", txreceipt);
-        resolve(txreceipt);
-      } catch (error: any) {
-        console.log("sendTransaction error:", error);
-        // console.log('error-message',error?.message)
-        // console.log('error-message',error?.toString()?.toLowerCase().indexOf('user rejected') > -1)
-        // console.log('error-reason',error?.reason)
-        // console.log('error-data-message', error?.data?.message)
-        const errStr = error?.toString()?.toLowerCase() || ''
-        // Signer had insufficient balance
-        
-        const userRejectErrStrArr = ['user rejected', 'approval denied']
-        const isUserRejected = userRejectErrStrArr.some(str => errStr.indexOf(str) > -1)
-        if (error?.code === 'ACTION_REJECTED' || isUserRejected) {
-          return reject('user rejected transaction')
-        }
-        
-        const insufficientBalanceErrStrArr = ['insufficient balance', 'unpredictable_gas_limit'] // 'unpredictable_gas_limit'
-        const isInsufficientBalance= insufficientBalanceErrStrArr.some(str => errStr.indexOf(str) > -1)
-        if (isInsufficientBalance) {
-          return reject('insufficient balance')
-        }
-        if (errStr.indexOf('no pending withdrawals') > -1) {
-          return reject('no pending withdrawals')
-        }
-        // if (error?.reason) {
-        //   return reject(error.reason)
-        // }
-        return reject(error)
+      const sendFn = async() => {
+        try {
+            console.log('sendTransaction params:', functionName, ...functionParams)
+            const tx = await this.contractInstance[functionName](...functionParams);
+            const txreceipt = await tx.wait();
+            console.log("txreceipt", txreceipt);
+            resolve(txreceipt);
+          } catch (error: any) {
+            console.log("sendTransaction error:", error);
+            // console.log('error-message',error?.message)
+            // console.log('error-message',error?.toString()?.toLowerCase().indexOf('user rejected') > -1)
+            // console.log('error-reason',error?.reason)
+            // console.log('error-data-message', error?.data?.message)
+            const errStr = error?.message || error?.toString()?.toLowerCase() || ''
+            // Signer had insufficient balance
+            const requestLImitMsg = "non-200 status code: '429'"
+            if (errStr.indexOf(requestLImitMsg) > -1) {
+              await sendFn()
+            }
+            const userRejectErrStrArr = ['user rejected', 'approval denied']
+            const isUserRejected = userRejectErrStrArr.some(str => errStr.indexOf(str) > -1)
+            if (error?.code === 'ACTION_REJECTED' || isUserRejected) {
+              return reject('user rejected transaction')
+            }
+            
+            const insufficientBalanceErrStrArr = ['insufficient balance', 'unpredictable_gas_limit'] // 'unpredictable_gas_limit'
+            const isInsufficientBalance= insufficientBalanceErrStrArr.some(str => errStr.indexOf(str) > -1)
+            if (isInsufficientBalance) {
+              return reject('insufficient balance')
+            }
+            if (errStr.indexOf('no pending withdrawals') > -1) {
+              return reject('no pending withdrawals')
+            }
+            // if (error?.reason) {
+            //   return reject(error.reason)
+            // }
+            return reject(error)
+          }
       }
+      sendFn()
+     
     });
   }
 }
