@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-
+import { hasErrorFlagFn } from '../utils/utils'
 class Contract {
   address: string;
   provider: any;
@@ -59,28 +59,39 @@ class Contract {
         // console.log('error-reason',error?.reason)
         // console.log('error-data-message', error?.data?.message)
         const errStr = error?.message || error?.toString()?.toLowerCase() || ''
+        const errorMsg1 = typeof error === 'string'
+          ? error
+            : error instanceof Error
+              ? error.message
+                : typeof (error as any).message === 'string'
+                  ? (error as any).message
+              : JSON.stringify(error);
+        const errorMsg2 = typeof error === 'object' ? JSON.stringify(error) : error?.toString();
+        const curErrorStrArr = [errorMsg1, errorMsg2]
+        
+
         // Signer had insufficient balance
         // const requestLImitMsg = "non-200 status code: '429'"
         // if (errStr.indexOf(requestLImitMsg) > -1) {
         //   await sendFn()
         // }
         const userRejectErrStrArr = ['user rejected', 'approval denied']
-        const isUserRejected = userRejectErrStrArr.some(str => errStr.indexOf(str) > -1)
+        const isUserRejected = hasErrorFlagFn(curErrorStrArr,userRejectErrStrArr)
         if (error?.code === 'ACTION_REJECTED' || isUserRejected) {
           return reject('user rejected transaction')
         }
         
         const insufficientBalanceErrStrArr = ['insufficient balance', 'unpredictable_gas_limit'] // 'unpredictable_gas_limit'
-        const isInsufficientBalance= insufficientBalanceErrStrArr.some(str => errStr.indexOf(str) > -1)
+        const isInsufficientBalance = hasErrorFlagFn(curErrorStrArr, insufficientBalanceErrStrArr)
         if (isInsufficientBalance) {
           return reject('insufficient balance')
         }
-        if (errStr.indexOf('no pending withdrawals') > -1) {
+
+        const isNoPendingWithdrawals = hasErrorFlagFn(curErrorStrArr,['no pending withdrawals'])
+        if (isNoPendingWithdrawals) {
           return reject('no pending withdrawals')
         }
-        // if (error?.reason) {
-        //   return reject(error.reason)
-        // }
+
         return reject(error)
       }
     

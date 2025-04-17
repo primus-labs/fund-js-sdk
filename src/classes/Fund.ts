@@ -319,8 +319,13 @@ class Fund {
                     let decimals = 18
                     let symbol = ''
                     if (tokenType === 0) {
-                        const web3Provider = new ethers.providers.Web3Provider(this.provider)
-                        const erc20Contract = new ethers.Contract(tokenAddress, erc20Abi,  web3Provider);
+                        let formatProvider;
+                        if (this.provider instanceof ethers.providers.JsonRpcProvider) {
+                            formatProvider = this.provider;
+                        } else {
+                            formatProvider = new ethers.providers.Web3Provider(this.provider)
+                        }
+                        const erc20Contract = new ethers.Contract(tokenAddress, erc20Abi,  formatProvider);
                         decimals = await erc20Contract.decimals();
                         symbol = await erc20Contract.symbol();
                     } else if (tokenType === 1) {
