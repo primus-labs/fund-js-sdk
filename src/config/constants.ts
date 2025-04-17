@@ -14,6 +14,10 @@ export const DATASOURCETEMPLATESMAP:{[propName:string]: {[propName:string]: stri
   'google account': {
     id: "3bad8a55-4415-4bec-9b47-a4c7bbe93518",
     field: '2'
+  },
+  xiaohongshu: {
+    id: '93c6e6df-63ab-41af-8cba-f2927c0d2f1c',
+    field: 'red_id'
   }
 };
 
