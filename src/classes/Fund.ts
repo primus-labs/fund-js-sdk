@@ -5,7 +5,7 @@ import { Attestation, RecipientInfo, TokenInfo ,RecipientBaseInfo, AttestParams,
 import Contract from './Contract';
 import abiJson from '../config/abi.json';
 import erc20Abi from '../config/erc20Abi.json';
-
+import Erc721Contract from './Erc721Contract'
 
 const { parseUnits, formatUnits } = ethers.utils;
 class Fund {
@@ -73,6 +73,10 @@ class Fund {
                     const web3Provider = new ethers.providers.Web3Provider(this.provider)
                     const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress, erc20Abi,  web3Provider);
                     decimals = await erc20Contract.decimals();
+                } else if (tokenInfo.tokenType === 2) {
+                    decimals = 0;
+                    const erc721ContractInstance = new Erc721Contract(this.provider, tokenInfo.tokenAddress);
+                    await erc721ContractInstance.approve(this.fundContract.address, (recipientInfo.nftIds as any)[0])
                 }
                 
                 const tokenAmount = parseUnits(recipientInfo.tokenAmount.toString(), decimals)
@@ -81,13 +85,13 @@ class Fund {
                     idSource: recipientInfo.socialPlatform,
                     id: recipientInfo.userIdentifier,
                     amount: tokenAmount,
-                    nftIds: []
+                    nftIds: recipientInfo.nftIds
                 }
             
-                if (tokenInfo.tokenType === 0) {
-                    params = [tokenInfo, newFundRecipientInfo]
+                if (tokenInfo.tokenType === 1) {
+                    params = [tokenInfo, newFundRecipientInfo, {value: tokenAmount}]
                 } else {
-                    params = [tokenInfo, newFundRecipientInfo, {value: tokenAmount} ]
+                    params = [tokenInfo, newFundRecipientInfo ]
                 }
                 const result = await this.fundContract.sendTransaction('tip', params)
                 resolve(result);
@@ -127,6 +131,10 @@ class Fund {
                     const web3Provider = new ethers.providers.Web3Provider(this.provider)
                     const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress, erc20Abi,  web3Provider);
                     decimals = await erc20Contract.decimals();
+                } else if (tokenInfo.tokenType === 2) {
+                    decimals = 0;
+                    const erc721ContractInstance = new Erc721Contract(this.provider, tokenInfo.tokenAddress);
+                    await erc721ContractInstance.setApprovalForAll(this.fundContract.address)
                 }
                 
                 let totalFormatAmount = recipientInfoList.reduce((acc, cur) =>
@@ -137,16 +145,15 @@ class Fund {
                         idSource: i.socialPlatform,
                         id: i.userIdentifier,
                         amount: formatAmount,
-                        nftIds: []
+                        nftIds: i.nftIds
                     }
                 })
             
-                if (tokenInfo.tokenType === 0) {
-                    params = [tokenInfo, newRecipientInfoList]
-                } else {
+                if (tokenInfo.tokenType === 1) {
                     params = [tokenInfo, newRecipientInfoList, {value: totalFormatAmount} ]
+                } else {
+                    params = [tokenInfo, newRecipientInfoList]
                 }
-
                 const result = await this.fundContract.sendTransaction('tipBatch', params)
                 return resolve(result);
             } catch (error) {
@@ -315,9 +322,11 @@ class Fund {
 
                 let formatRecords = []
                 for (const record of fundRecords) {
-                    const { tipper, timestamp, tipToken: [tokenType, tokenAddress], amount } = record
+                    const { tipper, timestamp, tipToken: [tokenType, tokenAddress], amount, nftIds} = record
                     let decimals = 18
                     let symbol = ''
+                    let tokenId = null
+                    let nftInfo = null
                     if (tokenType === 0) {
                         let formatProvider;
                         if (this.provider instanceof ethers.providers.JsonRpcProvider) {
@@ -330,7 +339,13 @@ class Fund {
                         symbol = await erc20Contract.symbol();
                     } else if (tokenType === 1) {
                         symbol = NATIVETOKENS[this.chainId]
+                    } else if (tokenType === 2) {
+                        decimals = 0 
+                        tokenId = parseInt(nftIds[0])
+                        const erc721ContractInstance = new Erc721Contract(this.provider, tokenAddress);
+                        nftInfo = await erc721ContractInstance.fetchMetaData(tokenAddress, tokenId)
                     }
+                    
                     let fundToken: any = {
                         tokenType,
                         // tokenAmount: formatUnits(amount, decimals),
@@ -340,6 +355,9 @@ class Fund {
                     }
                     if (tokenType === 0) {
                         fundToken.tokenAddress = tokenAddress
+                    }
+                    if (tokenType === 2) {
+                        Object.assign(fundToken , nftInfo ?? {})
                     }
                     formatRecords.push({
                         funder: tipper,

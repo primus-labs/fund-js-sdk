@@ -34,10 +34,11 @@ declare global {
 //
 // ERC20_TYPE = 0;
 // NATIVE_TYPE = 1;
-export type TokenType = 0 | 1
-export type TokenInfo =
-  | { tokenType: 0; tokenAddress: string }
-  | { tokenType: 1; tokenAddress?: string }; 
+// ERC721_TYPE = 2;
+export type TokenType = 0 | 1 | 2
+export type TokenInfo = { tokenType: 0; tokenAddress: string }
+    | { tokenType: 1; tokenAddress?: string }
+    | { tokenType: 2; tokenAddress: string }; 
 
 export type  RecipientBaseInfo = {
     socialPlatform: string;// The name of the social platform.

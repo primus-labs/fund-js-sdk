@@ -43,14 +43,13 @@ class PrimusFund {
                 const newFundRecipientInfos = recipientInfos.map(i => {
                     const formatSocialPlatform = i.socialPlatform.toLowerCase()
                     let formatUserIdentifier = i.userIdentifier
-                   
 
                     if (i.socialPlatform === "x" && i.userIdentifier.startsWith("@")) {
                        formatUserIdentifier = i.userIdentifier.slice(1);
                     }
                     
                     return {
-                        nftIds: [],
+                        nftIds: i.nftIds ?? [],
                         socialPlatform: formatSocialPlatform,
                         userIdentifier: formatUserIdentifier,
                         tokenAmount: i.tokenAmount

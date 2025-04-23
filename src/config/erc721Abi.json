@@ -1,0 +1,113 @@
+[
+  {
+    "type": "function",
+    "name": "supportsInterface",
+    "stateMutability": "view",
+    "inputs": [
+      { "internalType": "bytes4", "name": "interfaceId", "type": "bytes4" }
+    ],
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }]
+  },
+  {
+    "type": "function",
+    "name": "balanceOf",
+    "stateMutability": "view",
+    "inputs": [
+      { "internalType": "address", "name": "owner", "type": "address" }
+    ],
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }]
+  },
+  {
+    "type": "function",
+    "name": "ownerOf",
+    "stateMutability": "view",
+    "inputs": [
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "tokenURI",
+    "stateMutability": "view",
+    "inputs": [
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }]
+  },
+  {
+    "type": "function",
+    "name": "approve",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "getApproved",
+    "stateMutability": "view",
+    "inputs": [
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "outputs": [{ "internalType": "address", "name": "", "type": "address" }]
+  },
+  {
+    "type": "function",
+    "name": "setApprovalForAll",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "internalType": "address", "name": "operator", "type": "address" },
+      { "internalType": "bool", "name": "approved", "type": "bool" }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "isApprovedForAll",
+    "stateMutability": "view",
+    "inputs": [
+      { "internalType": "address", "name": "owner", "type": "address" },
+      { "internalType": "address", "name": "operator", "type": "address" }
+    ],
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }]
+  },
+  {
+    "type": "function",
+    "name": "transferFrom",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "internalType": "address", "name": "from", "type": "address" },
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "safeTransferFrom",
+    "stateMutability": "nonpayable",
+    "inputs": [
+      { "internalType": "address", "name": "from", "type": "address" },
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "uint256", "name": "tokenId", "type": "uint256" }
+    ],
+    "outputs": []
+  },
+  {
+    "type": "function",
+    "name": "name",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }]
+  },
+  {
+    "type": "function",
+    "name": "symbol",
+    "stateMutability": "view",
+    "inputs": [],
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }]
+  }
+]
