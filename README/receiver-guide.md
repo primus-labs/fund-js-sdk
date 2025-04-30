@@ -19,7 +19,7 @@ import { PrimusFund } from "@primuslabs/fund-js-sdk";
 // Initialize parameters. The init function is recommended to be called when the page is initialized.
 const primusFund = new PrimusFund();
 console.log("supportedChainIds=", primusFund.supportedChainIds); // [10143]
-console.log("supportedSocialPlatforms=", primusFund.supportedSocialPlatforms); // ['x', 'tiktok', 'google account']
+console.log("supportedSocialPlatforms=", primusFund.supportedSocialPlatforms); // ['x', 'tiktok', 'google account', 'xiaohongshu']
 const appId = "YOUR_APPID";
 const provider = YOUR_WALLET_PROVIDER // For MetaMask, use window.ethereum; for Wagmi, use useAccount().connector.getProvider(). Other wallet types, such as AA wallets or AI agents, will be supported in the future.
 const chainId = 10143;

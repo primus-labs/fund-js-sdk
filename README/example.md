@@ -51,6 +51,7 @@ Below is a list of currently supported platforms and their corresponding user id
 | X               | Username (handle)         |
 | TikTok          | Username        |
 | Google Account  | Email address   |
+| RedNote         | RedNote ID      |
 
 The SDK supports configuring multiple receivers across different social platforms.
 
@@ -65,6 +66,16 @@ const recipientInfo = [
     socialPlatform: "tiktok",
     userIdentifier: "tiktokUserName",
     tokenAmount: "0.1",
+  },
+  {
+    socialPlatform: "google account",
+    userIdentifier: "emailAddress",
+    tokenAmount: "1.5",
+  },
+  {
+    socialPlatform: "xiaohongshu",
+    userIdentifier: "xiaohongshuID",
+    tokenAmount: "100",
   },
 ];
 ```
@@ -84,7 +95,7 @@ Integration involves configuring [customized parameters](#customized-parameters)
   // Initialize parameters. The init function is recommended to be called when the page is initialized.
   const primusFund = new PrimusFund();
   console.log("supportedChainIds=", primusFund.supportedChainIds); // [10143]
-  console.log("supportedSocialPlatforms=", primusFund.supportedSocialPlatforms); // ['x', 'tiktok', 'google account']
+  console.log("supportedSocialPlatforms=", primusFund.supportedSocialPlatforms); // ['x', 'tiktok', 'google account', 'xiaohongshu']
   const appId = "YOUR_APPID";
   const provider = YOUR_WALLET_PROVIDER // For MetaMask, pass `window.ethereum`; for Wagmi, pass `useAccount().connector.getProvider`; Other wallet types, such as AA wallets or AI agents, will be supported in the future.
   const chainId = 10143;
@@ -140,15 +151,17 @@ In the current version, the fund contract has a 30-day processing period. If the
 
   export async function primusFundFn() {
     try {
-      // Set receiver's information
+      // Set refund info per platform and user, including fund time (to the second), platform, and user identifier.
       const recipients = [
         {
           socialPlatform: "x",
-          userIdentifier: "xUserName"
+          userIdentifier: "xUserName",
+          tipTimestamp: 1745394371
         },
         {
           socialPlatform: "tiktok",
-          userIdentifier: "tiktokUserName"
+          userIdentifier: "tiktokUserName",
+          tipTimestamp: 1745394371
         },
       ];
       const refundTxReceipt = await primusFund.refund(recipients);

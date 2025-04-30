@@ -80,16 +80,16 @@ class Contract {
         if (error?.code === 'ACTION_REJECTED' || isUserRejected) {
           return reject('user rejected transaction')
         }
+
+        const isNoPendingWithdrawals = hasErrorFlagFn(curErrorStrArr,['no pending withdrawals'])
+        if (isNoPendingWithdrawals) {
+          return reject('no pending withdrawals')
+        }
         
         const insufficientBalanceErrStrArr = ['insufficient balance', 'unpredictable_gas_limit'] // 'unpredictable_gas_limit'
         const isInsufficientBalance = hasErrorFlagFn(curErrorStrArr, insufficientBalanceErrStrArr)
         if (isInsufficientBalance) {
           return reject('insufficient balance')
-        }
-
-        const isNoPendingWithdrawals = hasErrorFlagFn(curErrorStrArr,['no pending withdrawals'])
-        if (isNoPendingWithdrawals) {
-          return reject('no pending withdrawals')
         }
 
         return reject(error)
