@@ -363,7 +363,7 @@ class Fund {
                         funder: tipper,
                         fundToken,
                         amount: formatUnits(amount, decimals),
-                        timestamp: timestamp.toNumber() * 1000
+                        timestamp: timestamp.toNumber()
                     })
                 }
                 console.log('formatRecords', formatRecords)

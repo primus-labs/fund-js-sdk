@@ -1,12 +1,8 @@
 {
-  "name": "@primuslabs/fund-js-sdk",
-  "version": "0.1.6",
-  "author": "Primus Labs <dev@primuslabs.org>",
-  "description": "Primus fund js sdk",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/primus-labs/fund-js-sdk.git"
-  },
+  "name": "@superorange/tip-js-sdk",
+  "version": "1.0.18",
+  "author": "",
+  "description": "",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
