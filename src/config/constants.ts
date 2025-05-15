@@ -35,6 +35,26 @@ export const SUPPORTEDCHAINIDSMAP = {
     },
     contractAddress: "0xcd1Ed9C1595A7e9DADe76808dd5e66aA95940A92"
   },  // monad testnet
+  97: {
+    chainId: 97,
+    chainName: 'BNB Testnet',
+    nativeCurrency: {
+      decimals: 18,
+      name: 'tBNB',
+      symbol: 'tBNB',
+    },
+    contractAddress: "0x1C5bfc91789DB3130A07a06407E02745945C3218"
+  },
+  56: {
+    chainId: 56,
+    chainName: 'BNB Chain',
+    nativeCurrency: {
+      decimals: 18,
+      name: 'BNB',
+      symbol: 'BNB',
+    },
+    contractAddress: "0x1fb86db904caF7c12100EA64024E5dfd7505E484"
+  },
 };
 
 

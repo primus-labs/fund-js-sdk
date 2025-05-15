@@ -351,7 +351,8 @@ class Fund {
                         // tokenAmount: formatUnits(amount, decimals),
                         decimals,
                         symbol,
-                        chainName: CHAINNAMES[this.chainId]
+                        chainName: CHAINNAMES[this.chainId],
+                        chainId: this.chainId
                     }
                     if (tokenType === 0) {
                         fundToken.tokenAddress = tokenAddress
