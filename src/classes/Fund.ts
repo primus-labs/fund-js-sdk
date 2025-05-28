@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import { PrimusZKTLS } from "@primuslabs/zktls-js-sdk";
+
 import { Fund_CONTRACTS, DATASOURCETEMPLATESMAP, NATIVETOKENS, CHAINNAMES } from "../config/constants";
 import { Attestation, RecipientInfo, TokenInfo ,RecipientBaseInfo, AttestParams, RefundParam } from '../index.d'
 import Contract from './Contract';
@@ -13,6 +14,7 @@ class Fund {
     private zkTlsSdk!: PrimusZKTLS;
     private fundContract!: any;
     private provider!: ethers.providers.Web3Provider;
+    private formatProvider!: ethers.providers.Web3Provider;
     private chainId!: number;
     private _dataSourceTemplateMap = DATASOURCETEMPLATESMAP;
     constructor() {
@@ -32,9 +34,13 @@ class Fund {
                 } else {
                     formatProvider = new ethers.providers.Web3Provider(provider)
                 }
+                const gasPrice = await formatProvider.getGasPrice();
+                console.log('getGasPrice=',gasPrice)
+                await formatProvider.ready;
                 const network = await formatProvider.getNetwork();
                 const providerChainId = network.chainId;
                 console.log('init provider', provider, network)
+                console.log('init providerChainId', providerChainId, chainId)
                 if (providerChainId !== chainId) {
                     return reject(`Please connect to the chain with ID ${chainId} first.`)
                 }
@@ -44,11 +50,32 @@ class Fund {
                 }
                 this.fundContract = new Contract(provider, fundContractAddress, abiJson);
                 this.provider = provider;
+                this.formatProvider = formatProvider
                 this.chainId = chainId;           
                 if (appId) {
+                    
                     this.zkTlsSdk = new PrimusZKTLS();
+                    let platformDevice = "pc";
+                    const isIpad = () => {
+                        const userAgent = navigator.userAgent.toLowerCase();
+                        const isTabletSize = window.innerWidth > 768 && window.innerWidth < 1366;
+                        
+                        return (
+                            /ipad/.test(userAgent) || 
+                            (navigator.platform === 'MacIntel' && 
+                            navigator.maxTouchPoints > 0 && 
+                            isTabletSize)
+                        );
+                        };
+                    if (navigator.userAgent.toLocaleLowerCase().includes("android")) {
+                        platformDevice = "android";
+                    } else if (navigator.userAgent.toLocaleLowerCase().includes("iphone") || isIpad()) {
+                        platformDevice = "ios";
+                    }
+                    console.log('init appId', appId, platformDevice)
+
                     const extensionVersion = await this.zkTlsSdk.init(
-                        appId
+                        appId, '',{platform: platformDevice}
                     );
                     resolve(extensionVersion);
                 } else {
@@ -70,6 +97,7 @@ class Fund {
                 
                 if (tokenInfo.tokenType === 0) {
                     await this.approve(tokenInfo, recipientInfos)
+                    console.log('after approve in fund fn')
                     const web3Provider = new ethers.providers.Web3Provider(this.provider)
                     const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress, erc20Abi,  web3Provider);
                     decimals = await erc20Contract.decimals();
@@ -89,10 +117,67 @@ class Fund {
                 }
             
                 if (tokenInfo.tokenType === 1) {
-                    params = [tokenInfo, newFundRecipientInfo, {value: tokenAmount}]
+                    params = [tokenInfo, newFundRecipientInfo, { value: tokenAmount }]
                 } else {
                     params = [tokenInfo, newFundRecipientInfo ]
                 }
+                if ([97, 56].includes(this.chainId)) {
+                    const gasPrice = await this.formatProvider.getGasPrice();
+                    params[2] = params[2] ? { ...params[2], gasPrice } : 
+                        { gasPrice }
+                }
+                console.log('tip-params', params,this.chainId )
+            
+                
+                const result = await this.fundContract.sendTransaction('tip', params)
+                resolve(result);
+            } catch (error) {
+                return reject(error);
+            }
+        });
+        
+        
+    }
+    async onlyFund (tokenInfo: TokenInfo, recipientInfo: RecipientInfo) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const recipientInfos = [];
+                recipientInfos[0] = recipientInfo;
+                let decimals = 18
+                let params = []
+                
+                if (tokenInfo.tokenType === 0) {
+                    const web3Provider = new ethers.providers.Web3Provider(this.provider)
+                    const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress, erc20Abi,  web3Provider);
+                    decimals = await erc20Contract.decimals();
+                } else if (tokenInfo.tokenType === 2) {
+                    decimals = 0;
+                    const erc721ContractInstance = new Erc721Contract(this.provider, tokenInfo.tokenAddress);
+                    await erc721ContractInstance.approve(this.fundContract.address, (recipientInfo.nftIds as any)[0])
+                }
+                
+                const tokenAmount = parseUnits(recipientInfo.tokenAmount.toString(), decimals)
+                // console.log('classes-Fund-fund',tokenAmount)
+                const newFundRecipientInfo = {
+                    idSource: recipientInfo.socialPlatform,
+                    id: recipientInfo.userIdentifier,
+                    amount: tokenAmount,
+                    nftIds: recipientInfo.nftIds
+                }
+            
+                if (tokenInfo.tokenType === 1) {
+                    params = [tokenInfo, newFundRecipientInfo, { value: tokenAmount }]
+                } else {
+                    params = [tokenInfo, newFundRecipientInfo ]
+                }
+                if ([97, 56].includes(this.chainId)) {
+                    const gasPrice = await this.formatProvider.getGasPrice();
+                    params[2] = params[2] ? { ...params[2], gasPrice } : 
+                        { gasPrice }
+                }
+                console.log('tip-params', params,this.chainId )
+            
+                
                 const result = await this.fundContract.sendTransaction('tip', params)
                 resolve(result);
             } catch (error) {
@@ -113,7 +198,14 @@ class Fund {
                         tipTimestamp: i.tipTimestamp
                     }
                 })
-                const result = await this.fundContract.sendTransaction('tipperWithdraw', [newRecipients])
+                let params = [newRecipients]
+                if ([97, 56].includes(this.chainId)) {
+                    const gasPrice = await this.formatProvider.getGasPrice();
+                    params.push({
+                        gasPrice
+                    })
+                }
+                const result = await this.fundContract.sendTransaction('tipperWithdraw', params)
                 return resolve(result);
             } catch (error) {
                 return reject(error);
@@ -154,6 +246,11 @@ class Fund {
                 } else {
                     params = [tokenInfo, newRecipientInfoList]
                 }
+                if ([97, 56].includes(this.chainId)) {
+                    const gasPrice = await this.formatProvider.getGasPrice();
+                    params[2] = params[2] ? { ...params[2], gasPrice } : 
+                        { gasPrice }
+                }
                 const result = await this.fundContract.sendTransaction('tipBatch', params)
                 return resolve(result);
             } catch (error) {
@@ -163,7 +260,8 @@ class Fund {
             
     }
 
-    private async approve(tokenInfo: TokenInfo, recipientInfoList: RecipientInfo[]) {
+    // TODO-nft
+    async approve(tokenInfo: TokenInfo, recipientInfoList: RecipientInfo[]) {
         return new Promise(async (resolve, reject) => {
             try {
                 const web3Provider = new ethers.providers.Web3Provider(this.provider)
@@ -172,15 +270,21 @@ class Fund {
                 const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress as string, erc20Abi, signer);
 
                 const allowance = await erc20Contract.allowance(address, this.fundContract.address);
-                // console.log('allowance', allowance)
+                
                 const decimals = await erc20Contract.decimals();
+                console.log('allowance', formatUnits(allowance.toString(), decimals))
 
                 // Compute total amount
                 const requiredAllowance = recipientInfoList.reduce((acc, cur) =>
                                             acc.add(parseUnits(cur.tokenAmount.toString(), decimals)), ethers.BigNumber.from(0))
 
                 if (allowance.lt(requiredAllowance)) {
-                    const tx = await erc20Contract.approve(this.fundContract.address, requiredAllowance);
+                    let params = [this.fundContract.address, requiredAllowance]
+                    if ([97, 56].includes(this.chainId)) {
+                        const gasPrice = await this.formatProvider.getGasPrice();
+                        params.push({ gasPrice })
+                    }
+                    const tx = await erc20Contract.approve(...params);
                     // Wait for the transaction to be mined
                     await tx.wait();
                     console.log(`Approved: ${requiredAllowance.toString()}`);
@@ -198,11 +302,12 @@ class Fund {
         });
     }
 
-    async attest(attestParams: AttestParams, genAppSignature: (signParams: string) => Promise<string>): Promise<Attestation | undefined> {
+    async attest(attestParams: AttestParams, genAppSignature: (signParams: string) => Promise<string>, backUrl?:string): Promise<Attestation | undefined> {
         return new Promise(async (resolve, reject) => {
-            if (!this.zkTlsSdk?.padoExtensionVersion) {
-                return reject(`Uninitialized!`)
-            }
+            // if (!this.zkTlsSdk?.padoExtensionVersion) {
+            //     return reject(`Uninitialized!`)
+            // } // TODO
+            console.log('this.zkTlsSdk', this.zkTlsSdk)
             if (this._attestLoading) {
                 return reject(`Under proof!`)
             }
@@ -214,6 +319,10 @@ class Fund {
                 templateId,
                 address
             );
+            if (backUrl) {
+                attRequest.setBackUrl(backUrl)
+            }
+            console.log(`attRequest: ${JSON.stringify(attRequest)}`)
             attRequest.setAttConditions([
                 [
                     {
@@ -264,7 +373,13 @@ class Fund {
                 } else {
                     const totalFee = claimFee.mul(recordCount)
                     // console.log('totalFee', totalFee)
-                    const txreceipt = await this.fundContract.sendTransaction('claimBySource', [socialPlatform, attestation, { value: totalFee }])
+                    
+                    let params = [socialPlatform, attestation,{ value: totalFee  }]
+                    if ([97, 56].includes(this.chainId)) {
+                        const gasPrice = await this.formatProvider.getGasPrice();
+                      params[2].gasPrice = gasPrice
+                    }
+                    const txreceipt = await this.fundContract.sendTransaction('claimBySource', params)
                     return resolve(txreceipt)
                 }
             } catch (error) {
@@ -298,7 +413,12 @@ class Fund {
                 } else {
                     const totalFee = claimFee.mul(recordCount)
                     // console.log('totalFee', totalFee)
-                    const txreceipt = await this.fundContract.sendTransaction('claimByMultiSource', [socialPlatforms, userIdentifiers, attestationList, { value: totalFee }])
+                    let params = [socialPlatforms, userIdentifiers, attestationList, { value: totalFee }]
+                    if ([97, 56].includes(this.chainId)) {
+                        const gasPrice = await this.formatProvider.getGasPrice();
+                        params[3].gasPrice= gasPrice
+                    }
+                    const txreceipt = await this.fundContract.sendTransaction('claimByMultiSource', params)
                     return resolve(txreceipt)
                 }
             } catch (error) {

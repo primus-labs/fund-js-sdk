@@ -69,6 +69,88 @@ class PrimusFund {
         });
     }
 
+    async approve(fundParam: FundParam) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const { tokenInfo, recipientInfos } = fundParam;
+                
+                if (!recipientInfos || recipientInfos.length === 0) {
+                    return reject('recipientInfos is empty')
+                }
+                const hasUnsupportedSocialPlatforms = recipientInfos.some(i => !this.supportedSocialPlatforms.includes(i.socialPlatform.toLowerCase()));
+                if (hasUnsupportedSocialPlatforms) {
+                    return reject('socialPlatform is not supported')
+                }
+                if (tokenInfo.tokenType === 1) {
+                    tokenInfo.tokenAddress = ethers.constants.AddressZero
+                }
+                const newFundRecipientInfos = recipientInfos.map(i => {
+                    const formatSocialPlatform = i.socialPlatform.toLowerCase()
+                    let formatUserIdentifier = i.userIdentifier
+
+                    if (i.socialPlatform === "x" && i.userIdentifier.startsWith("@")) {
+                       formatUserIdentifier = i.userIdentifier.slice(1);
+                    }
+                    
+                    return {
+                        nftIds: i.nftIds ?? [],
+                        socialPlatform: formatSocialPlatform,
+                        userIdentifier: formatUserIdentifier,
+                        tokenAmount: i.tokenAmount
+                    }
+                })
+                
+                const result = await this._fund?.approve(tokenInfo, newFundRecipientInfos);
+                return resolve(result);
+               
+            } catch (error) {
+                // console.error('fund-jssdk fund error', error)
+                return reject(error);
+            }
+        });
+    }
+    async onlyFund(fundParam: FundParam) {
+        
+        return new Promise(async (resolve, reject) => {
+            try {
+                const { tokenInfo, recipientInfos } = fundParam;
+                
+                if (!recipientInfos || recipientInfos.length === 0) {
+                    return reject('recipientInfos is empty')
+                }
+                const hasUnsupportedSocialPlatforms = recipientInfos.some(i => !this.supportedSocialPlatforms.includes(i.socialPlatform.toLowerCase()));
+                if (hasUnsupportedSocialPlatforms) {
+                    return reject('socialPlatform is not supported')
+                }
+                if (tokenInfo.tokenType === 1) {
+                    tokenInfo.tokenAddress = ethers.constants.AddressZero
+                }
+                const newFundRecipientInfos = recipientInfos.map(i => {
+                    const formatSocialPlatform = i.socialPlatform.toLowerCase()
+                    let formatUserIdentifier = i.userIdentifier
+
+                    if (i.socialPlatform === "x" && i.userIdentifier.startsWith("@")) {
+                       formatUserIdentifier = i.userIdentifier.slice(1);
+                    }
+                    
+                    return {
+                        nftIds: i.nftIds ?? [],
+                        socialPlatform: formatSocialPlatform,
+                        userIdentifier: formatUserIdentifier,
+                        tokenAmount: i.tokenAmount
+                    }
+                })
+                
+                const result = await this._fund?.onlyFund(tokenInfo, newFundRecipientInfos[0]);
+                return resolve(result);
+                
+            } catch (error) {
+                // console.error('fund-jssdk fund error', error)
+                return reject(error);
+            }
+        });
+    }
+
     async refund(recipients: RefundParam[]) {
         return new Promise(async (resolve, reject) => {
             try {
@@ -93,7 +175,7 @@ class PrimusFund {
     }
 
 
-    async attest(attestParams: AttestParams, genAppSignature: (signParams: string) => Promise<string>): Promise<Attestation | undefined> {
+    async attest(attestParams: AttestParams, genAppSignature: (signParams: string) => Promise<string>, backUrl?:string): Promise<Attestation | undefined> {
         return new Promise(async (resolve, reject) => {
             try {
                 const { socialPlatform } = attestParams
@@ -101,7 +183,7 @@ class PrimusFund {
                 const attestation = await this._fund?.attest({
                     ...attestParams,
                     socialPlatform: lcSocialPlatform
-                }, genAppSignature);
+                }, genAppSignature, backUrl);
                 return resolve(attestation)
             } catch (error) {
                 // console.log('fund-jssdk attest error:', error)

@@ -1,6 +1,6 @@
 {
   "name": "@primuslabs/fund-js-sdk",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "author": "Primus Labs <dev@primuslabs.org>",
   "description": "Primus fund js sdk",
   "repository": {
@@ -55,7 +55,7 @@
     ]
   },
   "dependencies": {
-    "@primuslabs/zktls-js-sdk": "^0.2.10",
+    "@primuslabs/zktls-js-sdk": "^0.3.2",
     "axios": "^1.8.1",
     "ethers": "^5.7.2"
   }
