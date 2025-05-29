@@ -10,7 +10,6 @@ import Erc721Contract from './Erc721Contract'
 
 const { parseUnits, formatUnits } = ethers.utils;
 class Fund {
-    private _attestLoading: boolean;
     private zkTlsSdk!: PrimusZKTLS;
     private fundContract!: any;
     private provider!: ethers.providers.Web3Provider;
@@ -18,7 +17,6 @@ class Fund {
     private chainId!: number;
     private _dataSourceTemplateMap = DATASOURCETEMPLATESMAP;
     constructor() {
-        this._attestLoading = false
     }
 
     getZkTlsSdk(): PrimusZKTLS {
@@ -308,12 +306,8 @@ class Fund {
             //     return reject(`Uninitialized!`)
             // } // TODO
             console.log('this.zkTlsSdk', this.zkTlsSdk)
-            if (this._attestLoading) {
-                return reject(`Under proof!`)
-            }
             const { socialPlatform, userIdentifier, address } = attestParams
 
-            this._attestLoading = true
             const {id: templateId, field} = this._dataSourceTemplateMap[socialPlatform]
             const attRequest = this.zkTlsSdk.generateRequestParams(
                 templateId,
@@ -336,7 +330,6 @@ class Fund {
             const signParams = attRequest.toJsonString();
             const signature = await genAppSignature(signParams);
             if (!signature) {
-                this._attestLoading = false
                 return reject(`appSignature is empty!`)
             }
             try {
@@ -350,11 +343,9 @@ class Fund {
                     JSON.stringify(formatAttestParams)
                 );
                 // console.log("attestation", attestation);
-                this._attestLoading = false
                 return resolve(attestation)
             } catch (error: any) {
                 // console.error('attest error:',error);
-                this._attestLoading = false
                 return reject(error);
             }
         });
