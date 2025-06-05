@@ -55,6 +55,16 @@ export const SUPPORTEDCHAINIDSMAP = {
     },
     contractAddress: "0x1fb86db904caF7c12100EA64024E5dfd7505E484"
   },
+  688688: {
+    chainId: 688688,
+    chainName: 'Pharos Testnet',
+    nativeCurrency: {
+      decimals: 18,
+      name: 'PHRS',
+      symbol: 'PHRS',
+    },
+    contractAddress: "0xD17512B7EC12880Bd94Eca9d774089fF89805F02"
+  }
 };
 
 
