@@ -64,7 +64,27 @@ export const SUPPORTEDCHAINIDSMAP = {
       symbol: 'PHRS',
     },
     contractAddress: "0xD17512B7EC12880Bd94Eca9d774089fF89805F02"
-  }
+  },
+  84532: {
+    chainId: 84532,
+    chainName: 'Base Sepolia',
+    nativeCurrency: {
+      decimals: 18,
+      name: 'Sepolia Ether',
+      symbol: 'ETH',
+    },
+    contractAddress: "0x4E78940F0019EbAEDc6F4995D7B8ABf060F7a341"
+  },
+  8453: { 
+    chainId: 8453,
+    chainName: 'Base',
+    nativeCurrency: {
+      decimals: 18,
+      name: 'Ether',
+      symbol: 'ETH',
+    },
+    contractAddress: "0xa2e0700a269Be3158c81E4739518b324d4398588"
+  },
 };
 
 
