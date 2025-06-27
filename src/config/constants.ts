@@ -2,7 +2,7 @@
 
 
 
-export const DATASOURCETEMPLATESMAP:{[propName:string]: {[propName:string]: string}} = {
+export const DATASOURCETEMPLATESMAP: { [propName: string]: { [propName: string]: string } } = {
   x: {
     id: "2e3160ae-8b1e-45e3-8c59-426366278b9d",
     field: 'screen_name'
@@ -63,7 +63,8 @@ export const SUPPORTEDCHAINIDSMAP = {
       name: 'PHRS',
       symbol: 'PHRS',
     },
-    contractAddress: "0xD17512B7EC12880Bd94Eca9d774089fF89805F02"
+    contractAddress: "0xD17512B7EC12880Bd94Eca9d774089fF89805F02",
+    redPacketContractAddress: '0x673D74d95A35B26804475066d9cD1DA3947f4eC3'
   },
   84532: {
     chainId: 84532,
@@ -75,7 +76,7 @@ export const SUPPORTEDCHAINIDSMAP = {
     },
     contractAddress: "0x4E78940F0019EbAEDc6F4995D7B8ABf060F7a341"
   },
-  8453: { 
+  8453: {
     chainId: 8453,
     chainName: 'Base',
     nativeCurrency: {
@@ -111,8 +112,18 @@ export const Fund_CONTRACTS: { [chainId: number]: string } = Object.values(SUPPO
     [curr.chainId]: curr.contractAddress
   }
 }, {})
-export const SUPPORTEDCHAINIDS:number[] = Object.keys(Fund_CONTRACTS).map(i => Number(i))
-
+export const SUPPORTEDCHAINIDS: number[] = Object.keys(Fund_CONTRACTS).map(i => Number(i))
+export const FundForRedPacket_CONTRACTS: { [chainId: number]: string } = Object.values(SUPPORTEDCHAINIDSMAP).filter(
+  (item) => {
+    return item.redPacketContractAddress
+  }
+).reduce((prev, curr) => {
+  return {
+    ...prev,
+    [curr.chainId]: curr.redPacketContractAddress
+  }
+}, {})
+export const SUPPORTEDCHAINIDSForRedPacket: number[] = Object.keys(FundForRedPacket_CONTRACTS).map(i => Number(i))
 
 export const REQUESTTIMEOUT = 10000;
 export const SERVICEBASEURL = 'https://api.padolabs.org';

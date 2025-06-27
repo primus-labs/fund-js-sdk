@@ -1,6 +1,8 @@
 import { ethers } from 'ethers';
-import { Attestation, ClaimParam, FundParam, RecipientBaseInfo, AttestParams, RefundParam } from './index.d'
+import { Attestation, ClaimParam, FundParam, RecipientBaseInfo, AttestParams, RefundParam, FundForRedPacketParam,RedPacketId, ERC20TokenInfo, AttestParamsV2 } from './index.d'
 import { Fund } from "./classes/Fund";
+import { FundForRedPacket } from "./classes/FundForRedPacket";
+import { ZktlsSdk } from "./classes/ZktlsSdk";
 import { SUPPORTEDCHAINIDS, SUPPORTEDSOCIALPLATFORMS } from './config/constants'
 
 export * from './index.d'
@@ -8,7 +10,8 @@ class PrimusFund {
     public supportedChainIds = SUPPORTEDCHAINIDS;
     public supportedSocialPlatforms = SUPPORTEDSOCIALPLATFORMS;
     private _fund: Fund | undefined;
-
+    private _fundForRedPacket: FundForRedPacket | undefined;
+    private _zkTlsSdk: ZktlsSdk | undefined;
     async init(provider: any, chainId: number, appId?: string) {
         return new Promise(async (resolve, reject) => {
             try {
@@ -16,7 +19,13 @@ class PrimusFund {
                     return reject('chainId is not supported')
                 }
                 this._fund = new Fund();
-                const result = await this._fund.init(provider, chainId, appId);
+                const result = await this._fund.init(provider, chainId);
+                this._fundForRedPacket = new FundForRedPacket();
+                await this._fundForRedPacket.init(provider, chainId);
+                if (appId) {
+                    this._zkTlsSdk= new ZktlsSdk();
+                    await this._zkTlsSdk.init(appId);
+                }
                 return resolve(result);
             } catch (error) {
                 return reject(error);
@@ -180,7 +189,7 @@ class PrimusFund {
             try {
                 const { socialPlatform } = attestParams
                 const lcSocialPlatform = socialPlatform.toLowerCase()
-                const attestation = await this._fund?.attest({
+                const attestation = await this._zkTlsSdk?.attest({
                     ...attestParams,
                     socialPlatform: lcSocialPlatform
                 }, genAppSignature, backUrl);
@@ -262,6 +271,59 @@ class PrimusFund {
         });
     }
 
+    
+    async fundForRedPacket(fundParam: FundForRedPacketParam) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const { tokenInfo, sendParam } = fundParam;
+                    const result = await this._fundForRedPacket?.fundForRedPacket(tokenInfo, sendParam);
+                    return resolve(result);
+            } catch (error) {
+                return reject(error);
+            }
+        });
+    }
+    async withdrawForRedPacket(redPacketId: RedPacketId) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                    const result = await this._fundForRedPacket?.withdrawForRedPacket(redPacketId);
+                    return resolve(result);
+            } catch (error) {
+                return reject(error);
+            }
+        });
+    }
+    async approveForRedPacket(tokenInfo: ERC20TokenInfo, approveAmount: string) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                    const result = await this._fundForRedPacket?.approveForRedPacket(tokenInfo, approveAmount);
+                    return resolve(result);
+            } catch (error) {
+                return reject(error);
+            }
+        });
+    }
+    async claimForRedPacket(redPacketId: RedPacketId, attestation: Attestation) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                    const result = await this._fundForRedPacket?.claimForRedPacket(redPacketId, attestation);
+                    return resolve(result);
+            } catch (error) {
+                return reject(error);
+            }
+        });
+    }
+    async attestV2(attestParams: AttestParamsV2): Promise<Attestation | undefined>  {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const attestation = await this._zkTlsSdk?.attestV2(attestParams);
+                return resolve(attestation)
+            } catch (error) {
+                // console.log('fund-jssdk attest error:', error)
+                return reject(error)
+            }
+        });
+    }
 }
 
 export { PrimusFund };

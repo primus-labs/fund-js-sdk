@@ -86,7 +86,7 @@ class Contract {
           return reject('no pending withdrawals')
         }
         
-        const insufficientBalanceErrStrArr = ['insufficient balance', 'unpredictable_gas_limit', 'INSUFFICIENT_FUNDS'] // 'unpredictable_gas_limit'
+        const insufficientBalanceErrStrArr = ['insufficient balance', 'INSUFFICIENT_FUNDS'] // 'unpredictable_gas_limit'
         const isInsufficientBalance = hasErrorFlagFn(curErrorStrArr, insufficientBalanceErrStrArr)
         if (isInsufficientBalance) {
           return reject('insufficient balance')
