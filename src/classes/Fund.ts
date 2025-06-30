@@ -1,9 +1,10 @@
 import { ethers } from 'ethers';
 import { Fund_CONTRACTS, NATIVETOKENS, CHAINNAMES } from "../config/constants";
-import { Attestation, RecipientInfo, TokenInfo, RecipientBaseInfo, RefundParam } from '../index.d'
+import { Attestation, RecipientInfo, TokenInfo, RecipientBaseInfo, RefundParam, ERC20TokenInfo, ApproveParams } from '../index.d'
 import Contract from './Contract';
+import Erc20Contract from './Erc20Contract';
 import abiJson from '../config/abi.json';
-import erc20Abi from '../config/erc20Abi.json';
+// import erc20Abi from '../config/erc20Abi.json';
 import Erc721Contract from './Erc721Contract';
 
 const { parseUnits, formatUnits } = ethers.utils;
@@ -17,29 +18,21 @@ class Fund {
   async init(provider: any, chainId: number) {
     return new Promise(async (resolve, reject) => {
       try {
-        let formatProvider: any;
-        if (provider instanceof ethers.providers.JsonRpcProvider) {
-          formatProvider = provider;
-        } else {
-          formatProvider = new ethers.providers.Web3Provider(provider)
-        }
-        const gasPrice = await formatProvider.getGasPrice();
-        console.log('getGasPrice=', gasPrice)
-        await formatProvider.ready;
-        const network = await formatProvider.getNetwork();
-        const providerChainId = network.chainId;
-        console.log('init provider', provider, network)
-        console.log('init providerChainId', providerChainId, chainId)
-        if (providerChainId !== chainId) {
-          return reject(`Please connect to the chain with ID ${chainId} first.`)
-        }
+        // let formatProvider: any;
+        // if (provider instanceof ethers.providers.JsonRpcProvider) {
+        //   formatProvider = provider;
+        // } else {
+        //   formatProvider = new ethers.providers.Web3Provider(provider)
+        // }
+        
+       
         const fundContractAddress = Fund_CONTRACTS[chainId];
         if (!fundContractAddress) {
           return reject(`Unsupported chainId:${chainId}`)
         }
         this.fundContract = new Contract(provider, fundContractAddress, abiJson);
         this.provider = provider;
-        this.formatProvider = formatProvider
+        // this.formatProvider = formatProvider
         this.chainId = chainId;
         resolve('success');
       } catch (error) {
@@ -59,9 +52,8 @@ class Fund {
         if (tokenInfo.tokenType === 0) {
           await this.approve(tokenInfo, recipientInfos)
           console.log('after approve in fund fn')
-          const web3Provider = new ethers.providers.Web3Provider(this.provider)
-          const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress, erc20Abi, web3Provider);
-          decimals = await erc20Contract.decimals();
+          const tokenContract = new Erc20Contract(this.provider, tokenInfo.tokenAddress);
+          decimals = await tokenContract.decimals();
         } else if (tokenInfo.tokenType === 2) {
           decimals = 0;
           const erc721ContractInstance = new Erc721Contract(this.provider, tokenInfo.tokenAddress);
@@ -83,7 +75,7 @@ class Fund {
           params = [tokenInfo, newFundRecipientInfo]
         }
         if ([97, 56].includes(this.chainId)) {
-          const gasPrice = await this.formatProvider.getGasPrice();
+          const gasPrice = await this.provider.getGasPrice();
           params[2] = params[2] ? { ...params[2], gasPrice } :
             { gasPrice }
         }
@@ -108,9 +100,8 @@ class Fund {
         let params = []
 
         if (tokenInfo.tokenType === 0) {
-          const web3Provider = new ethers.providers.Web3Provider(this.provider)
-          const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress, erc20Abi, web3Provider);
-          decimals = await erc20Contract.decimals();
+          const tokenContract = new Erc20Contract(this.provider, tokenInfo.tokenAddress);
+          decimals = await tokenContract.decimals();
         } else if (tokenInfo.tokenType === 2) {
           decimals = 0;
           const erc721ContractInstance = new Erc721Contract(this.provider, tokenInfo.tokenAddress);
@@ -132,7 +123,7 @@ class Fund {
           params = [tokenInfo, newFundRecipientInfo]
         }
         if ([97, 56].includes(this.chainId)) {
-          const gasPrice = await this.formatProvider.getGasPrice();
+          const gasPrice = await this.provider.getGasPrice();
           params[2] = params[2] ? { ...params[2], gasPrice } :
             { gasPrice }
         }
@@ -161,7 +152,7 @@ class Fund {
         })
         let params = [newRecipients]
         if ([97, 56].includes(this.chainId)) {
-          const gasPrice = await this.formatProvider.getGasPrice();
+          const gasPrice = await this.provider.getGasPrice();
           params.push({
             gasPrice
           })
@@ -181,9 +172,8 @@ class Fund {
         let params = []
         if (tokenInfo.tokenType === 0) {
           await this.approve(tokenInfo, recipientInfoList)
-          const web3Provider = new ethers.providers.Web3Provider(this.provider)
-          const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress, erc20Abi, web3Provider);
-          decimals = await erc20Contract.decimals();
+          const tokenContract = new Erc20Contract(this.provider, tokenInfo.tokenAddress);
+          decimals = await tokenContract.decimals();
         } else if (tokenInfo.tokenType === 2) {
           decimals = 0;
           const erc721ContractInstance = new Erc721Contract(this.provider, tokenInfo.tokenAddress);
@@ -208,7 +198,7 @@ class Fund {
           params = [tokenInfo, newRecipientInfoList]
         }
         if ([97, 56].includes(this.chainId)) {
-          const gasPrice = await this.formatProvider.getGasPrice();
+          const gasPrice = await this.provider.getGasPrice();
           params[2] = params[2] ? { ...params[2], gasPrice } :
             { gasPrice }
         }
@@ -221,47 +211,73 @@ class Fund {
 
   }
 
+
   // TODO-nft
-  async approve(tokenInfo: TokenInfo, recipientInfoList: RecipientInfo[]) {
+  async approve(tokenInfo: ERC20TokenInfo, recipientInfoList: RecipientInfo[]) {
     return new Promise(async (resolve, reject) => {
       try {
-        const web3Provider = new ethers.providers.Web3Provider(this.provider)
-        const signer = web3Provider.getSigner();
-        const address = await signer.getAddress();
-        const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress as string, erc20Abi, signer);
-
-        const allowance = await erc20Contract.allowance(address, this.fundContract.address);
-
-        const decimals = await erc20Contract.decimals();
-        console.log('allowance', formatUnits(allowance.toString(), decimals))
-
-        // Compute total amount
-        const requiredAllowance = recipientInfoList.reduce((acc, cur) =>
-          acc.add(parseUnits(cur.tokenAmount.toString(), decimals)), ethers.BigNumber.from(0))
-
-        if (allowance.lt(requiredAllowance)) {
-          let params = [this.fundContract.address, requiredAllowance]
-          if ([97, 56].includes(this.chainId)) {
-            const gasPrice = await this.formatProvider.getGasPrice();
-            params.push({ gasPrice })
-          }
-          const tx = await erc20Contract.approve(...params);
-          // Wait for the transaction to be mined
-          await tx.wait();
-          console.log(`Approved: ${requiredAllowance.toString()}`);
-        } else {
-          console.log(`Already approved: ${allowance.toString()}`);
+        const approveAmount = recipientInfoList.reduce((acc, cur) =>
+          acc.add(parseUnits(cur.tokenAmount.toString(), 0)), ethers.BigNumber.from(0)).toString()
+        let approveParams: ApproveParams = {
+          spenderAddress: this.fundContract.address,
+          approveAmount
         }
+        debugger
+        if ([97, 56].includes(this.chainId)) {
+          const gasPrice = await this.provider.getGasPrice();
+          approveParams.otherParams = { gasPrice }
+        }
+        const tokenContract = new Erc20Contract(this.provider, tokenInfo.tokenAddress as string);
+        await tokenContract.approve(approveParams)
         resolve('Approved');
       } catch (error: any) {
-        console.error('Approval failed:', error);
-        if (error?.code === 'ACTION_REJECTED') {
-          return reject('user rejected transaction')
-        }
         return reject(error);
       }
     });
   }
+  // TODO-nft
+  // async approve(tokenInfo: TokenInfo, recipientInfoList: RecipientInfo[]) {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       const web3Provider = new ethers.providers.Web3Provider(this.provider)
+  //       const signer = web3Provider.getSigner();
+  //       const address = await signer.getAddress();
+  //       const erc20Contract = new ethers.Contract(tokenInfo.tokenAddress as string, erc20Abi, signer);
+
+  //       const allowance = await erc20Contract.allowance(address, this.fundContract.address);
+
+  //       const decimals = await erc20Contract.decimals();
+
+
+  //       console.log('allowance', formatUnits(allowance.toString(), decimals))
+
+  //       // Compute total amount
+  //       const requiredAllowance = recipientInfoList.reduce((acc, cur) =>
+  //         acc.add(parseUnits(cur.tokenAmount.toString(), decimals)), ethers.BigNumber.from(0))
+
+  //       if (allowance.lt(requiredAllowance)) {
+  //         let params = [this.fundContract.address, requiredAllowance]
+  //         if ([97, 56].includes(this.chainId)) {
+  //           const gasPrice = await this.formatProvider.getGasPrice();
+  //           params.push({ gasPrice })
+  //         }
+  //         const tx = await erc20Contract.approve(...params);
+  //         // Wait for the transaction to be mined
+  //         await tx.wait();
+  //         console.log(`Approved: ${requiredAllowance.toString()}`);
+  //       } else {
+  //         console.log(`Already approved: ${allowance.toString()}`);
+  //       }
+  //       resolve('Approved');
+  //     } catch (error: any) {
+  //       console.error('Approval failed:', error);
+  //       if (error?.code === 'ACTION_REJECTED') {
+  //         return reject('user rejected transaction')
+  //       }
+  //       return reject(error);
+  //     }
+  //   });
+  // }
 
   async claimBySource(socialPlatform: string, userIdentifier: string, attestation: Attestation) {
     return new Promise(async (resolve, reject) => {
@@ -279,7 +295,7 @@ class Fund {
 
           let params = [socialPlatform, attestation, { value: totalFee }]
           if ([97, 56].includes(this.chainId)) {
-            const gasPrice = await this.formatProvider.getGasPrice();
+            const gasPrice = await this.provider.getGasPrice();
             params[2].gasPrice = gasPrice
           }
           const txreceipt = await this.fundContract.sendTransaction('claimBySource', params)
@@ -318,7 +334,7 @@ class Fund {
           // console.log('totalFee', totalFee)
           let params = [socialPlatforms, userIdentifiers, attestationList, { value: totalFee }]
           if ([97, 56].includes(this.chainId)) {
-            const gasPrice = await this.formatProvider.getGasPrice();
+            const gasPrice = await this.provider.getGasPrice();
             params[3].gasPrice = gasPrice
           }
           const txreceipt = await this.fundContract.sendTransaction('claimByMultiSource', params)
@@ -351,15 +367,9 @@ class Fund {
           let tokenId = null
           let nftInfo = null
           if (tokenType === 0) {
-            let formatProvider;
-            if (this.provider instanceof ethers.providers.JsonRpcProvider) {
-              formatProvider = this.provider;
-            } else {
-              formatProvider = new ethers.providers.Web3Provider(this.provider)
-            }
-            const erc20Contract = new ethers.Contract(tokenAddress, erc20Abi, formatProvider);
-            decimals = await erc20Contract.decimals();
-            symbol = await erc20Contract.symbol();
+            const tokenContract = new Erc20Contract(this.provider, tokenAddress);
+            decimals = await tokenContract.decimals();
+            symbol = await tokenContract.symbol();
           } else if (tokenType === 1) {
             symbol = NATIVETOKENS[this.chainId]
           } else if (tokenType === 2) {

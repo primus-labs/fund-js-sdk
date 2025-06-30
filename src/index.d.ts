@@ -83,6 +83,10 @@ export type FundForRedPacketParam = {
     tokenInfo: TokenInfo;
     sendParam: SendForRedPacketParam;
 }
+export type FundERC20ForRedPacketParam = {
+    tokenInfo: ERC20TokenInfo;
+    sendParam: SendForRedPacketParam;
+}
 export type RedPacketId = bigint;
 export type ApproveParams = {
     spenderAddress: string;
@@ -90,10 +94,14 @@ export type ApproveParams = {
     otherParams?:any
 }
 
-export type AttestParamsV2 = {
+export type AttestCommonParams = {
     templateId: string;
     address: string;
     genAppSignature: (signParams: string) => Promise<string>;
     conditions?: any[];
     backUrl?: string;
+}
+export type ApproveForRedPacketParams = {
+    tokenInfo: ERC20TokenInfo;
+    approveAmount: string;
 }

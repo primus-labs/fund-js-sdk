@@ -1,6 +1,6 @@
 import { PrimusZKTLS } from "@primuslabs/zktls-js-sdk";
 import { DATASOURCETEMPLATESMAP } from "../config/constants";
-import { Attestation, AttestParamsV2, AttestParams } from '../index.d'
+import { Attestation, AttestCommonParams, AttestParams } from '../index.d'
 
 class ZktlsSdk {
   private zkTlsSdk!: PrimusZKTLS;
@@ -94,7 +94,7 @@ class ZktlsSdk {
       }
     });
   }
-  async attestV2(attestParams: AttestParamsV2): Promise<Attestation | undefined> {
+  async attestCommon(attestParams: AttestCommonParams): Promise<Attestation | undefined> {
     const { templateId, address, genAppSignature, conditions, backUrl } = attestParams
     return new Promise(async (resolve, reject) => {
       // if (!this.zkTlsSdk?.padoExtensionVersion) {

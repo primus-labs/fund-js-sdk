@@ -19,28 +19,28 @@ class FundForRedPacket {
   async init(provider: any, chainId: number) {
     return new Promise(async (resolve, reject) => {
       try {
-        let formatProvider: any;
-        if (provider instanceof ethers.providers.JsonRpcProvider) {
-          formatProvider = provider;
-        } else {
-          formatProvider = new ethers.providers.Web3Provider(provider)
-        }
+        // let formatProvider: any;
+        // if (provider instanceof ethers.providers.JsonRpcProvider) {
+        //   formatProvider = provider;
+        // } else {
+        //   formatProvider = new ethers.providers.Web3Provider(provider)
+        // }
 
-        await formatProvider.ready;
-        const network = await formatProvider.getNetwork();
-        const providerChainId = network.chainId;
-        console.log('init provider', provider, network)
-        console.log('init providerChainId', providerChainId, chainId)
-        if (providerChainId !== chainId) {
-          return reject(`Please connect to the chain with ID ${chainId} first.`)
-        }
+        // await provider.ready;
+        // const network = await provider.getNetwork();
+        // const providerChainId = network.chainId;
+        // console.log('init provider', provider, network)
+        // console.log('init providerChainId', providerChainId, chainId)
+        // if (providerChainId !== chainId) {
+        //   return reject(`Please connect to the chain with ID ${chainId} first.`)
+        // }
         const fundContractAddress = FundForRedPacket_CONTRACTS[chainId];
         if (!fundContractAddress) {
           return reject(`Unsupported chainId:${chainId}`)
         }
         this.fundContract = new Contract(provider, fundContractAddress, abiJson);
         this.provider = provider;
-        this.formatProvider = formatProvider
+        // this.formatProvider = formatProvider
         this.chainId = chainId;
         resolve('success');
       } catch (error) {
@@ -55,7 +55,7 @@ class FundForRedPacket {
         let decimals = 18
         let params = []
         if (tokenInfo.tokenType === 0) {
-          await this.approve(tokenInfo, sendParam.amount)
+          await this.approveForRedPacket(tokenInfo, sendParam.amount)
           console.log('after approve in fund fn')
           const tokenContract = new Erc20Contract(this.provider, tokenInfo.tokenAddress);
           decimals = await tokenContract.decimals();
@@ -75,11 +75,48 @@ class FundForRedPacket {
           params = [tokenInfo, formatSendParam]
         }
         if ([97, 56].includes(this.chainId)) {
-          const gasPrice = await this.formatProvider.getGasPrice();
+          const gasPrice = await this.provider.getGasPrice();
           params[2] = params[2] ? { ...params[2], gasPrice } :
             { gasPrice }
         }
         console.log('tipForRedPacket-params', params, this.chainId)
+        const result = await this.fundContract.sendTransaction('reSend', params)
+        resolve(result);
+      } catch (error) {
+        return reject(error);
+      }
+    });
+  }
+
+  async onlyFundForRedPacket(tokenInfo: TokenInfo, sendParam: SendForRedPacketParam) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let decimals = 18
+        let params = []
+        if (tokenInfo.tokenType === 0) {
+          const tokenContract = new Erc20Contract(this.provider, tokenInfo.tokenAddress);
+          decimals = await tokenContract.decimals();
+        }
+        if (tokenInfo.tokenType === 1) {
+          tokenInfo.tokenAddress = ethers.constants.AddressZero
+        }
+        const formatSendAmount = parseUnits(sendParam.amount.toString(), decimals);
+        const formatSendParam = {
+          ...sendParam,
+          amount: formatSendAmount,
+        }
+
+        if (tokenInfo.tokenType === 1) {
+          params = [tokenInfo, formatSendParam, { value: formatSendAmount }]
+        } else {
+          params = [tokenInfo, formatSendParam]
+        }
+        if ([97, 56].includes(this.chainId)) {
+          const gasPrice = await this.provider.getGasPrice();
+          params[2] = params[2] ? { ...params[2], gasPrice } :
+            { gasPrice }
+        }
+        console.log('onlytipForRedPacket-params', params, this.chainId)
         const result = await this.fundContract.sendTransaction('reSend', params)
         resolve(result);
       } catch (error) {
@@ -94,7 +131,7 @@ class FundForRedPacket {
       try {
         let params = [redPacketId]
         if ([97, 56].includes(this.chainId)) {
-          const gasPrice = await this.formatProvider.getGasPrice();
+          const gasPrice = await this.provider.getGasPrice();
           params.push({
             gasPrice
           })
@@ -111,15 +148,16 @@ class FundForRedPacket {
   async approveForRedPacket(tokenInfo: ERC20TokenInfo, approveAmount: string) {
     return new Promise(async (resolve, reject) => {
       try {
-        const tokenContract = new Erc20Contract(this.provider, tokenInfo.tokenAddress);
+        
         let approveParams: ApproveParams = {
           spenderAddress: this.fundContract.address,
           approveAmount
         }
         if ([97, 56].includes(this.chainId)) {
-          const gasPrice = await this.formatProvider.getGasPrice();
+          const gasPrice = await this.provider.getGasPrice();
           approveParams.otherParams = { gasPrice }
         }
+        const tokenContract = new Erc20Contract(this.provider, tokenInfo.tokenAddress);
         await tokenContract.approve(approveParams)
         resolve('Approved');
       } catch (error: any) {
@@ -134,7 +172,7 @@ class FundForRedPacket {
         const claimFee = await this.fundContract.callMethod('claimFee', [])
         let params = [redPacketId, attestation, { value: claimFee }]
         if ([97, 56].includes(this.chainId)) {
-          const gasPrice = await this.formatProvider.getGasPrice();
+          const gasPrice = await this.provider.getGasPrice();
           params[2].gasPrice = gasPrice
         }
         const txreceipt = await this.fundContract.sendTransaction('reClaim', params)
@@ -142,6 +180,18 @@ class FundForRedPacket {
         return resolve(txreceipt)
       } catch (error) {
         // console.log('claimBySource', error)
+        return reject(error)
+      }
+    });
+  }
+
+  async getRedPacketInfo(redPacketId: RedPacketId) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const redpacketInfo = await this.fundContract.callMethod('getREInfo', [redPacketId])
+        return resolve(redpacketInfo)
+      } catch (error) {
+        // console.log('getREInfo', error)
         return reject(error)
       }
     });
