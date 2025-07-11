@@ -222,7 +222,6 @@ class Fund {
           spenderAddress: this.fundContract.address,
           approveAmount
         }
-        debugger
         if ([97, 56].includes(this.chainId)) {
           const gasPrice = await this.provider.getGasPrice();
           approveParams.otherParams = { gasPrice }

@@ -204,7 +204,7 @@ class PrimusFund {
   }
 
 
-  async attest(attestParams: AttestParams, genAppSignature: (signParams: string) => Promise<string>, backUrl?: string): Promise<Attestation | undefined> {
+  async attest(attestParams: AttestParams, signFn: (signParams: string) => Promise<string>, backUrl?: string): Promise<Attestation | undefined> {
     return new Promise(async (resolve, reject) => {
       try {
         const { socialPlatform } = attestParams
@@ -212,7 +212,7 @@ class PrimusFund {
         const attestation = await this._zkTlsSdk?.attest({
           ...attestParams,
           socialPlatform: lcSocialPlatform
-        }, genAppSignature, backUrl);
+        }, signFn, backUrl);
         return resolve(attestation)
       } catch (error) {
         // console.log('fund-jssdk attest error:', error)

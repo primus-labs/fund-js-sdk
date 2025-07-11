@@ -53,6 +53,7 @@ class Contract {
         console.log("txreceipt", txreceipt);
         resolve(txreceipt);
       } catch (error: any) {
+        // not expired
         console.log("sendTransaction error:", error);
         // console.log('error-message',error?.message)
         // console.log('error-message',error?.toString()?.toLowerCase().indexOf('user rejected') > -1)
@@ -90,6 +91,12 @@ class Contract {
         const isInsufficientBalance = hasErrorFlagFn(curErrorStrArr, insufficientBalanceErrStrArr)
         if (isInsufficientBalance) {
           return reject('insufficient balance')
+        }
+
+        const alreadyClaimedErrStrArr = ['Already claimed']
+        const isAlreadyClaimed = hasErrorFlagFn(curErrorStrArr, alreadyClaimedErrStrArr)
+        if (isAlreadyClaimed) {
+          return reject('already claimed')
         }
 
         return reject(error)

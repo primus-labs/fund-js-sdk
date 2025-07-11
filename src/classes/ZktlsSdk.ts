@@ -44,7 +44,7 @@ class ZktlsSdk {
     });
   }
 
-  async attest(attestParams: AttestParams, genAppSignature: (signParams: string) => Promise<string>, backUrl?: string): Promise<Attestation | undefined> {
+  async attest(attestParams: AttestParams, signFn: (signParams: string) => Promise<string>, backUrl?: string): Promise<Attestation | undefined> {
     return new Promise(async (resolve, reject) => {
       // if (!this.zkTlsSdk?.padoExtensionVersion) {
       //     return reject(`Uninitialized!`)
@@ -72,7 +72,7 @@ class ZktlsSdk {
       ]);
 
       const signParams = attRequest.toJsonString();
-      const signature = await genAppSignature(signParams);
+      const signature = await signFn(signParams);
       if (!signature) {
         return reject(`appSignature is empty!`)
       }
@@ -95,7 +95,7 @@ class ZktlsSdk {
     });
   }
   async attestCommon(attestParams: AttestCommonParams): Promise<Attestation | undefined> {
-    const { templateId, address, genAppSignature, conditions, backUrl } = attestParams
+    const { templateId, address, signFn, conditions, additionParams, backUrl } = attestParams
     return new Promise(async (resolve, reject) => {
       // if (!this.zkTlsSdk?.padoExtensionVersion) {
       //     return reject(`Uninitialized!`)
@@ -112,9 +112,12 @@ class ZktlsSdk {
       if (conditions) {
         attRequest.setAttConditions(conditions);
       }
-
+      if (additionParams) {
+        console.log('setAdditionParams--',additionParams)
+        attRequest.setAdditionParams(additionParams);
+      }
       const signParams = attRequest.toJsonString();
-      const signature = await genAppSignature(signParams);
+      const signature = await signFn(signParams);
       if (!signature) {
         return reject(`appSignature is empty!`)
       }

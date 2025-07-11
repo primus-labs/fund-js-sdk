@@ -97,8 +97,9 @@ export type ApproveParams = {
 export type AttestCommonParams = {
     templateId: string;
     address: string;
-    genAppSignature: (signParams: string) => Promise<string>;
+    signFn: (signParams: string) => Promise<string>;
     conditions?: any[];
+    additionParams: string;
     backUrl?: string;
 }
 export type ApproveForRedPacketParams = {

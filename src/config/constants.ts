@@ -1,7 +1,3 @@
-
-
-
-
 export const DATASOURCETEMPLATESMAP: { [propName: string]: { [propName: string]: string } } = {
   x: {
     id: "2e3160ae-8b1e-45e3-8c59-426366278b9d",
@@ -33,7 +29,8 @@ export const SUPPORTEDCHAINIDSMAP = {
       symbol: "MON",
       decimals: 18,
     },
-    contractAddress: "0xcd1Ed9C1595A7e9DADe76808dd5e66aA95940A92"
+    contractAddress: "0xcd1Ed9C1595A7e9DADe76808dd5e66aA95940A92",
+    redPacketContractAddress: "0x5508fC45d930B5dE36647Dbbe5B9414e43C4F614"
   },  // monad testnet
   97: {
     chainId: 97,
@@ -43,7 +40,8 @@ export const SUPPORTEDCHAINIDSMAP = {
       name: 'tBNB',
       symbol: 'tBNB',
     },
-    contractAddress: "0x1C5bfc91789DB3130A07a06407E02745945C3218"
+    contractAddress: "0x1C5bfc91789DB3130A07a06407E02745945C3218",
+    redPacketContractAddress: "0xC75901570dB65070caDEBB74d6702E299Ac8e019"
   },
   56: {
     chainId: 56,
@@ -74,7 +72,8 @@ export const SUPPORTEDCHAINIDSMAP = {
       name: 'Sepolia Ether',
       symbol: 'ETH',
     },
-    contractAddress: "0x4E78940F0019EbAEDc6F4995D7B8ABf060F7a341"
+    contractAddress: "0x4E78940F0019EbAEDc6F4995D7B8ABf060F7a341",
+    redPacketContractAddress: '0xA33Ed35460C3d06094693956B2d7Cd1a9e7A39a8'
   },
   8453: {
     chainId: 8453,

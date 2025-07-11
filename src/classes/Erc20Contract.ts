@@ -38,10 +38,8 @@ class Erc20Contract {
     return new Promise(async (resolve, reject) => {
       try {
         const userAddress = await this.getAddress()
-        debugger
         const allowance = await this.allowance(userAddress, spenderAddress);
         const decimals = await this.decimals()
-        debugger
         const formatApproveAmount = parseUnits(approveAmount.toString(), decimals)
         const formatAllowance = formatUnits(allowance.toString(), decimals)
         console.log('allowance:', formatAllowance)
