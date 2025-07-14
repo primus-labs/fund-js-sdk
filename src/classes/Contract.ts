@@ -99,6 +99,12 @@ class Contract {
           return reject('already claimed')
         }
 
+        const allClaimedErrStrArr = ['All claimed']
+        const isAllClaimed = hasErrorFlagFn(curErrorStrArr, allClaimedErrStrArr)
+        if (isAllClaimed) {
+          return reject('all claimed')
+        }
+
         return reject(error)
       }
     
