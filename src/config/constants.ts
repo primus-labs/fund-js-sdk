@@ -51,7 +51,8 @@ export const SUPPORTEDCHAINIDSMAP = {
       name: 'BNB',
       symbol: 'BNB',
     },
-    contractAddress: "0x1fb86db904caF7c12100EA64024E5dfd7505E484"
+    contractAddress: "0x1fb86db904caF7c12100EA64024E5dfd7505E484",
+    redPacketContractAddress: "0x083693C148e30b3A231D325366E76b38293FCa10"
   },
   688688: {
     chainId: 688688,
@@ -83,7 +84,8 @@ export const SUPPORTEDCHAINIDSMAP = {
       name: 'Ether',
       symbol: 'ETH',
     },
-    contractAddress: "0xa2e0700a269Be3158c81E4739518b324d4398588"
+    contractAddress: "0xa2e0700a269Be3158c81E4739518b324d4398588",
+    redPacketContractAddress:"0x50bd377EB8D4236Bb587AB3FB1eeafd888AEeC58"
   },
 };
 
