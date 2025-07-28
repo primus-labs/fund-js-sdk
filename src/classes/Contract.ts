@@ -49,9 +49,11 @@ class Contract {
       try {
         console.log('sendTransaction params:', functionName, ...functionParams)
         const tx = await this.contractInstance[functionName](...functionParams);
-        const txreceipt = await tx.wait();
-        console.log("txreceipt", txreceipt);
-        resolve(txreceipt);
+        // console.time('txreceiptTimeInSdk');
+        // const txreceipt = await tx.wait();
+        // console.timeEnd('txreceiptTimeInSdk');
+        // console.log("txreceipt", txreceipt);
+        resolve(tx.hash);
       } catch (error: any) {
         // not expired
         console.log("sendTransaction error:", error);
@@ -87,7 +89,7 @@ class Contract {
           return reject('no pending withdrawals')
         }
         
-        const insufficientBalanceErrStrArr = ['insufficient balance', 'INSUFFICIENT_FUNDS'] // 'unpredictable_gas_limit'
+        const insufficientBalanceErrStrArr = ['insufficient balance', 'INSUFFICIENT_FUNDS', 'The caller does not have enough funds for value transfer.'] // 'unpredictable_gas_limit'
         const isInsufficientBalance = hasErrorFlagFn(curErrorStrArr, insufficientBalanceErrStrArr)
         if (isInsufficientBalance) {
           return reject('insufficient balance')

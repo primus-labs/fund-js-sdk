@@ -1,6 +1,6 @@
 {
   "name": "@primuslabs/fund-js-sdk",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "author": "Primus Labs <dev@primuslabs.org>",
   "description": "Primus fund js sdk",
   "repository": {

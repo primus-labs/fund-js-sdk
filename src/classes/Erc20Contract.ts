@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import Contract from './Contract';
+// import Contract from './Contract';
 import abi from '../config/erc20Abi.json';
 import { ApproveParams } from '../index.d';
 
