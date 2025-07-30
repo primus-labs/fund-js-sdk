@@ -6,7 +6,7 @@ import Erc20Contract from './Erc20Contract';
 import abiJson from '../config/abi.json';
 // import erc20Abi from '../config/erc20Abi.json';
 import Erc721Contract from './Erc721Contract';
-
+const defaultDecimals = 18;
 const { parseUnits, formatUnits } = ethers.utils;
 class Fund {
   private fundContract!: any;
@@ -46,7 +46,7 @@ class Fund {
       try {
         const recipientInfos = [];
         recipientInfos[0] = recipientInfo;
-        let decimals = 18
+        let decimals = defaultDecimals
         let params = []
 
         if (tokenInfo.tokenType === 0) {
@@ -96,7 +96,7 @@ class Fund {
       try {
         const recipientInfos = [];
         recipientInfos[0] = recipientInfo;
-        let decimals = 18
+        let decimals = defaultDecimals
         let params = []
 
         if (tokenInfo.tokenType === 0) {
@@ -168,7 +168,7 @@ class Fund {
   async fundBatch(tokenInfo: TokenInfo, recipientInfoList: RecipientInfo[]) {
     return new Promise(async (resolve, reject) => {
       try {
-        let decimals = 18
+        let decimals = defaultDecimals
         let params = []
         if (tokenInfo.tokenType === 0) {
           await this.approve(tokenInfo, recipientInfoList)
@@ -345,6 +345,52 @@ class Fund {
       }
     });
   }
+  async _formatTipRecords(fundRecords: any[]) {
+    console.log('fundRecords', fundRecords)
+    let formatRecords = []
+    for (const record of fundRecords) {
+      const { tipper, timestamp, tipToken: [tokenType, tokenAddress], amount, nftIds } = record
+      let decimals = defaultDecimals
+      let symbol = ''
+      let tokenId = null
+      let nftInfo = null
+      if (tokenType === 0) {
+        const tokenContract = new Erc20Contract(this.provider, tokenAddress);
+        decimals = await tokenContract.decimals();
+        symbol = await tokenContract.symbol();
+      } else if (tokenType === 1) {
+        symbol = NATIVETOKENS[this.chainId]
+      } else if (tokenType === 2) {
+        decimals = 0
+        tokenId = parseInt(nftIds[0])
+        const erc721ContractInstance = new Erc721Contract(this.provider, tokenAddress);
+        nftInfo = await erc721ContractInstance.fetchMetaData(tokenAddress, tokenId)
+      }
+
+      let fundToken: any = {
+        tokenType,
+        // tokenAmount: formatUnits(amount, decimals),
+        decimals,
+        symbol,
+        chainName: CHAINNAMES[this.chainId],
+        chainId: this.chainId
+      }
+      if (tokenType === 0) {
+        fundToken.tokenAddress = tokenAddress
+      }
+      if (tokenType === 2) {
+        Object.assign(fundToken, nftInfo ?? {})
+      }
+      formatRecords.push({
+        funder: tipper,
+        fundToken,
+        amount: formatUnits(amount, decimals),
+        timestamp: timestamp.toNumber()
+      })
+    }
+    console.log('formatRecords', formatRecords)
+    return formatRecords
+  }
 
   async getTipRecords(getFundRecordsParams: RecipientBaseInfo[]) {
     return new Promise(async (resolve, reject) => {
@@ -356,53 +402,68 @@ class Fund {
           }
         })
         const fundRecords = await this.fundContract.callMethod('getTipRecords', formatGetFundRecordsParams)
-        console.log('fundRecords', fundRecords)
-
-        let formatRecords = []
-        for (const record of fundRecords) {
-          const { tipper, timestamp, tipToken: [tokenType, tokenAddress], amount, nftIds } = record
-          let decimals = 18
-          let symbol = ''
-          let tokenId = null
-          let nftInfo = null
-          if (tokenType === 0) {
-            const tokenContract = new Erc20Contract(this.provider, tokenAddress);
-            decimals = await tokenContract.decimals();
-            symbol = await tokenContract.symbol();
-          } else if (tokenType === 1) {
-            symbol = NATIVETOKENS[this.chainId]
-          } else if (tokenType === 2) {
-            decimals = 0
-            tokenId = parseInt(nftIds[0])
-            const erc721ContractInstance = new Erc721Contract(this.provider, tokenAddress);
-            nftInfo = await erc721ContractInstance.fetchMetaData(tokenAddress, tokenId)
-          }
-
-          let fundToken: any = {
-            tokenType,
-            // tokenAmount: formatUnits(amount, decimals),
-            decimals,
-            symbol,
-            chainName: CHAINNAMES[this.chainId],
-            chainId: this.chainId
-          }
-          if (tokenType === 0) {
-            fundToken.tokenAddress = tokenAddress
-          }
-          if (tokenType === 2) {
-            Object.assign(fundToken, nftInfo ?? {})
-          }
-          formatRecords.push({
-            funder: tipper,
-            fundToken,
-            amount: formatUnits(amount, decimals),
-            timestamp: timestamp.toNumber()
-          })
-        }
-        console.log('formatRecords', formatRecords)
+        let formatRecords = await this._formatTipRecords(fundRecords)
         return resolve(formatRecords)
       } catch (error) {
         // console.log('getTipRecords', error)
+        return reject(error)
+      }
+    });
+  }
+  
+  async getTipRecordsNativeAmount(getFundRecordsParams: RecipientBaseInfo[]) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const formatGetFundRecordsParams = getFundRecordsParams.map(item => {
+          return {
+            idSource: item.socialPlatform,
+            id: item.userIdentifier
+          }
+        })
+        const fundNativeTokenAmount = await this.fundContract.callMethod('getTipRecordsNativeAmount', formatGetFundRecordsParams)
+        
+        const amount = formatUnits(fundNativeTokenAmount, defaultDecimals)
+        console.log('fundNativeTokenAmount', amount)
+        return resolve(amount)
+      } catch (error) {
+        // console.log('getTipRecords', error)
+        return reject(error)
+      }
+    });
+  }
+  async getTipRecordsLength(getFundRecordsParams: RecipientBaseInfo[]) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const formatGetFundRecordsParams = getFundRecordsParams.map(item => {
+          return {
+            idSource: item.socialPlatform,
+            id: item.userIdentifier
+          }
+        })
+        const fundRecordsLen = await this.fundContract.callMethod('getTipRecordsLength', formatGetFundRecordsParams)
+        const len = fundRecordsLen.toNumber()
+        console.log('fundRecordsLength', len)
+        return resolve(len)
+      } catch (error) {
+        return reject(error)
+      }
+    });
+  }
+  async getTipRecordsPaginated(getFundRecordsParams: RecipientBaseInfo[], pageNum: number, pageSize: number) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const formatGetFundRecordsParams = getFundRecordsParams.map(item => {
+          return {
+            idSource: item.socialPlatform,
+            id: item.userIdentifier
+          }
+        })
+        let params = [...formatGetFundRecordsParams, pageNum, pageSize]
+        const fundRecords = await this.fundContract.callMethod('getTipRecordsPaginated', params)
+        let formatRecords = await this._formatTipRecords(fundRecords)
+        console.log('fundRecordsPaginated', formatRecords)
+        return resolve(formatRecords)
+      } catch (error) {
         return reject(error)
       }
     });

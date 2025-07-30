@@ -4,7 +4,7 @@ import { Fund } from "./classes/Fund";
 import { FundForRedPacket } from "./classes/FundForRedPacket";
 import { ZktlsSdk } from "./classes/ZktlsSdk";
 import { SUPPORTEDCHAINIDS, SUPPORTEDSOCIALPLATFORMS } from './config/constants'
-
+console.log('SUPPORTEDCHAINIDS', SUPPORTEDCHAINIDS)
 export * from './index.d'
 class PrimusFund {
   public supportedChainIds = SUPPORTEDCHAINIDS;
@@ -259,33 +259,108 @@ class PrimusFund {
       }
     });
   }
-
+  _formatGetFundRecordsParams(queryList: RecipientBaseInfo[]) {
+    const socialPlatforms: string[] = [];
+    const userIdentifiers: string[] = [];
+    for (let i = 0; i < queryList.length; i++) {
+      socialPlatforms[i] = queryList[i].socialPlatform.toLowerCase();
+      userIdentifiers[i] = queryList[i].userIdentifier;
+      if (socialPlatforms[i] === "x" && userIdentifiers[i].startsWith("@")) {
+        queryList[i].userIdentifier = queryList[i].userIdentifier.slice(1);
+      }
+    }
+    return queryList
+  }
   async getFundRecords(getFundRecordsParams: RecipientBaseInfo) {
-    const queryList = Array.isArray(getFundRecordsParams) ? getFundRecordsParams : [getFundRecordsParams];
+    let queryList = Array.isArray(getFundRecordsParams) ? getFundRecordsParams : [getFundRecordsParams];
+    const socialPlatformList = queryList.map(i => i.socialPlatform)
+    const userIdentifierList = queryList.map(i => i.userIdentifier)
+    
     return new Promise(async (resolve, reject) => {
-      if (!queryList || queryList?.length === 0) {
+      if (!queryList || queryList?.length === 0) {  
         const error = new Error('getFundRecordsParams is empty');
         return reject(error)
       }
-      const socialPlatforms: string[] = [];
-      const userIdentifiers: string[] = [];
-
-      for (let i = 0; i < queryList.length; i++) {
-        socialPlatforms[i] = queryList[i].socialPlatform.toLowerCase();
-        userIdentifiers[i] = queryList[i].userIdentifier;
-        if (socialPlatforms[i] === "x" && userIdentifiers[i].startsWith("@")) {
-          queryList[i].userIdentifier = queryList[i].userIdentifier.slice(1);
-        }
-      }
-
-      if (socialPlatforms.length !== userIdentifiers.length) {
+      if (socialPlatformList.length !== userIdentifierList.length) {
         return reject(`getFundRecordsParams is wrong`)
       }
+      queryList = this._formatGetFundRecordsParams(queryList)
       try {
         const result = await this._fund?.getTipRecords(queryList);
         resolve(result);
       } catch (error) {
         // console.log('fund-jssdk getFundRecords error:', error)
+        return reject(error)
+      }
+    });
+  }
+
+  async getFundRecordsNativeAmount(getFundRecordsParams: RecipientBaseInfo) {
+    let queryList = Array.isArray(getFundRecordsParams) ? getFundRecordsParams : [getFundRecordsParams];
+    const socialPlatformList = queryList.map(i => i.socialPlatform)
+    const userIdentifierList = queryList.map(i => i.userIdentifier)
+    
+    return new Promise(async (resolve, reject) => {
+      if (!queryList || queryList?.length === 0) {  
+        const error = new Error('getFundRecordsParams is empty');
+        return reject(error)
+      }
+      if (socialPlatformList.length !== userIdentifierList.length) {
+        return reject(`getFundRecordsParams is wrong`)
+      }
+      queryList = this._formatGetFundRecordsParams(queryList)
+      try {
+        const result = await this._fund?.getTipRecordsNativeAmount(queryList);
+        resolve(result);
+      } catch (error) {
+        return reject(error)
+      }
+    });
+  }
+
+  
+  async getFundRecordsLen(getFundRecordsParams: RecipientBaseInfo) {
+    let queryList = Array.isArray(getFundRecordsParams) ? getFundRecordsParams : [getFundRecordsParams];
+    const socialPlatformList = queryList.map(i => i.socialPlatform)
+    const userIdentifierList = queryList.map(i => i.userIdentifier)
+    
+    return new Promise(async (resolve, reject) => {
+      if (!queryList || queryList?.length === 0) {  
+        const error = new Error('getFundRecordsParams is empty');
+        return reject(error)
+      }
+      if (socialPlatformList.length !== userIdentifierList.length) {
+        return reject(`getFundRecordsParams is wrong`)
+      }
+      queryList = this._formatGetFundRecordsParams(queryList)
+      try {
+        const result = await this._fund?.getTipRecordsLength(queryList);
+        resolve(result);
+      } catch (error) {
+        return reject(error)
+      }
+    });
+  }
+
+  
+  async getFundRecordsPaginated(getFundRecordsParams: RecipientBaseInfo, pageNum: number, pageSize: number) {
+    let queryList = Array.isArray(getFundRecordsParams) ? getFundRecordsParams : [getFundRecordsParams];
+    const socialPlatformList = queryList.map(i => i.socialPlatform)
+    const userIdentifierList = queryList.map(i => i.userIdentifier)
+    
+    return new Promise(async (resolve, reject) => {
+      if (!queryList || queryList?.length === 0) {  
+        const error = new Error('getFundRecordsParams is empty');
+        return reject(error)
+      }
+      if (socialPlatformList.length !== userIdentifierList.length) {
+        return reject(`getFundRecordsParams is wrong`)
+      }
+      queryList = this._formatGetFundRecordsParams(queryList)
+      try {
+        const result = await this._fund?.getTipRecordsPaginated(queryList, pageNum, pageSize);
+        resolve(result);
+      } catch (error) {
         return reject(error)
       }
     });
