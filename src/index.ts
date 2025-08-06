@@ -4,7 +4,10 @@ import { Fund } from "./classes/Fund";
 import { FundForRedPacket } from "./classes/FundForRedPacket";
 import { ZktlsSdk } from "./classes/ZktlsSdk";
 import { SUPPORTEDCHAINIDS, SUPPORTEDSOCIALPLATFORMS } from './config/constants'
-console.log('SUPPORTEDCHAINIDS', SUPPORTEDCHAINIDS)
+import { testReSend } from './classes/solana/test'
+import { getProgram } from './classes/solana/program'
+import redPacketIdl from './config/redPacketIdl.json'
+console.log('SUPPORTEDCHAINIDS444', SUPPORTEDCHAINIDS)
 export * from './index.d'
 class PrimusFund {
   public supportedChainIds = SUPPORTEDCHAINIDS;
@@ -439,6 +442,10 @@ class PrimusFund {
         return reject(error)
       }
     });
+  }
+  async testReSend(params: any, provider: any) {
+    const p = getProgram(redPacketIdl, provider)
+    await testReSend({redEnvelopeProgram: p,...params})
   }
 }
 

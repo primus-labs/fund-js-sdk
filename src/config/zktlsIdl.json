@@ -1,0 +1,620 @@
+{
+  "address": "3qG9pUbAHfizoqnvj9GxnTPaVgkyb7Ry6Q5vozMYdVAA",
+  "metadata": {
+    "name": "primus_zktls",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "initialize",
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  105,
+                  109,
+                  117,
+                  115,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "default_addr",
+          "type": {
+            "array": [
+              "u8",
+              20
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "remove_attestor",
+      "discriminator": [
+        108,
+        232,
+        239,
+        229,
+        84,
+        249,
+        29,
+        22
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "state"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "target_addr",
+          "type": {
+            "array": [
+              "u8",
+              20
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_attestor",
+      "discriminator": [
+        95,
+        11,
+        236,
+        157,
+        234,
+        146,
+        163,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "state"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "attestor",
+          "type": {
+            "defined": {
+              "name": "Attestor"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "store_chunk",
+      "discriminator": [
+        100,
+        147,
+        78,
+        157,
+        82,
+        197,
+        253,
+        165
+      ],
+      "accounts": [
+        {
+          "name": "data_buffer",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "signer": true,
+          "relations": [
+            "data_buffer"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "chunk",
+          "type": "bytes"
+        }
+      ]
+    },
+    {
+      "name": "store_close",
+      "discriminator": [
+        231,
+        65,
+        66,
+        193,
+        128,
+        236,
+        61,
+        11
+      ],
+      "accounts": [
+        {
+          "name": "data_buffer",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "signer": true,
+          "relations": [
+            "data_buffer"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "store_initialize",
+      "docs": [
+        "DataBuffer Store"
+      ],
+      "discriminator": [
+        58,
+        143,
+        215,
+        232,
+        184,
+        29,
+        233,
+        116
+      ],
+      "accounts": [
+        {
+          "name": "data_buffer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "data_length",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "verify_attestation",
+      "discriminator": [
+        144,
+        30,
+        116,
+        186,
+        33,
+        176,
+        35,
+        60
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "signer": true,
+          "relations": [
+            "data_buffer"
+          ]
+        },
+        {
+          "name": "data_buffer",
+          "writable": true,
+          "optional": true
+        }
+      ],
+      "args": [
+        {
+          "name": "_att",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "Attestation"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "DataBuffer",
+      "discriminator": [
+        235,
+        220,
+        51,
+        248,
+        56,
+        77,
+        241,
+        89
+      ]
+    },
+    {
+      "name": "PrimusState",
+      "discriminator": [
+        200,
+        136,
+        35,
+        84,
+        173,
+        237,
+        163,
+        179
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "AddAttestorEvent",
+      "discriminator": [
+        36,
+        104,
+        4,
+        119,
+        98,
+        31,
+        220,
+        145
+      ]
+    },
+    {
+      "name": "DelAttestorEvent",
+      "discriminator": [
+        103,
+        73,
+        88,
+        10,
+        15,
+        78,
+        23,
+        49
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Unauthorized"
+    },
+    {
+      "code": 6001,
+      "name": "AttestationExpired",
+      "msg": "Attestation expired"
+    },
+    {
+      "code": 6002,
+      "name": "AttestorLimitReached",
+      "msg": "Attestor limit reached"
+    },
+    {
+      "code": 6003,
+      "name": "AttestorNotFound",
+      "msg": "Attestor not found"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidSignatureLength",
+      "msg": "Invalid signature length"
+    },
+    {
+      "code": 6005,
+      "name": "InvalidSignatureVValue",
+      "msg": "Invalid signature v value"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidSignature",
+      "msg": "Invalid signature"
+    },
+    {
+      "code": 6007,
+      "name": "TooLarge",
+      "msg": "Too Large"
+    },
+    {
+      "code": 6008,
+      "name": "DeserializationFailed",
+      "msg": "Deserialization Failed"
+    },
+    {
+      "code": 6009,
+      "name": "OutOfBounds",
+      "msg": "Out Of Bounds"
+    }
+  ],
+  "types": [
+    {
+      "name": "AddAttestorEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": {
+              "array": [
+                "u8",
+                20
+              ]
+            }
+          },
+          {
+            "name": "attestor",
+            "type": {
+              "defined": {
+                "name": "Attestor"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "AttNetworkRequest",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "url",
+            "type": "string"
+          },
+          {
+            "name": "header",
+            "type": "string"
+          },
+          {
+            "name": "method",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AttNetworkResponseResolve",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "key_name",
+            "type": "string"
+          },
+          {
+            "name": "parse_type",
+            "type": "string"
+          },
+          {
+            "name": "parse_path",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Attestation",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "recipient",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "request",
+            "type": {
+              "defined": {
+                "name": "AttNetworkRequest"
+              }
+            }
+          },
+          {
+            "name": "response_resolve",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "AttNetworkResponseResolve"
+                }
+              }
+            }
+          },
+          {
+            "name": "data",
+            "type": "string"
+          },
+          {
+            "name": "att_conditions",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "addition_params",
+            "type": "string"
+          },
+          {
+            "name": "attestors",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Attestor"
+                }
+              }
+            }
+          },
+          {
+            "name": "signatures",
+            "type": {
+              "vec": "bytes"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Attestor",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "attestor_addr",
+            "type": {
+              "array": [
+                "u8",
+                20
+              ]
+            }
+          },
+          {
+            "name": "url",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DataBuffer",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "length",
+            "type": "u32"
+          },
+          {
+            "name": "data",
+            "type": "bytes"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DelAttestorEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": {
+              "array": [
+                "u8",
+                20
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "PrimusState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "attestors",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Attestor"
+                }
+              }
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

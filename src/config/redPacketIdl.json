@@ -1,0 +1,2130 @@
+{
+  "address": "EmK8RSeeHBxb1iZUipon2QqvatcuJyJZM4cpTtSAYzud",
+  "metadata": {
+    "name": "primus_red_envelope",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "initialize",
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  100,
+                  95,
+                  101,
+                  110,
+                  118,
+                  101,
+                  108,
+                  111,
+                  112,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "primus_zktls",
+          "type": "pubkey"
+        },
+        {
+          "name": "fee_recipient",
+          "type": "pubkey"
+        },
+        {
+          "name": "claim_fee",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "re_claim",
+      "discriminator": [
+        105,
+        179,
+        220,
+        94,
+        121,
+        140,
+        144,
+        24
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true
+        },
+        {
+          "name": "re_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  95,
+                  114,
+                  101,
+                  99,
+                  111,
+                  114,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "re_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "re_record_data",
+          "writable": true
+        },
+        {
+          "name": "claimer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "primus_zktls_state",
+          "writable": true
+        },
+        {
+          "name": "primus_zktls_program",
+          "address": "3qG9pUbAHfizoqnvj9GxnTPaVgkyb7Ry6Q5vozMYdVAA"
+        },
+        {
+          "name": "fee_recipient",
+          "writable": true
+        },
+        {
+          "name": "att_recipient",
+          "writable": true
+        },
+        {
+          "name": "data_buffer",
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "from_token_account",
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "re_record"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "to_token_account",
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "att_recipient"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "mint",
+          "optional": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        }
+      ],
+      "args": [
+        {
+          "name": "re_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "_att",
+          "type": {
+            "option": {
+              "defined": {
+                "name": "Attestation"
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "re_send",
+      "discriminator": [
+        31,
+        123,
+        130,
+        212,
+        113,
+        174,
+        167,
+        63
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  100,
+                  95,
+                  101,
+                  110,
+                  118,
+                  101,
+                  108,
+                  111,
+                  112,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "re_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  95,
+                  114,
+                  101,
+                  99,
+                  111,
+                  114,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "re_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "re_record_data",
+          "writable": true
+        },
+        {
+          "name": "sender",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "from_token_account",
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "sender"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "to_token_account",
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "re_record"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "mint",
+          "optional": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        }
+      ],
+      "args": [
+        {
+          "name": "re_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "token",
+          "type": {
+            "defined": {
+              "name": "TipToken"
+            }
+          }
+        },
+        {
+          "name": "send_param",
+          "type": {
+            "defined": {
+              "name": "RESendParam"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "re_send_init",
+      "discriminator": [
+        119,
+        43,
+        109,
+        131,
+        190,
+        47,
+        59,
+        30
+      ],
+      "accounts": [
+        {
+          "name": "re_record_data",
+          "writable": true
+        },
+        {
+          "name": "sender",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "re_sender_withdraw",
+      "discriminator": [
+        231,
+        140,
+        27,
+        36,
+        175,
+        206,
+        105,
+        68
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true
+        },
+        {
+          "name": "re_record",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  95,
+                  114,
+                  101,
+                  99,
+                  111,
+                  114,
+                  100
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "re_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "re_sender",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "re_record"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "from_token_account",
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "re_record"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "to_token_account",
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "re_sender"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "mint",
+          "optional": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        }
+      ],
+      "args": [
+        {
+          "name": "re_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_claim_fee",
+      "discriminator": [
+        124,
+        3,
+        184,
+        17,
+        133,
+        67,
+        255,
+        50
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  100,
+                  95,
+                  101,
+                  110,
+                  118,
+                  101,
+                  108,
+                  111,
+                  112,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "state"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "claim_fee",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "set_fee_recipient",
+      "discriminator": [
+        227,
+        18,
+        215,
+        42,
+        237,
+        246,
+        151,
+        66
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  100,
+                  95,
+                  101,
+                  110,
+                  118,
+                  101,
+                  108,
+                  111,
+                  112,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "state"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "fee_recipient",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "set_primus_zktls",
+      "discriminator": [
+        248,
+        182,
+        45,
+        229,
+        46,
+        5,
+        95,
+        71
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  100,
+                  95,
+                  101,
+                  110,
+                  118,
+                  101,
+                  108,
+                  111,
+                  112,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "state"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "primus_zktls",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "set_withdraw_delay",
+      "discriminator": [
+        184,
+        89,
+        21,
+        192,
+        34,
+        24,
+        3,
+        142
+      ],
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  100,
+                  95,
+                  101,
+                  110,
+                  118,
+                  101,
+                  108,
+                  111,
+                  112,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "state"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "withdraw_delay",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "DataBuffer",
+      "discriminator": [
+        235,
+        220,
+        51,
+        248,
+        56,
+        77,
+        241,
+        89
+      ]
+    },
+    {
+      "name": "PrimusState",
+      "discriminator": [
+        200,
+        136,
+        35,
+        84,
+        173,
+        237,
+        163,
+        179
+      ]
+    },
+    {
+      "name": "RERecord",
+      "discriminator": [
+        242,
+        171,
+        141,
+        17,
+        123,
+        107,
+        153,
+        15
+      ]
+    },
+    {
+      "name": "RERecordData",
+      "discriminator": [
+        165,
+        107,
+        251,
+        115,
+        50,
+        118,
+        32,
+        148
+      ]
+    },
+    {
+      "name": "RedEnvelopeState",
+      "discriminator": [
+        89,
+        134,
+        184,
+        61,
+        201,
+        123,
+        226,
+        180
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "REClaimEvent",
+      "discriminator": [
+        214,
+        100,
+        41,
+        0,
+        45,
+        92,
+        31,
+        248
+      ]
+    },
+    {
+      "name": "RESWithdrawEvent",
+      "discriminator": [
+        26,
+        207,
+        42,
+        68,
+        36,
+        174,
+        127,
+        205
+      ]
+    },
+    {
+      "name": "RESendEvent",
+      "discriminator": [
+        147,
+        8,
+        237,
+        225,
+        123,
+        64,
+        157,
+        199
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidZktlsProgram",
+      "msg": "Invalid Zktls Program"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidTokenType",
+      "msg": "Invalid token type"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidREType",
+      "msg": "Invalid red envelope type"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidNumber",
+      "msg": "Invalid number"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidEmptyRatio",
+      "msg": "Invalid empty ratio"
+    },
+    {
+      "code": 6005,
+      "name": "AmountTooLow",
+      "msg": "Amount too low"
+    },
+    {
+      "code": 6006,
+      "name": "WrongAmount",
+      "msg": "Wrong amount"
+    },
+    {
+      "code": 6007,
+      "name": "NoReId",
+      "msg": "Red envelope ID does not exist"
+    },
+    {
+      "code": 6008,
+      "name": "AllClaimed",
+      "msg": "All envelopes claimed"
+    },
+    {
+      "code": 6009,
+      "name": "UserIdEmpty",
+      "msg": "User ID empty"
+    },
+    {
+      "code": 6010,
+      "name": "InvalidUserAddress",
+      "msg": "Invalid User Address"
+    },
+    {
+      "code": 6011,
+      "name": "AlreadyClaimed",
+      "msg": "Already claimed"
+    },
+    {
+      "code": 6012,
+      "name": "AmountUnderflow",
+      "msg": "Amount underflow"
+    },
+    {
+      "code": 6013,
+      "name": "InvalidFeeRecipient",
+      "msg": "Invalid fee recipient"
+    },
+    {
+      "code": 6014,
+      "name": "InvalidStateAccount",
+      "msg": "Invalid state account"
+    },
+    {
+      "code": 6015,
+      "name": "RecipientIsZero",
+      "msg": "Recipient cannot be zero"
+    },
+    {
+      "code": 6016,
+      "name": "InvalidCheckType",
+      "msg": "Invalid checkType"
+    },
+    {
+      "code": 6017,
+      "name": "InvalidCheckParams",
+      "msg": "CheckParams decode failed"
+    },
+    {
+      "code": 6018,
+      "name": "NoFund",
+      "msg": "No fund"
+    },
+    {
+      "code": 6019,
+      "name": "NotOwner",
+      "msg": "Not owner"
+    },
+    {
+      "code": 6020,
+      "name": "NotExpired",
+      "msg": "Not expired"
+    },
+    {
+      "code": 6021,
+      "name": "UnsupportedTokenType",
+      "msg": "Unsupported Token Type"
+    },
+    {
+      "code": 6022,
+      "name": "InsufficientSOL",
+      "msg": "Insufficient SOL"
+    },
+    {
+      "code": 6023,
+      "name": "WrongTokenMint",
+      "msg": "Wrong token mint"
+    },
+    {
+      "code": 6024,
+      "name": "DeserializationFailed",
+      "msg": "Deserialization Failed"
+    },
+    {
+      "code": 6025,
+      "name": "JsonParseError",
+      "msg": "JSON Parse Error"
+    },
+    {
+      "code": 6026,
+      "name": "ResponseLengthError",
+      "msg": "response length error"
+    },
+    {
+      "code": 6027,
+      "name": "AttUrlError",
+      "msg": "att url error"
+    },
+    {
+      "code": 6028,
+      "name": "AttSuffixUrlError",
+      "msg": "att suffix url error"
+    },
+    {
+      "code": 6029,
+      "name": "JsonPathError",
+      "msg": "json path error"
+    },
+    {
+      "code": 6030,
+      "name": "UsernameKeyError",
+      "msg": "username key error"
+    },
+    {
+      "code": 6031,
+      "name": "FollowingError",
+      "msg": "following error"
+    },
+    {
+      "code": 6032,
+      "name": "FollowingNameError",
+      "msg": "following name error"
+    },
+    {
+      "code": 6033,
+      "name": "NameOpError",
+      "msg": "name op error"
+    },
+    {
+      "code": 6034,
+      "name": "TooManyUrls",
+      "msg": "too many urls"
+    },
+    {
+      "code": 6035,
+      "name": "TooManyResponseresolve",
+      "msg": "too many responseResolve"
+    },
+    {
+      "code": 6036,
+      "name": "UserNameEmpty",
+      "msg": "user name empty"
+    },
+    {
+      "code": 6037,
+      "name": "SourceError",
+      "msg": "source error"
+    },
+    {
+      "code": 6038,
+      "name": "AccountResponseLengthError",
+      "msg": "account response length error"
+    },
+    {
+      "code": 6039,
+      "name": "TiktokAttUrlError",
+      "msg": "tiktok att url error"
+    },
+    {
+      "code": 6040,
+      "name": "TiktokJsonPathError",
+      "msg": "tiktok json path error"
+    },
+    {
+      "code": 6041,
+      "name": "XAttUrlError",
+      "msg": "x att url error"
+    },
+    {
+      "code": 6042,
+      "name": "XJsonPathError",
+      "msg": "x json path error"
+    },
+    {
+      "code": 6043,
+      "name": "GoogleAttUrlError",
+      "msg": "google att url error"
+    },
+    {
+      "code": 6044,
+      "name": "GoogleJsonPathError",
+      "msg": "google json path error"
+    },
+    {
+      "code": 6045,
+      "name": "XiaohongshuAttUrlError",
+      "msg": "xiaohongshu att url error"
+    },
+    {
+      "code": 6046,
+      "name": "XiaohongshuJsonPathError",
+      "msg": "xiaohongshu json path error"
+    }
+  ],
+  "types": [
+    {
+      "name": "AttNetworkRequest",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "url",
+            "type": "string"
+          },
+          {
+            "name": "header",
+            "type": "string"
+          },
+          {
+            "name": "method",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AttNetworkResponseResolve",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "key_name",
+            "type": "string"
+          },
+          {
+            "name": "parse_type",
+            "type": "string"
+          },
+          {
+            "name": "parse_path",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Attestation",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "recipient",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "request",
+            "type": {
+              "defined": {
+                "name": "AttNetworkRequest"
+              }
+            }
+          },
+          {
+            "name": "response_resolve",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "AttNetworkResponseResolve"
+                }
+              }
+            }
+          },
+          {
+            "name": "data",
+            "type": "string"
+          },
+          {
+            "name": "att_conditions",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "addition_params",
+            "type": "string"
+          },
+          {
+            "name": "attestors",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Attestor"
+                }
+              }
+            }
+          },
+          {
+            "name": "signatures",
+            "type": {
+              "vec": "bytes"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Attestor",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "attestor_addr",
+            "type": {
+              "array": [
+                "u8",
+                20
+              ]
+            }
+          },
+          {
+            "name": "url",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CheckParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "check_type",
+            "type": "u32"
+          },
+          {
+            "name": "params",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DataBuffer",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "length",
+            "type": "u32"
+          },
+          {
+            "name": "data",
+            "type": "bytes"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PrimusState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "attestors",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Attestor"
+                }
+              }
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "REClaimEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "user_id",
+            "type": "string"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "index",
+            "type": "u32"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "token_address",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RERecord",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "docs": [
+              "Red envelope ID"
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "token_type",
+            "docs": [
+              "Token type (ERC20 / NATIVE)"
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "re_type",
+            "docs": [
+              "Red envelope type"
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "number",
+            "docs": [
+              "Number of recipients"
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "remaining_number",
+            "docs": [
+              "Remaining recipients"
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "timestamp",
+            "docs": [
+              "Timestamp sent"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "token_address",
+            "docs": [
+              "Token address"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "re_sender",
+            "docs": [
+              "Sender address"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "check_contract",
+            "docs": [
+              "Eligibility check contract"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "docs": [
+              "Total amount"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "remaining_amount",
+            "docs": [
+              "Remaining amount"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "check_params",
+            "docs": [
+              "Eligibility check params"
+            ],
+            "type": {
+              "defined": {
+                "name": "CheckParams"
+              }
+            }
+          },
+          {
+            "name": "empty_ratio",
+            "docs": [
+              "Empty red envelope ratio, 0–100"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "record_data",
+            "docs": [
+              "RE Record account, refer to Account<RERecordData>"
+            ],
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RERecordData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "docs": [
+              "Red envelope ID"
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "amounts",
+            "docs": [
+              "Red envelope amount array, containing 0 amounts."
+            ],
+            "type": {
+              "vec": "u64"
+            }
+          },
+          {
+            "name": "re_claimed",
+            "type": {
+              "vec": {
+                "array": [
+                  "u8",
+                  8
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "RESWithdrawEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "re_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "sender",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "remaining_number",
+            "type": "u32"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RESendEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "re_sender",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_type",
+            "type": "u32"
+          },
+          {
+            "name": "token_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "re_type",
+            "type": "u32"
+          },
+          {
+            "name": "number",
+            "type": "u32"
+          },
+          {
+            "name": "timestamp",
+            "type": "u64"
+          },
+          {
+            "name": "check_params",
+            "type": {
+              "defined": {
+                "name": "CheckParams"
+              }
+            }
+          },
+          {
+            "name": "empty_ratio",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RESendParam",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "re_type",
+            "docs": [
+              "Red envelope type: 0 = random, 1 = average"
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "number",
+            "docs": [
+              "Number of recipients"
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "amount",
+            "docs": [
+              "Total amount, the smallest unit"
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "check_contract",
+            "docs": [
+              "Eligibility check contract"
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "check_params",
+            "docs": [
+              "Params passed to check_contract"
+            ],
+            "type": {
+              "defined": {
+                "name": "CheckParams"
+              }
+            }
+          },
+          {
+            "name": "empty_ratio",
+            "docs": [
+              "Empty red envelope ratio, 0–100"
+            ],
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RedEnvelopeState",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "id_counter",
+            "type": "u128"
+          },
+          {
+            "name": "primus_zktls",
+            "type": "pubkey"
+          },
+          {
+            "name": "claim_fee",
+            "type": "u64"
+          },
+          {
+            "name": "fee_recipient",
+            "type": "pubkey"
+          },
+          {
+            "name": "withdraw_delay",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TipToken",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token_type",
+            "docs": [
+              "tokenType is erc20, native or nft. 0 means erc20, 1 means native and 2 means nft."
+            ],
+            "type": "u32"
+          },
+          {
+            "name": "token_address",
+            "docs": [
+              "Token address"
+            ],
+            "type": "pubkey"
+          }
+        ]
+      }
+    }
+  ]
+}
