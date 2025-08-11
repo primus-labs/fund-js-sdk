@@ -1,12 +1,13 @@
 import { ethers } from 'ethers';
-import { Attestation, ClaimParam, FundParam, RecipientBaseInfo, AttestParams, RefundParam, FundForRedPacketParam, RedPacketId, AttestCommonParams,FundERC20ForRedPacketParam } from './index.d'
+import { Attestation, ClaimParam, FundParam, RecipientBaseInfo, AttestParams, RefundParam, FundForRedPacketParam, RedPacketId, AttestCommonParams, FundERC20ForRedPacketParam } from './index.d'
 import { Fund } from "./classes/Fund";
 import { FundForRedPacket } from "./classes/FundForRedPacket";
 import { ZktlsSdk } from "./classes/ZktlsSdk";
-import { SUPPORTEDCHAINIDS, SUPPORTEDSOCIALPLATFORMS } from './config/constants'
-import { testReSend } from './classes/solana/test'
+import { SUPPORTEDCHAINIDS, SUPPORTEDSOCIALPLATFORMS, SUPPORTEDSOLANACHAINIDS } from './config/constants'
+import { testReSend, testReClaim, testReSenderWithdraw } from './classes/solana/test'
 import { getProgram } from './classes/solana/program'
 import redPacketIdl from './config/redPacketIdl.json'
+import zktlsIdl from './config/zktlsIdl.json'
 console.log('SUPPORTEDCHAINIDS444', SUPPORTEDCHAINIDS)
 export * from './index.d'
 class PrimusFund {
@@ -14,37 +15,43 @@ class PrimusFund {
   public supportedSocialPlatforms = SUPPORTEDSOCIALPLATFORMS;
   private provider!: ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider | ethers.providers.JsonRpcSigner;
   private _fund: Fund | undefined;
+  private _fundOnSolana: any;// TODO
   private _fundForRedPacket: FundForRedPacket | undefined;
   private _zkTlsSdk: ZktlsSdk | undefined;
-  async init(provider: any, chainId: number, appId?: string) {
+  async init(provider: any, chainId: number | string, appId?: string) {
     return new Promise(async (resolve, reject) => {
       try {
-        if (!this.supportedChainIds.includes(chainId)) {
+        if (!this.supportedChainIds.includes(chainId as number) && !SUPPORTEDSOLANACHAINIDS.includes(chainId as string)) {
           return reject('chainId is not supported')
         }
-        let formatProvider;
-        let signer;
-        if (provider instanceof ethers.providers.JsonRpcProvider) {
-          // console.log('provider is JsonRpcProvider')
-          formatProvider = provider;
-        } else {
-          // console.log('provider is Web3Provider')
-          formatProvider = new ethers.providers.Web3Provider(provider)
-          signer = formatProvider.getSigner();
+        if (this.supportedChainIds.includes(chainId as number)) {
+          let formatProvider;
+          let signer;
+          if (provider instanceof ethers.providers.JsonRpcProvider) {
+            // console.log('provider is JsonRpcProvider')
+            formatProvider = provider;
+          } else {
+            // console.log('provider is Web3Provider')
+            formatProvider = new ethers.providers.Web3Provider(provider)
+            signer = formatProvider.getSigner();
+          }
+          await formatProvider.ready;
+          const network = await formatProvider.getNetwork();
+          const providerChainId = network.chainId;
+          console.log('init provider', provider, network)
+          console.log('init providerChainId', providerChainId, chainId)
+          if (providerChainId !== chainId) {
+            return reject(`Please connect to the chain with ID ${chainId} first.`)
+          }
+          this.provider = signer ?? formatProvider;
+          this._fund = new Fund();
+          const result = await this._fund.init(this.provider, chainId);
+          this._fundForRedPacket = new FundForRedPacket();
+          await this._fundForRedPacket.init(this.provider, chainId);
+        } else if (SUPPORTEDSOLANACHAINIDS.includes(chainId as string)) {
+          this.provider = provider;
+          // this._fundOnSolana = 
         }
-        await formatProvider.ready;
-        const network = await formatProvider.getNetwork();
-        const providerChainId = network.chainId;
-        console.log('init provider', provider, network)
-        console.log('init providerChainId', providerChainId, chainId)
-        if (providerChainId !== chainId) {
-          return reject(`Please connect to the chain with ID ${chainId} first.`)
-        }
-        this.provider = signer ?? formatProvider;
-        this._fund = new Fund();
-        const result = await this._fund.init(this.provider, chainId);
-        this._fundForRedPacket = new FundForRedPacket();
-        await this._fundForRedPacket.init(this.provider, chainId);
         if (appId) {
           this._zkTlsSdk = new ZktlsSdk();
           await this._zkTlsSdk.init(appId);
@@ -278,9 +285,9 @@ class PrimusFund {
     let queryList = Array.isArray(getFundRecordsParams) ? getFundRecordsParams : [getFundRecordsParams];
     const socialPlatformList = queryList.map(i => i.socialPlatform)
     const userIdentifierList = queryList.map(i => i.userIdentifier)
-    
+
     return new Promise(async (resolve, reject) => {
-      if (!queryList || queryList?.length === 0) {  
+      if (!queryList || queryList?.length === 0) {
         const error = new Error('getFundRecordsParams is empty');
         return reject(error)
       }
@@ -302,9 +309,9 @@ class PrimusFund {
     let queryList = Array.isArray(getFundRecordsParams) ? getFundRecordsParams : [getFundRecordsParams];
     const socialPlatformList = queryList.map(i => i.socialPlatform)
     const userIdentifierList = queryList.map(i => i.userIdentifier)
-    
+
     return new Promise(async (resolve, reject) => {
-      if (!queryList || queryList?.length === 0) {  
+      if (!queryList || queryList?.length === 0) {
         const error = new Error('getFundRecordsParams is empty');
         return reject(error)
       }
@@ -321,14 +328,14 @@ class PrimusFund {
     });
   }
 
-  
+
   async getFundRecordsLen(getFundRecordsParams: RecipientBaseInfo) {
     let queryList = Array.isArray(getFundRecordsParams) ? getFundRecordsParams : [getFundRecordsParams];
     const socialPlatformList = queryList.map(i => i.socialPlatform)
     const userIdentifierList = queryList.map(i => i.userIdentifier)
-    
+
     return new Promise(async (resolve, reject) => {
-      if (!queryList || queryList?.length === 0) {  
+      if (!queryList || queryList?.length === 0) {
         const error = new Error('getFundRecordsParams is empty');
         return reject(error)
       }
@@ -345,14 +352,14 @@ class PrimusFund {
     });
   }
 
-  
+
   async getFundRecordsPaginated(getFundRecordsParams: RecipientBaseInfo, pageNum: number, pageSize: number) {
     let queryList = Array.isArray(getFundRecordsParams) ? getFundRecordsParams : [getFundRecordsParams];
     const socialPlatformList = queryList.map(i => i.socialPlatform)
     const userIdentifierList = queryList.map(i => i.userIdentifier)
-    
+
     return new Promise(async (resolve, reject) => {
-      if (!queryList || queryList?.length === 0) {  
+      if (!queryList || queryList?.length === 0) {
         const error = new Error('getFundRecordsParams is empty');
         return reject(error)
       }
@@ -411,7 +418,7 @@ class PrimusFund {
       }
     });
   }
-  async approveForRedPacket(fundParam: FundERC20ForRedPacketParam ) {
+  async approveForRedPacket(fundParam: FundERC20ForRedPacketParam) {
     return new Promise(async (resolve, reject) => {
       try {
         const { tokenInfo, sendParam: { amount } } = fundParam
@@ -443,10 +450,27 @@ class PrimusFund {
       }
     });
   }
-  async testReSend(params: any, provider: any) {
-    const p = getProgram(redPacketIdl, provider)
-    await testReSend({redEnvelopeProgram: p,...params})
+  async testReSend(params: any) {
+    const p = getProgram(redPacketIdl, params.provider)
+    await testReSend({ redEnvelopeProgram: p, ...params })
   }
+  async testReClaim(params: any) {
+    const resPacketP = getProgram(redPacketIdl, params.provider)
+    const zktlsP = getProgram(zktlsIdl, params.provider)
+    //   redEnvelopeProgram,
+    // userKey,
+    // provider,
+    // zktlsProgram,
+    // reId,
+    // xFollowing = true
+    await testReClaim({ redEnvelopeProgram: resPacketP, zktlsProgram: zktlsP, ...params })
+  }
+  async testReSenderWithdraw(params: any) {
+    const resPacketP = getProgram(redPacketIdl, params.provider)
+    debugger
+    await testReSenderWithdraw({ redEnvelopeProgram: resPacketP, ...params })
+  }
+
 }
 
 export { PrimusFund };

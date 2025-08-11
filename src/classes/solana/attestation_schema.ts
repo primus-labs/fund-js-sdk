@@ -122,6 +122,7 @@ function normalizeAttestationInput(obj: any): Attestation {
 
 export function serializeAttestation(attObj: any): Uint8Array {
   const borshObj = normalizeAttestationInput(attObj)
+  console.log('attObj', attObj,'serializeAttestation-borshObj',borshObj)
   const buffer = serialize(schema, borshObj);
   return buffer;
 }

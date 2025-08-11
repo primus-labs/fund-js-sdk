@@ -155,7 +155,7 @@
             "seeds": [
               {
                 "kind": "account",
-                "path": "re_record"
+                "path": "state"
               },
               {
                 "kind": "const",
@@ -344,7 +344,7 @@
       ],
       "args": [
         {
-          "name": "re_id",
+          "name": "_re_id",
           "type": {
             "array": [
               "u8",
@@ -363,6 +363,35 @@
           }
         }
       ]
+    },
+    {
+      "name": "re_record_data_init",
+      "discriminator": [
+        211,
+        91,
+        95,
+        249,
+        111,
+        81,
+        103,
+        124
+      ],
+      "accounts": [
+        {
+          "name": "re_record_data",
+          "writable": true
+        },
+        {
+          "name": "sender",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
     },
     {
       "name": "re_send",
@@ -540,7 +569,7 @@
             "seeds": [
               {
                 "kind": "account",
-                "path": "re_record"
+                "path": "state"
               },
               {
                 "kind": "const",
@@ -665,35 +694,6 @@
       ]
     },
     {
-      "name": "re_send_init",
-      "discriminator": [
-        119,
-        43,
-        109,
-        131,
-        190,
-        47,
-        59,
-        30
-      ],
-      "accounts": [
-        {
-          "name": "re_record_data",
-          "writable": true
-        },
-        {
-          "name": "sender",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "re_sender_withdraw",
       "discriminator": [
         231,
@@ -756,7 +756,7 @@
             "seeds": [
               {
                 "kind": "account",
-                "path": "re_record"
+                "path": "state"
               },
               {
                 "kind": "const",
@@ -945,7 +945,7 @@
       ],
       "args": [
         {
-          "name": "re_id",
+          "name": "_re_id",
           "type": {
             "array": [
               "u8",

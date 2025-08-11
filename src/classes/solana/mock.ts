@@ -61,6 +61,7 @@ function getMockAttestationXFollowing() {
 
   return attestation;
 }
+
 function getMockAttestationAccount() {
   const request = {
     "url": "https://developers.google.com/_d/profile/user",
@@ -104,9 +105,13 @@ export function getMockAttestation(xFollowing: boolean = true) {
 
 
 export function getMockReSendParams(xFollowing: boolean = true) {
+  // const tipToken = {// TODO
+  //   tokenType: NATIVE_TYPE, // 0,ERC20_TYPE; 1,NATIVE_TYPE
+  //   tokenAddress: anchor.web3.PublicKey.default,
+  // };
   const tipToken = {// TODO
-    tokenType: NATIVE_TYPE, // 0,ERC20_TYPE; 1,NATIVE_TYPE
-    tokenAddress: anchor.web3.PublicKey.default,
+    tokenType: ERC20_TYPE, // 0,ERC20_TYPE; 1,NATIVE_TYPE
+    tokenAddress: new PublicKey('4aEvQMXgLVwzJsg5SjDpuQ1mA7wM2qj5jdMezRyRMXT5'),
   };
   let checkParams = {
     checkType: CHECK_TYPE_ACCOUNT, // 0,CHECK_TYPE_X_FOLLOWING; 1,CHECK_TYPE_ACCOUNT
@@ -115,20 +120,21 @@ export function getMockReSendParams(xFollowing: boolean = true) {
   if (xFollowing) {
     checkParams.checkType = CHECK_TYPE_X_FOLLOWING;
     checkParams.params = "pharos_network";
+    // TODO primus_labs
   }
   // about 135 compute units per non-empty-red-envelope
   // max non-empty-red-envelope of 20w CUs is (200000 - 49200) / 135 = 1117
   // let { n, r } = { n: 1, r: 0 };
   // let { n, r } = { n: 1117, r: 0 };
   // let { n, r } = { n: 5678, r: 90 };
-  let { n, r } = { n: 2, r: 50 };
+  let { n, r } = { n: 2, r: 0 };
   // let { n, r } = { n: 10000, r: 95 };
   // let { n, r } = { n: 17000, r: 97 };
   // let { n, r } = { n: 50000, r: 99 };
   const reSendParam = {
     reType: 0,
     number: n,
-    amount: new anchor.BN(1_000_000),
+    amount: new anchor.BN(2_000_000),
     checkContract: anchor.web3.PublicKey.default,
     checkParams: checkParams,
     emptyRatio: r,
@@ -137,6 +143,7 @@ export function getMockReSendParams(xFollowing: boolean = true) {
 }
 
 // Helper to create mint + mint tokens
+// TODO???
 export async function createMintAndAccounts(provider: anchor.AnchorProvider, payer: Keypair, userKey: anchor.web3.PublicKey): Promise<{
   mint: anchor.web3.PublicKey; senderTokenAccount: anchor.web3.PublicKey;
 }> {
@@ -184,8 +191,10 @@ export async function getOrCreateMockAccount(
   const tempAccount = Keypair.fromSecretKey(secretKey);
   const accountInfo = await connection.getAccountInfo(tempAccount.publicKey);
   if (accountInfo) {
+    debugger
     return tempAccount;
   }
+  debugger
 
   const lamports = await connection.getMinimumBalanceForRentExemption(0);
 

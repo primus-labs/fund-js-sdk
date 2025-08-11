@@ -7,12 +7,13 @@ import {
   SystemProgram,
   Transaction,
   Keypair,
-  sendAndConfirmTransaction
+  sendAndConfirmTransaction,
+  ComputeBudgetProgram
 } from "@solana/web3.js";
 import { serializeAttestation } from "./attestation_schema";
 import { getPrimusZktlsPda, getPrimusRedEnvelopePda, getPrimusRERecordPda } from "./pda";
-import {utils} from 'ethers';
-import { createMint, getAssociatedTokenAddress, mintTo, getAccount } from "@solana/spl-token";
+import { utils } from 'ethers';
+import { createMint, getAssociatedTokenAddress, mintTo, getAccount,getOrCreateAssociatedTokenAccount, createAssociatedTokenAccountInstruction, } from "@solana/spl-token";
 
 export const ERC20_TYPE = 0; //  SPL Token
 export const NATIVE_TYPE = 1; // SOL
@@ -41,7 +42,7 @@ export async function waitForTransactionConfirmation(
       commitment: "confirmed",
     });
     if (txDetails) {
-      // console.log("Transaction details:", txDetails);
+      console.log("Transaction details:", txDetails);
       if (VERBOSE > 2) {
         console.log("Program logs:", txDetails.meta?.logMessages);
       }
@@ -136,6 +137,7 @@ export async function verifyAttestation({
 
   let storeInitialized = false;
   let useStoreVersion = false;
+  // TODO
   if (attBuffer.length > 999 - 32) {// exactly 999, update this if the parameters has changed
     useStoreVersion = true;
   }
@@ -245,111 +247,121 @@ export async function reSend({
   reSendParam: any;
   payer?: Keypair;
 }): Promise<Buffer | null> {
-  const newAccount = Keypair.generate();
-  // discriminator + re_id + vec<u64> + vec<[u8;8]>
-  const space = 8 + 32 + 4 + 8 * reSendParam.number + 4 + RE_USERID_LEN * reSendParam.number;
-  const lamports = await provider.connection.getMinimumBalanceForRentExemption(space);
-  console.log("newAccount:", newAccount.publicKey.toBase58(), "minimum rent:", lamports / 1_000_000_000, "SOL");
-
-  const createIx = SystemProgram.createAccount({
-    fromPubkey: userKey,
-    newAccountPubkey: newAccount.publicKey,
-    lamports,
-    space,
-    programId: redEnvelopeProgram.programId,
-  });
-
-  const [redEnvelopePda] = getPrimusRedEnvelopePda({ programId: redEnvelopeProgram.programId });
-
-  // 1. get the id counter
-  const redEnvelopeState = await redEnvelopeProgram.account.redEnvelopeState.fetch(redEnvelopePda);
-  console.log("idCounter", redEnvelopeState.idCounter.toString());
-
-  // 2. get the ReRecordPda
-  const idCounter = new anchor.BN(redEnvelopeState.idCounter);
-  const idCounterBytes = idCounter.toArrayLike(Buffer, "le", 16);
-  
-  let reId = utils.keccak256(idCounterBytes);
-let reId2  = Buffer.from(reId.slice(2), "hex")
-  reId = utils.arrayify(reId)
-
-    
-  const [reRecordPda] = getPrimusRERecordPda({ programId: redEnvelopeProgram.programId, reId: reId });
-  // console.log("reRecordPda:", reRecordPda.toBase58());
-  // console.log("idCounterBytes:", idCounterBytes.toString("hex"));
-  // console.log("reId:", reId.toString("hex"));
-
-  let reSenderInitialized = false;
   try {
-    {
-      // reSendInit
-      // const ix = await redEnvelopeProgram.methods
-      //   .reSendInit()
-      //   .accounts({
-      //     reRecordData: newAccount.publicKey,
-      //     sender: userKey,
-      //   })
-      //   .signers([newAccount])
-      //   .instruction();
-      
-      
-      const tx = new Transaction().add(createIx);
-      // const tx = new Transaction().add(createIx, ix);
-      // debugger
-      // // const tx0 = await sendAndConfirmTransaction(provider.connection, tx, [newAccount]);
-      // const tx0 = await sendAndConfirmTransaction(provider.connection, tx, [payer, newAccount]);
-      // await waitForTransactionConfirmation(provider, tx0);
-
-      // 构造交易
-      tx.feePayer = userKey;
-      tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
-
-      // 签名交易（浏览器钱包 + newAccount）
-      tx.partialSign(newAccount);
-      const signedTx = await provider.wallet.signTransaction(tx);
-
-      // 发送并确认
-      const sig = await provider.connection.sendRawTransaction(signedTx.serialize());
-      await provider.connection.confirmTransaction(sig);
-      
-
-      console.log("reSendInit done");
-      reSenderInitialized = true;
+    console.log('provider', provider)
+    debugger
+    // 1. Create an account to store the amounts and reclaimeds
+    const spaceAccount = Keypair.generate();
+    // layout: discriminator(8) + re_id(32) + vec<u64> + vec<[u8;8]>
+    const space = 8 + 32 + 4 + 8 * reSendParam.number + 4 + RE_USERID_LEN * reSendParam.number;
+    if (space > 10 * 1024 * 1024 - 256) {
+      throw "Cannot make so large space[" + space.toString() + "]";
     }
+    const lamports = await provider.connection.getMinimumBalanceForRentExemption(space);
+    console.log("spaceAccount:", spaceAccount.publicKey.toBase58(), "space:", space, "minimum rent:", lamports / 1_000_000_000, "SOL");
 
-    // 3. call reSend
+    const createIx = SystemProgram.createAccount({
+      fromPubkey: userKey,
+      newAccountPubkey: spaceAccount.publicKey,
+      lamports,
+      space,
+      programId: redEnvelopeProgram.programId,
+    });
+
+    // 2. init the spaceAccount
+    const reRecordDataInitIx = await redEnvelopeProgram.methods
+      .reRecordDataInit()
+      .accounts({
+        reRecordData: spaceAccount.publicKey,
+        sender: userKey,
+      })
+      .signers([spaceAccount])
+      .instruction();
+
+    // 3. reSend
+    // 1). get the id counter
+    const [redEnvelopePda] = getPrimusRedEnvelopePda({ programId: redEnvelopeProgram.programId });
+    const redEnvelopeState = await redEnvelopeProgram.account.redEnvelopeState.fetch(redEnvelopePda);
+    console.log("idCounter", redEnvelopeState.idCounter.toString());
+
+    // 2). generate reId
+    const idCounter = new anchor.BN(redEnvelopeState.idCounter);
+    const idCounterBytes = idCounter.toArrayLike(Buffer, "le", 16);
+    // const reId = utils.arrayify(utils.keccak256(idCounterBytes))
+    const reId = Buffer.from(utils.arrayify(utils.keccak256(idCounterBytes)));// update
+    const [reRecordPda] = getPrimusRERecordPda({ programId: redEnvelopeProgram.programId, reId: reId });
+    // console.log("idCounterBytes:", idCounterBytes.toString("hex"));
+    console.log("reId:", reId.toString("hex"));
+    // console.log("reRecordPda:", reRecordPda.toBase58());
+
+    // 3). set from/to token account
+    let mint = null;
     let fromTokenAccount = null;
     let toTokenAccount = null;
-    let mint = null;
     if (tipToken.tokenType == ERC20_TYPE) {
-      fromTokenAccount = await getAssociatedTokenAddress(tipToken.tokenAddress, userKey);
-      toTokenAccount = await getAssociatedTokenAddress(tipToken.tokenAddress, reRecordPda, true);
       mint = tipToken.tokenAddress;
+      fromTokenAccount = await getAssociatedTokenAddress(mint, userKey);
+      debugger
+      toTokenAccount = await getAssociatedTokenAddress(mint, redEnvelopePda, true);
     }
 
-    const tx = await redEnvelopeProgram.methods
+    const reSendIx = await redEnvelopeProgram.methods
       .reSend(Array.from(reId), tipToken, reSendParam)
       .accounts({
         state: redEnvelopePda,
         reRecord: reRecordPda,
-        reRecordData: newAccount.publicKey,
+        reRecordData: spaceAccount.publicKey,
         sender: userKey,
         // SPL
         fromTokenAccount: fromTokenAccount,
         toTokenAccount: toTokenAccount,
         mint: mint,
       })
-      .signers([])
-      .rpc();
-    await waitForTransactionConfirmation(provider, tx);
-    console.log("reSend done");
+      .instruction();
+
+
+    // 4. set max CU limit, mainly for reSend
+    // const max_cu_limit = 1_000_000; // 1_400_000;
+    // const computeIx = ComputeBudgetProgram.setComputeUnitLimit({ units: max_cu_limit });
+
+    //
+    const tx = new Transaction()
+      // .add(computeIx)
+      .add(createIx)
+      .add(reRecordDataInitIx)
+      .add(reSendIx);
+      debugger
+
+    // const ts = await sendAndConfirmTransaction(provider.connection, tx, [payer, spaceAccount]);
+    // Construct the transaction
+    tx.feePayer = userKey;
+    tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
+
+    // sign the transaction (browser wallet + newAccount)
+    tx.partialSign(spaceAccount);
+   
+    const signedTx = await provider.wallet.signTransaction(tx);
+    const serializeSignedTx = signedTx.serialize()
+    console.log('signedTx', signedTx, serializeSignedTx, tx.recentBlockhash)
+    // send and confirm it.
+    debugger
+    const sig = await provider.connection.sendRawTransaction(serializeSignedTx);
+    await provider.connection.confirmTransaction(sig);
+    
+    // await waitForTransactionConfirmation(provider, sig);
+    console.log("reSend done, reId: ", reId);
+    debugger
+    return reId;
+
+
+
   } catch (err) {
     console.error("reSend error:", err);
     throw err;
   } finally {
-    if (reSenderInitialized) {
-      // TODO, close newAccount
-    }
+    // if (reSenderInitialized) {
+    // TODO, close newAccount
+    // }
   }
 
   return reId;
@@ -377,6 +389,7 @@ export async function reClaim({
 
   let storeInitialized = false;
   let useStoreVersion = false;
+  // TODO
   if (attBuffer.length > 719 - 32) {// exactly 719, update this if the parameters has changed
     useStoreVersion = true;
   }
@@ -392,7 +405,7 @@ export async function reClaim({
       await waitForTransactionConfirmation(provider, txStoreInitialize);
       storeInitialized = true;
       console.log("storeInitialize done");
-
+debugger
       // 2. write data
       for (let offset = 0; offset < attBuffer.length; offset += CHUNK_SIZE) {
         const chunk = attBuffer.slice(offset, offset + CHUNK_SIZE);
@@ -400,6 +413,7 @@ export async function reClaim({
           .storeChunk(Buffer.from(chunk))
           .accounts({ dataBuffer: dataBufferKey, user: userKey })
           .rpc();
+        debugger
         await waitForTransactionConfirmation(provider, txStoreChunk);
       }
       console.log("storeChunk done");
@@ -417,24 +431,28 @@ export async function reClaim({
     // get fee recipient
     const redEnvelopeState = await redEnvelopeProgram.account.redEnvelopeState.fetch(redEnvelopePda);
     console.log("redEnvelopeState.feeRecipient", redEnvelopeState.feeRecipient.toBase58());
+
     const feeRecipient = redEnvelopeState.feeRecipient;
 
     // get token type
     const reRecord = await redEnvelopeProgram.account.reRecord.fetch(reRecordPda);
+    const reRecordData2 = await redEnvelopeProgram.account.reRecordData.fetch(reRecord.recordData);
+    debugger
+    console.log("reRecordData2:", reRecordData2);
     console.log("reRecord.tokenType:", reRecord.tokenType);
 
     // get record data account
     const reRecordData = reRecord.recordData;
     console.log("reRecord.recordData", reRecord.recordData.toBase58());
 
+    let mint = null;
     let fromTokenAccount = null;
     let toTokenAccount = null;
-    let mint = null;
     if (reRecord.tokenType == ERC20_TYPE) {
       console.log("reRecord.tokenAddress:", reRecord.tokenAddress);
-      fromTokenAccount = await getAssociatedTokenAddress(reRecord.tokenAddress, reRecordPda, true);
-      toTokenAccount = await getAssociatedTokenAddress(reRecord.tokenAddress, attRecipient);
       mint = reRecord.tokenAddress;
+      fromTokenAccount = await getAssociatedTokenAddress(mint, redEnvelopePda, true);
+      toTokenAccount = await getAssociatedTokenAddress(mint, attRecipient);
     }
 
     let _att = attObj;
@@ -443,6 +461,7 @@ export async function reClaim({
       _att = null;
       _dataBufferKey = dataBufferKey
     }
+    debugger
     const tx = await redEnvelopeProgram.methods
       .reClaim(reId, _att)
       .accounts({
@@ -462,14 +481,17 @@ export async function reClaim({
       })
       .signers([])
       .rpc();
+    debugger
     await waitForTransactionConfirmation(provider, tx);
     console.log("reClaim done");
   } catch (err) {
+    debugger
     console.error("reClaim error:", err);
     throw err;
   } finally {
     if (useStoreVersion && storeInitialized) {
       try {
+        debugger
         // 4. close storage account, back rent
         const txStoreClose = await zktlsProgram.methods
           .storeClose()
@@ -478,6 +500,7 @@ export async function reClaim({
         await waitForTransactionConfirmation(provider, txStoreClose);
         console.log("storeClose done");
       } catch (closeErr) {
+        debugger
         console.error("Failed to close dataBuffer:", closeErr);
       }
     }
@@ -494,24 +517,25 @@ export async function reSenderWithdraw({
   userKey: anchor.web3.PublicKey;
   provider: anchor.AnchorProvider;
   reId: any;
-}) {
+  }) {
+  const [redEnvelopePda] = getPrimusRedEnvelopePda({ programId: redEnvelopeProgram.programId });
   const [reRecordPda] = getPrimusRERecordPda({ programId: redEnvelopeProgram.programId, reId: reId });
   console.log("reRecordPda:", reRecordPda.toBase58());
 
   const reRecord = await redEnvelopeProgram.account.reRecord.fetch(reRecordPda);
   console.log("reRecord.tokenType:", reRecord.tokenType);
 
+   let mint = null;
   let fromTokenAccount = null;
   let toTokenAccount = null;
-  let mint = null;
+ 
   if (reRecord.tokenType == ERC20_TYPE) {
     console.log("reRecord.tokenAddress:", reRecord.tokenAddress);
-    fromTokenAccount = await getAssociatedTokenAddress(reRecord.tokenAddress, reRecordPda, true);
-    toTokenAccount = await getAssociatedTokenAddress(reRecord.tokenAddress, userKey);
     mint = reRecord.tokenAddress;
+    fromTokenAccount = await getAssociatedTokenAddress(mint, redEnvelopePda, true);
+    toTokenAccount = await getAssociatedTokenAddress(mint, userKey);
   }
-
-  const [redEnvelopePda] = getPrimusRedEnvelopePda({ programId: redEnvelopeProgram.programId });
+  debugger
   const tx = await redEnvelopeProgram.methods
     .reSenderWithdraw(reId)
     .accounts({
@@ -525,7 +549,7 @@ export async function reSenderWithdraw({
     })
     .signers([])
     .rpc();
-
+    debugger
   await waitForTransactionConfirmation(provider, tx);
   console.log("reSenderWithdraw done");
 }
@@ -536,9 +560,11 @@ export async function getREInfo({
 }: {
   redEnvelopeProgram: any;
   reId: any;
-}): Promise<any | null> {
+  }): Promise<any | null> {
+  debugger
   const [reRecordPda] = getPrimusRERecordPda({ programId: redEnvelopeProgram.programId, reId: reId });
   const reRecord = await redEnvelopeProgram.account.reRecord.fetch(reRecordPda);
+  debugger
   return reRecord;
 }
 
@@ -554,7 +580,9 @@ export async function getClaimed({
   const reRecord = await getREInfo({ redEnvelopeProgram, reId });
   const reRecordData = await redEnvelopeProgram.account.reRecordData.fetch(reRecord.recordData);
   const userIdBytes = (new TextEncoder()).encode(userid);
-  const userIdHash = utils.keccak256(Buffer.from(userIdBytes)).subarray(0, 8);
+  // const userIdHash = utils.keccak256(Buffer.from(userIdBytes)).subarray(0, 8);
+  const userIdHash = utils.arrayify(utils.keccak256(Buffer.from(userIdBytes))).subarray(0, 8); // update
+  debugger
   const contains = reRecordData.reClaimed.some(arr =>
     arr.length === userIdHash.length && arr.every((v, i) => v === userIdHash[i])
   );

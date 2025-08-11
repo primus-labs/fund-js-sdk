@@ -114,6 +114,7 @@ export const Fund_CONTRACTS: { [chainId: number]: string } = Object.values(SUPPO
   }
 }, {})
 export const SUPPORTEDCHAINIDS: number[] = Object.keys(Fund_CONTRACTS).map(i => Number(i))
+export const SUPPORTEDSOLANACHAINIDS: string[] = ['EtWTRABZaYq6iMfeYKouRu166VU2xqa1']
 export const FundForRedPacket_CONTRACTS: { [chainId: number]: string } = Object.values(SUPPORTEDCHAINIDSMAP).filter(
   (item) => {
     return item.redPacketContractAddress
