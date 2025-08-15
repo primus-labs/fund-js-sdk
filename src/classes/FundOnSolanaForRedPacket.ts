@@ -1,4 +1,3 @@
-import { ethers } from 'ethers';
 import * as anchor from "@coral-xyz/anchor";
 import { Attestation, TokenInfo, SendOnSolanaForRedPacketParam, RedPacketId } from '../index.d'
 import { getProgram, toTokenAmount, getTokenDecimals, formatAttestation, hexToUint8Array, decodeReSendEvent, decodeClaimEvent } from './solana/program';
@@ -39,9 +38,7 @@ class FundOnSolanaForRedPacket {
         } else if (tokenInfo.tokenType === 0) {
           decimals = await getTokenDecimals(tokenInfo.tokenAddress, this.provider.connection)
           amountOnChain = toTokenAmount(sendParam.amount, decimals)
-
           formatTokenInfo.tokenAddress = new PublicKey(tokenInfo.tokenAddress)
-
         }
 
         const reSendParam = {
@@ -76,6 +73,7 @@ class FundOnSolanaForRedPacket {
         });
         return resolve(result)
       } catch (error) {
+        debugger
         return reject(error)
       }
     });

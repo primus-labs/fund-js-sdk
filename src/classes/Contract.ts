@@ -106,7 +106,6 @@ class Contract {
         if (isAllClaimed) {
           return reject('all claimed')
         }
-
         return reject(error)
       }
     
