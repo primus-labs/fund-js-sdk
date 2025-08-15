@@ -1,7 +1,8 @@
 import { ethers } from 'ethers';
-import { Attestation, ClaimParam, FundParam, RecipientBaseInfo, AttestParams, RefundParam, FundForRedPacketParam, RedPacketId, AttestCommonParams, FundERC20ForRedPacketParam } from './index.d'
+import { Attestation, ClaimParam, FundParam, RecipientBaseInfo, AttestParams, RefundParam, FundForRedPacketParam, RedPacketId, AttestCommonParams, FundERC20ForRedPacketParam,FundOnSolanaForRedPacketParam } from './index.d'
 import { Fund } from "./classes/Fund";
 import { FundForRedPacket } from "./classes/FundForRedPacket";
+import {FundOnSolanaForRedPacket} from "./classes/FundOnSolanaForRedPacket";
 import { ZktlsSdk } from "./classes/ZktlsSdk";
 import { SUPPORTEDCHAINIDS, SUPPORTEDSOCIALPLATFORMS, SUPPORTEDSOLANACHAINIDS } from './config/constants'
 import { testReSend, testReClaim, testReSenderWithdraw } from './classes/solana/test'
@@ -10,14 +11,19 @@ import redPacketIdl from './config/redPacketIdl.json'
 import zktlsIdl from './config/zktlsIdl.json'
 console.log('SUPPORTEDCHAINIDS444', SUPPORTEDCHAINIDS)
 export * from './index.d'
+import { decodeReSendEvent, decodeClaimEvent } from './classes/solana/program';
 class PrimusFund {
   public supportedChainIds = SUPPORTEDCHAINIDS;
   public supportedSocialPlatforms = SUPPORTEDSOCIALPLATFORMS;
   private provider!: ethers.providers.Web3Provider | ethers.providers.JsonRpcProvider | ethers.providers.JsonRpcSigner;
   private _fund: Fund | undefined;
-  private _fundOnSolana: any;// TODO
   private _fundForRedPacket: FundForRedPacket | undefined;
+  private _fundOnSolanaForRedPacket: any;// TODO
   private _zkTlsSdk: ZktlsSdk | undefined;
+  static utils = {
+    decodeReSendEvent,
+    decodeClaimEvent
+  }
   async init(provider: any, chainId: number | string, appId?: string) {
     return new Promise(async (resolve, reject) => {
       try {
@@ -45,18 +51,19 @@ class PrimusFund {
           }
           this.provider = signer ?? formatProvider;
           this._fund = new Fund();
-          const result = await this._fund.init(this.provider, chainId);
+          await this._fund.init(this.provider, chainId);
           this._fundForRedPacket = new FundForRedPacket();
           await this._fundForRedPacket.init(this.provider, chainId);
         } else if (SUPPORTEDSOLANACHAINIDS.includes(chainId as string)) {
           this.provider = provider;
-          // this._fundOnSolana = 
+          this._fundOnSolanaForRedPacket = new FundOnSolanaForRedPacket()
+          this._fundOnSolanaForRedPacket.init(provider, chainId)
         }
         if (appId) {
           this._zkTlsSdk = new ZktlsSdk();
           await this._zkTlsSdk.init(appId);
         }
-        return resolve(result);
+        return resolve(true);
       } catch (error) {
         return reject(error);
       }
@@ -408,10 +415,15 @@ class PrimusFund {
       }
     });
   }
-  async getRedPacketInfo(redPacketId: RedPacketId) {
+  async getRedPacketInfo(redPacketId: RedPacketId, chainId?: number | string) {
     return new Promise(async (resolve, reject) => {
       try {
-        const result = await this._fundForRedPacket?.getRedPacketInfo(redPacketId);
+        let result;
+        if (chainId && typeof chainId === 'string') {
+          result = await this._fundOnSolanaForRedPacket?.getRedPacketInfo(redPacketId);
+        } else {
+          result = await this._fundForRedPacket?.getRedPacketInfo(redPacketId);
+        }
         return resolve(result);
       } catch (error) {
         return reject(error);
@@ -450,26 +462,53 @@ class PrimusFund {
       }
     });
   }
-  async testReSend(params: any) {
-    const p = getProgram(redPacketIdl, params.provider)
-    await testReSend({ redEnvelopeProgram: p, ...params })
+
+  async fundonSolanaForRedPacket(fundParam: FundOnSolanaForRedPacketParam) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { tokenInfo, sendParam } = fundParam;
+        const result = await this._fundOnSolanaForRedPacket?.fund( tokenInfo, sendParam);
+        return resolve(result)
+      } catch (error) {
+        return reject(error)
+      }
+    });
   }
-  async testReClaim(params: any) {
-    const resPacketP = getProgram(redPacketIdl, params.provider)
-    const zktlsP = getProgram(zktlsIdl, params.provider)
-    //   redEnvelopeProgram,
-    // userKey,
-    // provider,
-    // zktlsProgram,
-    // reId,
-    // xFollowing = true
-    await testReClaim({ redEnvelopeProgram: resPacketP, zktlsProgram: zktlsP, ...params })
+  async claimOnSolanaForRedPacket(redPacketId: RedPacketId, attestation: Attestation) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        let formatAttestation = { ...attestation, responseResolve: attestation.reponseResolve }
+        delete formatAttestation.reponseResolve
+        const result = await this._fundOnSolanaForRedPacket?.claim( redPacketId, formatAttestation);
+        return resolve(result)
+      } catch (error) {
+        return reject(error)
+      }
+    });
   }
-  async testReSenderWithdraw(params: any) {
-    const resPacketP = getProgram(redPacketIdl, params.provider)
-    debugger
-    await testReSenderWithdraw({ redEnvelopeProgram: resPacketP, ...params })
+  async withdrawOnSolanaForRedPacket(redPacketId: RedPacketId) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const result = await this._fundOnSolanaForRedPacket?.withdraw(redPacketId);
+        return resolve(result)
+      } catch (error) {
+        return reject(error)
+      }
+    });
   }
+  // async testReSend(params: any) {
+  //   const p = getProgram(redPacketIdl, params.provider)
+  //   await testReSend({ redEnvelopeProgram: p, ...params })
+  // }
+  // async testReClaim(params: any) {
+  //   const resPacketP = getProgram(redPacketIdl, params.provider)
+  //   const zktlsP = getProgram(zktlsIdl, params.provider)
+  //   await testReClaim({ redEnvelopeProgram: resPacketP, zktlsProgram: zktlsP, ...params })
+  // }
+  // async testReSenderWithdraw(params: any) {
+  //   const resPacketP = getProgram(redPacketIdl, params.provider)
+  //   await testReSenderWithdraw({ redEnvelopeProgram: resPacketP, ...params })
+  // }
 
 }
 

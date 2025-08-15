@@ -1,5 +1,5 @@
-import { serialize, deserialize } from 'borsh';
-
+import * as borsh from 'borsh'
+const { serialize } = borsh
 class Attestor {
   attestorAddr: Uint8Array;
   url: string;
@@ -124,5 +124,6 @@ export function serializeAttestation(attObj: any): Uint8Array {
   const borshObj = normalizeAttestationInput(attObj)
   console.log('attObj', attObj,'serializeAttestation-borshObj',borshObj)
   const buffer = serialize(schema, borshObj);
+  console.log('attObj=buffer', buffer)
   return buffer;
 }

@@ -1,9 +1,5 @@
-import * as anchor from "@coral-xyz/anchor";
 import {
   PublicKey,
-  VersionedTransactionResponse,
-  Connection,
-  Commitment,
 } from "@solana/web3.js";
 
 const SEED_PRIMUS_STATE = new TextEncoder().encode("primus_state");
@@ -38,7 +34,7 @@ export function getPrimusRERecordPda({
 }: {
   programId: PublicKey;
   reId: any,
-  }): [PublicKey, number] {
+}): [PublicKey, number] {
   return PublicKey.findProgramAddressSync(
     [SEED_PRIMUS_RE_RECORD, reId],
     programId

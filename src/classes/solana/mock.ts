@@ -191,10 +191,8 @@ export async function getOrCreateMockAccount(
   const tempAccount = Keypair.fromSecretKey(secretKey);
   const accountInfo = await connection.getAccountInfo(tempAccount.publicKey);
   if (accountInfo) {
-    debugger
     return tempAccount;
   }
-  debugger
 
   const lamports = await connection.getMinimumBalanceForRentExemption(0);
 

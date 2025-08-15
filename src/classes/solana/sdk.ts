@@ -3,17 +3,14 @@ import {
   PublicKey,
   VersionedTransactionResponse,
   Connection,
-  Commitment,
   SystemProgram,
   Transaction,
   Keypair,
-  sendAndConfirmTransaction,
-  ComputeBudgetProgram
 } from "@solana/web3.js";
 import { serializeAttestation } from "./attestation_schema";
 import { getPrimusZktlsPda, getPrimusRedEnvelopePda, getPrimusRERecordPda } from "./pda";
 import { utils } from 'ethers';
-import { createMint, getAssociatedTokenAddress, mintTo, getAccount,getOrCreateAssociatedTokenAccount, createAssociatedTokenAccountInstruction, } from "@solana/spl-token";
+import { getAssociatedTokenAddress } from "@solana/spl-token";
 
 export const ERC20_TYPE = 0; //  SPL Token
 export const NATIVE_TYPE = 1; // SOL
@@ -50,7 +47,6 @@ export async function waitForTransactionConfirmation(
     }
     await new Promise(res => setTimeout(res, delayMs));
   }
-
   console.warn(`Transaction ${tx} not found after ${retries} retries.`);
   return null;
 }
@@ -129,7 +125,7 @@ export async function verifyAttestation({
   attObj: any;
   userKey: anchor.web3.PublicKey;
   provider: anchor.AnchorProvider;
-}) {
+  }) {
   const dataBuffer = anchor.web3.Keypair.generate();
   const dataBufferKey = dataBuffer.publicKey;
   const attBuffer = serializeAttestation(attObj);
@@ -246,10 +242,9 @@ export async function reSend({
   tipToken: any;
   reSendParam: any;
   payer?: Keypair;
-}): Promise<Buffer | null> {
+}): Promise<string | null> {
   try {
-    console.log('provider', provider)
-    debugger
+    // console.log('provider', provider)
     // 1. Create an account to store the amounts and reclaimeds
     const spaceAccount = Keypair.generate();
     // layout: discriminator(8) + re_id(32) + vec<u64> + vec<[u8;8]>
@@ -289,9 +284,10 @@ export async function reSend({
     const idCounterBytes = idCounter.toArrayLike(Buffer, "le", 16);
     // const reId = utils.arrayify(utils.keccak256(idCounterBytes))
     const reId = Buffer.from(utils.arrayify(utils.keccak256(idCounterBytes)));// update
+    
     const [reRecordPda] = getPrimusRERecordPda({ programId: redEnvelopeProgram.programId, reId: reId });
     // console.log("idCounterBytes:", idCounterBytes.toString("hex"));
-    console.log("reId:", reId.toString("hex"));
+    
     // console.log("reRecordPda:", reRecordPda.toBase58());
 
     // 3). set from/to token account
@@ -301,10 +297,8 @@ export async function reSend({
     if (tipToken.tokenType == ERC20_TYPE) {
       mint = tipToken.tokenAddress;
       fromTokenAccount = await getAssociatedTokenAddress(mint, userKey);
-      debugger
       toTokenAccount = await getAssociatedTokenAddress(mint, redEnvelopePda, true);
     }
-
     const reSendIx = await redEnvelopeProgram.methods
       .reSend(Array.from(reId), tipToken, reSendParam)
       .accounts({
@@ -330,7 +324,6 @@ export async function reSend({
       .add(createIx)
       .add(reRecordDataInitIx)
       .add(reSendIx);
-      debugger
 
     // const ts = await sendAndConfirmTransaction(provider.connection, tx, [payer, spaceAccount]);
     // Construct the transaction
@@ -342,19 +335,17 @@ export async function reSend({
    
     const signedTx = await provider.wallet.signTransaction(tx);
     const serializeSignedTx = signedTx.serialize()
-    console.log('signedTx', signedTx, serializeSignedTx, tx.recentBlockhash)
+    console.log('signedTx', signedTx, serializeSignedTx, tx.recentBlockhash, )
     // send and confirm it.
-    debugger
     const sig = await provider.connection.sendRawTransaction(serializeSignedTx);
-    await provider.connection.confirmTransaction(sig);
+    // await provider.connection.confirmTransaction(sig);
     
     // await waitForTransactionConfirmation(provider, sig);
-    console.log("reSend done, reId: ", reId);
-    debugger
-    return reId;
+    console.log("reSend done, reId: ", reId.toString("hex"), sig);
+  
 
-
-
+    await waitForTransactionConfirmation(provider, sig);
+    return sig;
   } catch (err) {
     console.error("reSend error:", err);
     throw err;
@@ -381,12 +372,14 @@ export async function reClaim({
   zktlsProgram: any;
   reId: any;
   attObj: any;
-}) {
+  }) {
+  let tx
   const dataBuffer = anchor.web3.Keypair.generate();
   const dataBufferKey = dataBuffer.publicKey;
+  debugger
   const attBuffer = serializeAttestation(attObj);
   console.log(`attBuffer.length=${attBuffer.length}`);
-
+debugger
   let storeInitialized = false;
   let useStoreVersion = false;
   // TODO
@@ -395,6 +388,7 @@ export async function reClaim({
   }
 
   try {
+    
     if (useStoreVersion) {
       // 1, init storage
       const txStoreInitialize = await zktlsProgram.methods
@@ -405,7 +399,6 @@ export async function reClaim({
       await waitForTransactionConfirmation(provider, txStoreInitialize);
       storeInitialized = true;
       console.log("storeInitialize done");
-debugger
       // 2. write data
       for (let offset = 0; offset < attBuffer.length; offset += CHUNK_SIZE) {
         const chunk = attBuffer.slice(offset, offset + CHUNK_SIZE);
@@ -413,7 +406,6 @@ debugger
           .storeChunk(Buffer.from(chunk))
           .accounts({ dataBuffer: dataBufferKey, user: userKey })
           .rpc();
-        debugger
         await waitForTransactionConfirmation(provider, txStoreChunk);
       }
       console.log("storeChunk done");
@@ -437,7 +429,6 @@ debugger
     // get token type
     const reRecord = await redEnvelopeProgram.account.reRecord.fetch(reRecordPda);
     const reRecordData2 = await redEnvelopeProgram.account.reRecordData.fetch(reRecord.recordData);
-    debugger
     console.log("reRecordData2:", reRecordData2);
     console.log("reRecord.tokenType:", reRecord.tokenType);
 
@@ -462,7 +453,7 @@ debugger
       _dataBufferKey = dataBufferKey
     }
     debugger
-    const tx = await redEnvelopeProgram.methods
+    tx = await redEnvelopeProgram.methods
       .reClaim(reId, _att)
       .accounts({
         state: redEnvelopePda,
@@ -482,7 +473,7 @@ debugger
       .signers([])
       .rpc();
     debugger
-    await waitForTransactionConfirmation(provider, tx);
+    // await waitForTransactionConfirmation(provider, tx);
     console.log("reClaim done");
   } catch (err) {
     debugger
@@ -491,7 +482,6 @@ debugger
   } finally {
     if (useStoreVersion && storeInitialized) {
       try {
-        debugger
         // 4. close storage account, back rent
         const txStoreClose = await zktlsProgram.methods
           .storeClose()
@@ -499,10 +489,13 @@ debugger
           .rpc();
         await waitForTransactionConfirmation(provider, txStoreClose);
         console.log("storeClose done");
+        return tx
       } catch (closeErr) {
-        debugger
         console.error("Failed to close dataBuffer:", closeErr);
       }
+    } else {
+      debugger
+      return tx
     }
   }
 }
@@ -535,7 +528,6 @@ export async function reSenderWithdraw({
     fromTokenAccount = await getAssociatedTokenAddress(mint, redEnvelopePda, true);
     toTokenAccount = await getAssociatedTokenAddress(mint, userKey);
   }
-  debugger
   const tx = await redEnvelopeProgram.methods
     .reSenderWithdraw(reId)
     .accounts({
@@ -549,9 +541,9 @@ export async function reSenderWithdraw({
     })
     .signers([])
     .rpc();
-    debugger
-  await waitForTransactionConfirmation(provider, tx);
+  // await waitForTransactionConfirmation(provider, tx);
   console.log("reSenderWithdraw done");
+  return tx;
 }
 
 export async function getREInfo({
@@ -561,10 +553,8 @@ export async function getREInfo({
   redEnvelopeProgram: any;
   reId: any;
   }): Promise<any | null> {
-  debugger
   const [reRecordPda] = getPrimusRERecordPda({ programId: redEnvelopeProgram.programId, reId: reId });
   const reRecord = await redEnvelopeProgram.account.reRecord.fetch(reRecordPda);
-  debugger
   return reRecord;
 }
 
@@ -582,7 +572,6 @@ export async function getClaimed({
   const userIdBytes = (new TextEncoder()).encode(userid);
   // const userIdHash = utils.keccak256(Buffer.from(userIdBytes)).subarray(0, 8);
   const userIdHash = utils.arrayify(utils.keccak256(Buffer.from(userIdBytes))).subarray(0, 8); // update
-  debugger
   const contains = reRecordData.reClaimed.some(arr =>
     arr.length === userIdHash.length && arr.every((v, i) => v === userIdHash[i])
   );
