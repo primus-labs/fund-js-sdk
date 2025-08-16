@@ -16,8 +16,8 @@ export const hasErrorFlagFn = (curErrorArr: string[], targetErrorStrArr: string[
   })
 }
 
-export const formatErrFn = (error: any) => {
-  let formatError = error
+
+export const getErrArrFn = (error: any) => {
   const errorMsg1 = typeof error === 'string'
     ? error
     : error instanceof Error
@@ -27,6 +27,11 @@ export const formatErrFn = (error: any) => {
         : JSON.stringify(error);
   const errorMsg2 = typeof error === 'object' ? JSON.stringify(error) : error?.toString();
   const curErrorStrArr = [errorMsg1, errorMsg2]
+  return curErrorStrArr
+}
+export const formatErrFn = (error: any) => {
+  let formatError = error
+  const curErrorStrArr = getErrArrFn(error)
 
 
   // Signer had insufficient balance

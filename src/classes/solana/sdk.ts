@@ -12,6 +12,7 @@ import { getPrimusZktlsPda, getPrimusRedEnvelopePda, getPrimusRERecordPda } from
 import { utils } from 'ethers';
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 import { formatErrFn } from '../../utils/utils'
+import { getTxSigStrFromTx, getTxIsOnChain, getTxIsOnProcess } from './program'
 
 export const ERC20_TYPE = 0; //  SPL Token
 export const NATIVE_TYPE = 1; // SOL
@@ -245,8 +246,9 @@ export async function reSend({
   tipToken: any;
   reSendParam: any;
   payer?: Keypair;
-  }): Promise<string | null> {
+}): Promise<string | null> {
   return new Promise(async (resolve, reject) => {
+    let signatureStr
     try {
       // console.log('provider', provider)
       // 1. Create an account to store the amounts and reclaimeds
@@ -338,19 +340,33 @@ export async function reSend({
       tx.partialSign(spaceAccount);
 
       const signedTx = await provider.wallet.signTransaction(tx);
-      const serializeSignedTx = signedTx.serialize()
-      console.log('signedTx', signedTx, serializeSignedTx, tx.recentBlockhash,)
-      // send and confirm it.
-      const sig = await provider.connection.sendRawTransaction(serializeSignedTx);
-      // await provider.connection.confirmTransaction(sig);
 
-      // await waitForTransactionConfirmation(provider, sig);
-      console.log("reSend done, reId: ", reId.toString("hex"), sig);
-      return resolve(sig)
+      signatureStr = getTxSigStrFromTx(signedTx)
+      const isOnChain = await getTxIsOnChain(signatureStr, provider.connection)
+      if (isOnChain) {
+        console.log("reSend done, reId: ", reId.toString("hex"), signatureStr);
+        return resolve(signatureStr)
+      } else {
+        const serializeSignedTx = signedTx.serialize()
+        console.log('signedTx', signedTx, serializeSignedTx, tx.recentBlockhash,)
+        // send and confirm it.
+        signatureStr = await provider.connection.sendRawTransaction(serializeSignedTx);
+        // await provider.connection.confirmTransaction(sig,"confirmed");
+        // await waitForTransactionConfirmation(provider, sig);
+        console.log("reSend done, reId: ", reId.toString("hex"), signatureStr);
+        return resolve(signatureStr)
+      }
+
     } catch (err) {
-      console.error("reSend error:", err);
-      const formatErr = formatErrFn(err);
-      return reject(formatErr)
+      if (getTxIsOnProcess(err)) {
+        console.log("reSenderWithdraw done");
+        return resolve(signatureStr)
+      } else {
+        console.error("reSend error:", err);
+        const formatErr = formatErrFn(err);
+        return reject(formatErr)
+      }
+      
     } finally {
       // if (reSenderInitialized) {
       // TODO, close newAccount
@@ -374,7 +390,7 @@ export async function reClaim({
   reId: any;
   attObj: any;
 }) {
-  return new Promise(async(resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     const [redEnvelopePda] = getPrimusRedEnvelopePda({ programId: redEnvelopeProgram.programId });
     const [reRecordPda] = getPrimusRERecordPda({ programId: redEnvelopeProgram.programId, reId: reId });
     const [primusZktlsPda] = getPrimusZktlsPda({ programId: zktlsProgram.programId });
@@ -394,6 +410,7 @@ export async function reClaim({
 
 
     let tx
+    let signatureStr
     const dataBuffer = anchor.web3.Keypair.generate();
     const dataBufferKey = dataBuffer.publicKey;
     const attBuffer = serializeAttestation(attObj);
@@ -472,14 +489,32 @@ export async function reClaim({
           toTokenAccount: toTokenAccount,
           mint: mint,
         })
-        .signers([])
-        .rpc();
-      // await waitForTransactionConfirmation(provider, tx);
-      console.log("reClaim done");
+        .transaction();
+      
+      tx.feePayer = userKey;
+      tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
+
+      const signedTx = await provider.wallet.signTransaction(tx);
+
+      signatureStr = getTxSigStrFromTx(signedTx)
+      const isOnChain = await getTxIsOnChain(signatureStr, provider.connection)
+      if (isOnChain) {
+        console.log("reClaim done", signatureStr);
+        return resolve(signatureStr)
+      } else {
+        const serializeSignedTx = signedTx.serialize()
+        signatureStr = await provider.connection.sendRawTransaction(serializeSignedTx);
+        console.log("reClaim done ", signatureStr);
+        return resolve(signatureStr)
+      }
     } catch (err) {
-      console.error("reClaim error:", err);
-      const formatErr = formatErrFn(err)
-      return reject(formatErr)
+      if (getTxIsOnProcess(err)) {
+        console.log("reClaim done");
+      } else {
+        console.error("reClaim error:", err);
+        const formatErr = formatErrFn(err)
+        return reject(formatErr)
+      }
     } finally {
       if (useStoreVersion && storeInitialized) {
         try {
@@ -490,12 +525,12 @@ export async function reClaim({
             .rpc();
           await waitForTransactionConfirmation(provider, txStoreClose);
           console.log("storeClose done");
-          return resolve(tx)
+          return resolve(signatureStr)
         } catch (closeErr) {
           console.error("Failed to close dataBuffer:", closeErr);
         }
       } else {
-        return resolve(tx)
+        return resolve(signatureStr)
       }
     }
   })
@@ -511,9 +546,11 @@ export async function reSenderWithdraw({
   userKey: anchor.web3.PublicKey;
   provider: anchor.AnchorProvider;
   reId: any;
-  }) {
+}) {
   return new Promise(async (resolve, reject) => {
-    try { 
+    let tx;
+    let signatureStr
+    try {
       const [redEnvelopePda] = getPrimusRedEnvelopePda({ programId: redEnvelopeProgram.programId });
       const [reRecordPda] = getPrimusRERecordPda({ programId: redEnvelopeProgram.programId, reId: reId });
       // console.log("reRecordPda:", reRecordPda.toBase58());
@@ -531,7 +568,7 @@ export async function reSenderWithdraw({
         fromTokenAccount = await getAssociatedTokenAddress(mint, redEnvelopePda, true);
         toTokenAccount = await getAssociatedTokenAddress(mint, userKey);
       }
-      const tx = await redEnvelopeProgram.methods
+      tx = await redEnvelopeProgram.methods
         .reSenderWithdraw(reId)
         .accounts({
           state: redEnvelopePda,
@@ -542,15 +579,33 @@ export async function reSenderWithdraw({
           toTokenAccount: toTokenAccount,
           mint: mint,
         })
-        .signers([])
-        .rpc();
-      // await waitForTransactionConfirmation(provider, tx);
-      console.log("reSenderWithdraw done");
-      return resolve(tx)
+      .transaction();
+
+      tx.feePayer = userKey;
+      tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
+
+      const signedTx = await provider.wallet.signTransaction(tx);
+
+      signatureStr = getTxSigStrFromTx(signedTx)
+      const isOnChain = await getTxIsOnChain(signatureStr, provider.connection)
+      if (isOnChain) {
+        console.log("reSenderWithdraw done", signatureStr);
+        return resolve(signatureStr)
+      } else {
+        const serializeSignedTx = signedTx.serialize()
+        signatureStr = await provider.connection.sendRawTransaction(serializeSignedTx);
+        console.log("reSenderWithdraw done", signatureStr);
+        return resolve(signatureStr)
+      }
     } catch (err) {
-      console.error("reSenderWithdraw error:", err);
-      const formatErr = formatErrFn(err)
-      return reject(formatErr)
+      if (getTxIsOnProcess(err)) {
+        console.log("reSenderWithdraw done");
+        return resolve(signatureStr)
+      } else {
+        console.error("reSenderWithdraw error:", err);
+        const formatErr = formatErrFn(err)
+        return reject(formatErr)
+      }
     }
   })
 }
@@ -561,7 +616,7 @@ export async function getREInfo({
 }: {
   redEnvelopeProgram: any;
   reId: any;
-  }): Promise<any | null> {
+}): Promise<any | null> {
   return new Promise(async (resolve, reject) => {
     try {
       const [reRecordPda] = getPrimusRERecordPda({ programId: redEnvelopeProgram.programId, reId: reId });

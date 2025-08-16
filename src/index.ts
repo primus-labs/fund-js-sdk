@@ -5,10 +5,7 @@ import { FundForRedPacket } from "./classes/FundForRedPacket";
 import {FundOnSolanaForRedPacket} from "./classes/FundOnSolanaForRedPacket";
 import { ZktlsSdk } from "./classes/ZktlsSdk";
 import { SUPPORTEDCHAINIDS, SUPPORTEDSOCIALPLATFORMS, SUPPORTEDSOLANACHAINIDS } from './config/constants'
-import { testReSend, testReClaim, testReSenderWithdraw } from './classes/solana/test'
-import { getProgram } from './classes/solana/program'
-import redPacketIdl from './config/redPacketIdl.json'
-import zktlsIdl from './config/zktlsIdl.json'
+// import { testReSend, testReClaim, testReSenderWithdraw } from './classes/solana/test'
 console.log('SUPPORTEDCHAINIDS444', SUPPORTEDCHAINIDS)
 export * from './index.d'
 import { decodeReSendEvent, decodeClaimEvent } from './classes/solana/program';

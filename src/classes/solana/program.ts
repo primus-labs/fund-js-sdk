@@ -2,7 +2,9 @@ import { Program, Idl } from "@coral-xyz/anchor";
 import * as anchor from "@coral-xyz/anchor";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { getMint } from "@solana/spl-token";
+import { encode as encodeBase58 } from 'micro-base58';
 import * as borsh from 'borsh'
+import { hasErrorFlagFn, getErrArrFn } from '../../utils/utils'
 const { deserialize } = borsh
 const BN = anchor.BN;
 
@@ -170,7 +172,7 @@ export async function decodeClaimEvent(eventData: string) {
     index: any;
     timestamp: any;
     token_address: any;
-    constructor(fields:any) {
+    constructor(fields: any) {
       this.id = fields.id;
       this.user = fields.user;
       this.user_id = fields.user_id;
@@ -202,4 +204,32 @@ export async function decodeClaimEvent(eventData: string) {
   console.log("res=", res);
   console.log("res=", new PublicKey(res.user).toBase58());
   return res
+}
+
+export const getTxSigStrFromTx = (signedTx: any) => {
+  if (signedTx?.signatures[0] && signedTx?.signatures[0].signature) {
+    const signatureBytes = signedTx.signatures[0].signature;
+    const signatureStr = encodeBase58(signatureBytes);
+    return signatureStr;
+  } return ''
+
+};
+export const getTxIsOnChain = async (signatureStr: string, connection: any) => {
+  if (signatureStr) {
+    const { value } = await connection.getSignatureStatus(signatureStr);
+    if (value && value.confirmationStatus) {
+      // console.log('already on chain,status:', value.confirmationStatus);
+      return true;
+    } else {
+      return false
+    }
+  }
+  return false
+}
+
+export const getTxIsOnProcess = (err: any) => {
+  const strArr = ['This transaction has already been processed']
+  const curErrorStrArr = getErrArrFn(err)
+  const isOnProcess = hasErrorFlagFn(curErrorStrArr, strArr)
+  return isOnProcess
 }

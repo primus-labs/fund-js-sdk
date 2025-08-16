@@ -73,7 +73,6 @@ class FundOnSolanaForRedPacket {
         });
         return resolve(result)
       } catch (error) {
-        debugger
         return reject(error)
       }
     });
