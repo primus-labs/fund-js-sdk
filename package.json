@@ -55,9 +55,14 @@
     ]
   },
   "dependencies": {
+    "@coral-xyz/anchor": "^0.31.1",
     "@primuslabs/zktls-js-sdk": "^0.3.4",
+    "@solana/spl-token": "^0.4.13",
+    "@solana/web3.js": "^1.98.4",
     "axios": "^1.8.1",
+    "borsh": "^0.7.0",
     "ethers": "^5.7.2",
+    "keccak256": "^1.0.6",
     "micro-base58": "^0.5.1"
   }
 }
