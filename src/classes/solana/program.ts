@@ -1,7 +1,7 @@
 import { Program, Idl } from "@coral-xyz/anchor";
 import * as anchor from "@coral-xyz/anchor";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { getMint } from "@solana/spl-token";
+import { getMint, TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
 import { encode as encodeBase58 } from 'micro-base58';
 import * as borsh from 'borsh'
 import { hasErrorFlagFn, getErrArrFn } from '../../utils/utils'
@@ -39,10 +39,42 @@ export const fromTokenAmount = (amount: number | string, decimals: number) => {
   return fraction.length > 0 ? `${whole}.${fraction}` : whole;
 }
 
+export const getTokenProgramType = async (mintAddress: string, connection: any) => {
+  if (!connection) {
+    return ''
+  }
+  const mintPubkey = new PublicKey(mintAddress);
+
+  const accountInfo = await connection.getAccountInfo(mintPubkey);
+
+  if (!accountInfo) {
+    throw new Error("Mint account not found");
+  }
+  const TOKEN_PROGRAM_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+  const TOKEN_2022_PROGRAM_ID = new PublicKey("TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb");
+
+  if (accountInfo.owner.equals(TOKEN_PROGRAM_ID)) {
+    return "Token";
+  } else if (accountInfo.owner.equals(TOKEN_2022_PROGRAM_ID)) {
+    return "Token-2022";
+  } else {
+    return `Unknown Program: ${accountInfo.owner.toBase58()}`;
+  }
+}
 export async function getTokenDecimals(mintAddress: string, connection: Connection) {
   const mintPubkey = new PublicKey(mintAddress);
-  const mintInfo = await getMint(connection, mintPubkey);
-  return mintInfo.decimals;
+  const tokenProgramType = await getTokenProgramType(mintAddress, connection)
+  if (tokenProgramType === 'Token-2022') {
+
+    const mintInfo = await getMint(connection, mintPubkey, "confirmed", TOKEN_2022_PROGRAM_ID);
+    return mintInfo.decimals;
+  } else if (tokenProgramType === 'Token') {
+    const mintInfo = await getMint(connection, mintPubkey);
+    return mintInfo.decimals;
+  }
+
+
+
 }
 
 export const hexToUint8Array = (hex: string) => {
