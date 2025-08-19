@@ -158,41 +158,8 @@
                 "path": "state"
               },
               {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
+                "kind": "account",
+                "path": "token_program"
               },
               {
                 "kind": "account",
@@ -249,41 +216,8 @@
                 "path": "att_recipient"
               },
               {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
+                "kind": "account",
+                "path": "token_program"
               },
               {
                 "kind": "account",
@@ -334,8 +268,7 @@
           "optional": true
         },
         {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "token_program"
         },
         {
           "name": "associated_token_program",
@@ -481,41 +414,8 @@
                 "path": "sender"
               },
               {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
+                "kind": "account",
+                "path": "token_program"
               },
               {
                 "kind": "account",
@@ -572,41 +472,8 @@
                 "path": "state"
               },
               {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
+                "kind": "account",
+                "path": "token_program"
               },
               {
                 "kind": "account",
@@ -657,8 +524,7 @@
           "optional": true
         },
         {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "token_program"
         },
         {
           "name": "associated_token_program",
@@ -759,41 +625,8 @@
                 "path": "state"
               },
               {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
+                "kind": "account",
+                "path": "token_program"
               },
               {
                 "kind": "account",
@@ -850,41 +683,8 @@
                 "path": "re_sender"
               },
               {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
+                "kind": "account",
+                "path": "token_program"
               },
               {
                 "kind": "account",
@@ -935,8 +735,7 @@
           "optional": true
         },
         {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "token_program"
         },
         {
           "name": "associated_token_program",
@@ -1304,236 +1103,241 @@
     },
     {
       "code": 6001,
+      "name": "InvalidTokenProgram",
+      "msg": "Invalid token program"
+    },
+    {
+      "code": 6002,
       "name": "InvalidTokenType",
       "msg": "Invalid token type"
     },
     {
-      "code": 6002,
+      "code": 6003,
       "name": "InvalidREType",
       "msg": "Invalid red envelope type"
     },
     {
-      "code": 6003,
+      "code": 6004,
       "name": "InvalidNumber",
       "msg": "Invalid number"
     },
     {
-      "code": 6004,
+      "code": 6005,
       "name": "InvalidEmptyRatio",
       "msg": "Invalid empty ratio"
     },
     {
-      "code": 6005,
+      "code": 6006,
       "name": "AmountTooLow",
       "msg": "Amount too low"
     },
     {
-      "code": 6006,
+      "code": 6007,
       "name": "WrongAmount",
       "msg": "Wrong amount"
     },
     {
-      "code": 6007,
+      "code": 6008,
       "name": "NoReId",
       "msg": "Red envelope ID does not exist"
     },
     {
-      "code": 6008,
+      "code": 6009,
       "name": "AllClaimed",
       "msg": "All envelopes claimed"
     },
     {
-      "code": 6009,
+      "code": 6010,
       "name": "UserIdEmpty",
       "msg": "User ID empty"
     },
     {
-      "code": 6010,
+      "code": 6011,
       "name": "InvalidUserAddress",
       "msg": "Invalid User Address"
     },
     {
-      "code": 6011,
+      "code": 6012,
       "name": "AlreadyClaimed",
       "msg": "Already claimed"
     },
     {
-      "code": 6012,
+      "code": 6013,
       "name": "AmountUnderflow",
       "msg": "Amount underflow"
     },
     {
-      "code": 6013,
+      "code": 6014,
       "name": "InvalidFeeRecipient",
       "msg": "Invalid fee recipient"
     },
     {
-      "code": 6014,
+      "code": 6015,
       "name": "InvalidStateAccount",
       "msg": "Invalid state account"
     },
     {
-      "code": 6015,
+      "code": 6016,
       "name": "RecipientIsZero",
       "msg": "Recipient cannot be zero"
     },
     {
-      "code": 6016,
+      "code": 6017,
       "name": "InvalidCheckType",
       "msg": "Invalid checkType"
     },
     {
-      "code": 6017,
+      "code": 6018,
       "name": "InvalidCheckParams",
       "msg": "CheckParams decode failed"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "NoFund",
       "msg": "No fund"
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "NotOwner",
       "msg": "Not owner"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "NotExpired",
       "msg": "Not expired"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "UnsupportedTokenType",
       "msg": "Unsupported Token Type"
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "InsufficientSOL",
       "msg": "Insufficient SOL"
     },
     {
-      "code": 6023,
+      "code": 6024,
       "name": "WrongTokenMint",
       "msg": "Wrong token mint"
     },
     {
-      "code": 6024,
+      "code": 6025,
       "name": "DeserializationFailed",
       "msg": "Deserialization Failed"
     },
     {
-      "code": 6025,
+      "code": 6026,
       "name": "JsonParseError",
       "msg": "JSON Parse Error"
     },
     {
-      "code": 6026,
+      "code": 6027,
       "name": "ResponseLengthError",
       "msg": "response length error"
     },
     {
-      "code": 6027,
+      "code": 6028,
       "name": "AttUrlError",
       "msg": "att url error"
     },
     {
-      "code": 6028,
+      "code": 6029,
       "name": "AttSuffixUrlError",
       "msg": "att suffix url error"
     },
     {
-      "code": 6029,
+      "code": 6030,
       "name": "JsonPathError",
       "msg": "json path error"
     },
     {
-      "code": 6030,
+      "code": 6031,
       "name": "UsernameKeyError",
       "msg": "username key error"
     },
     {
-      "code": 6031,
+      "code": 6032,
       "name": "FollowingError",
       "msg": "following error"
     },
     {
-      "code": 6032,
+      "code": 6033,
       "name": "FollowingNameError",
       "msg": "following name error"
     },
     {
-      "code": 6033,
+      "code": 6034,
       "name": "NameOpError",
       "msg": "name op error"
     },
     {
-      "code": 6034,
+      "code": 6035,
       "name": "AttConditionsError",
       "msg": "att conditions error"
     },
     {
-      "code": 6035,
+      "code": 6036,
       "name": "TooManyUrls",
       "msg": "too many urls"
     },
     {
-      "code": 6036,
+      "code": 6037,
       "name": "TooManyResponseresolve",
       "msg": "too many responseResolve"
     },
     {
-      "code": 6037,
+      "code": 6038,
       "name": "UserNameEmpty",
       "msg": "user name empty"
     },
     {
-      "code": 6038,
+      "code": 6039,
       "name": "SourceError",
       "msg": "source error"
     },
     {
-      "code": 6039,
+      "code": 6040,
       "name": "AccountResponseLengthError",
       "msg": "account response length error"
     },
     {
-      "code": 6040,
+      "code": 6041,
       "name": "TiktokAttUrlError",
       "msg": "tiktok att url error"
     },
     {
-      "code": 6041,
+      "code": 6042,
       "name": "TiktokJsonPathError",
       "msg": "tiktok json path error"
     },
     {
-      "code": 6042,
+      "code": 6043,
       "name": "XAttUrlError",
       "msg": "x att url error"
     },
     {
-      "code": 6043,
+      "code": 6044,
       "name": "XJsonPathError",
       "msg": "x json path error"
     },
     {
-      "code": 6044,
+      "code": 6045,
       "name": "GoogleAttUrlError",
       "msg": "google att url error"
     },
     {
-      "code": 6045,
+      "code": 6046,
       "name": "GoogleJsonPathError",
       "msg": "google json path error"
     },
     {
-      "code": 6046,
+      "code": 6047,
       "name": "XiaohongshuAttUrlError",
       "msg": "xiaohongshu att url error"
     },
     {
-      "code": 6047,
+      "code": 6048,
       "name": "XiaohongshuJsonPathError",
       "msg": "xiaohongshu json path error"
     }

@@ -10,9 +10,9 @@ import {
 import { serializeAttestation } from "./attestation_schema";
 import { getPrimusZktlsPda, getPrimusRedEnvelopePda, getPrimusRERecordPda } from "./pda";
 import { utils } from 'ethers';
-import { getAssociatedTokenAddress } from "@solana/spl-token";
+import { getAssociatedTokenAddress, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction } from "@solana/spl-token";
 import { formatErrFn } from '../../utils/utils'
-import { getTxSigStrFromTx, getTxIsOnChain, getTxIsOnProcess } from './program'
+import { getTxSigStrFromTx, getTxIsOnChain, getTxIsOnProcess, getTokenProgramType } from './program'
 
 export const ERC20_TYPE = 0; //  SPL Token
 export const NATIVE_TYPE = 1; // SOL
@@ -24,7 +24,39 @@ export const RE_USERID_LEN = 8; // TODO
 const NATIVETOKENATTBUFFERMAXLEN = 718
 const ERC20TOKENATTBUFFERMAXLEN = 622
 
+export async function getATAAndProgramId(
+  connection: Connection,
+  mint: PublicKey,
+  owner: PublicKey,
+  allowOwnerOffCurve = false
+): Promise<{ ata: PublicKey; tokenProgramId: PublicKey }> {
+  const accountInfo = await connection.getAccountInfo(mint);
+  if (!accountInfo) {
+    throw new Error("Mint account does not exist");
+  }
 
+  const mintOwner = accountInfo.owner; // mint.owner is program id
+
+  let tokenProgramId: PublicKey;
+  if (mintOwner.equals(TOKEN_PROGRAM_ID)) {
+    tokenProgramId = TOKEN_PROGRAM_ID;
+  } else if (mintOwner.equals(TOKEN_2022_PROGRAM_ID)) {
+    tokenProgramId = TOKEN_2022_PROGRAM_ID;
+  } else {
+    throw new Error(
+      `Unknown mint owner: ${mintOwner.toBase58()}. Not SPL or Token-2022`
+    );
+  }
+
+  const ata = await getAssociatedTokenAddress(
+    mint,
+    owner,
+    allowOwnerOffCurve,
+    tokenProgramId
+  );
+
+  return { ata, tokenProgramId };
+}
 // export type ReRecord = anchor.Program<PrimusRedEnvelope>['account']['reRecord'];
 
 export async function getBalance(connection: Connection, address: PublicKey): Promise<number> {
@@ -238,15 +270,14 @@ export async function reSend({
   provider,
   tipToken,
   reSendParam,
-  payer = null,
 }: {
   redEnvelopeProgram: any;
   userKey: anchor.web3.PublicKey;
   provider: anchor.AnchorProvider;
   tipToken: any;
   reSendParam: any;
-  payer?: Keypair;
 }): Promise<string | null> {
+
   return new Promise(async (resolve, reject) => {
     let signatureStr
     try {
@@ -268,6 +299,7 @@ export async function reSend({
         space,
         programId: redEnvelopeProgram.programId,
       });
+      debugger
 
       // 2. init the spaceAccount
       const reRecordDataInitIx = await redEnvelopeProgram.methods
@@ -278,7 +310,7 @@ export async function reSend({
         })
         .signers([spaceAccount])
         .instruction();
-
+      debugger
       // 3. reSend
       // 1). get the id counter
       const [redEnvelopePda] = getPrimusRedEnvelopePda({ programId: redEnvelopeProgram.programId });
@@ -300,11 +332,22 @@ export async function reSend({
       let mint = null;
       let fromTokenAccount = null;
       let toTokenAccount = null;
+      let tokenProgram = TOKEN_PROGRAM_ID;
+
       if (tipToken.tokenType == ERC20_TYPE) {
         mint = tipToken.tokenAddress;
-        fromTokenAccount = await getAssociatedTokenAddress(mint, userKey);
-        toTokenAccount = await getAssociatedTokenAddress(mint, redEnvelopePda, true);
+        const from = await getATAAndProgramId(provider.connection, mint, userKey, false);
+        const to = await getATAAndProgramId(provider.connection, mint, redEnvelopePda, true);
+        if (from.tokenProgramId != to.tokenProgramId) {
+          throw new Error(
+            `from.tokenProgramId ${from.tokenProgramId.toBase58()} not equal to.tokenProgramId ${to.tokenProgramId.toBase58()}`
+          );
+        }
+        fromTokenAccount = from.ata;
+        toTokenAccount = to.ata;
+        tokenProgram = from.tokenProgramId;
       }
+      debugger
       const reSendIx = await redEnvelopeProgram.methods
         .reSend(Array.from(reId), tipToken, reSendParam)
         .accounts({
@@ -316,6 +359,7 @@ export async function reSend({
           fromTokenAccount: fromTokenAccount,
           toTokenAccount: toTokenAccount,
           mint: mint,
+          tokenProgram: tokenProgram,
         })
         .instruction();
 
@@ -330,6 +374,7 @@ export async function reSend({
         .add(createIx)
         .add(reRecordDataInitIx)
         .add(reSendIx);
+      //  .add(...createATAInstructions)
 
       // const ts = await sendAndConfirmTransaction(provider.connection, tx, [payer, spaceAccount]);
       // Construct the transaction
@@ -366,7 +411,7 @@ export async function reSend({
         const formatErr = formatErrFn(err);
         return reject(formatErr)
       }
-      
+
     } finally {
       // if (reSenderInitialized) {
       // TODO, close newAccount
@@ -418,6 +463,7 @@ export async function reClaim({
     let storeInitialized = false;
     let useStoreVersion = false;
 
+    debugger // TODO
     if ((reRecord.tokenType == ERC20_TYPE && attBuffer.length > ERC20TOKENATTBUFFERMAXLEN) || (reRecord.tokenType != ERC20_TYPE && attBuffer.length > NATIVETOKENATTBUFFERMAXLEN)) {// exactly 719, update this if the parameters has changed
       useStoreVersion = true;
     }
@@ -459,11 +505,20 @@ export async function reClaim({
       let mint = null;
       let fromTokenAccount = null;
       let toTokenAccount = null;
+      let tokenProgram = TOKEN_PROGRAM_ID;
       if (reRecord.tokenType == ERC20_TYPE) {
         console.log("reRecord.tokenAddress:", reRecord.tokenAddress);
         mint = reRecord.tokenAddress;
-        fromTokenAccount = await getAssociatedTokenAddress(mint, redEnvelopePda, true);
-        toTokenAccount = await getAssociatedTokenAddress(mint, attRecipient);
+        const from = await getATAAndProgramId(provider.connection, mint, redEnvelopePda, true);
+        const to = await getATAAndProgramId(provider.connection, mint, attRecipient, false);
+        if (from.tokenProgramId != to.tokenProgramId) {
+          throw new Error(
+            `from.tokenProgramId ${from.tokenProgramId.toBase58()} not equal to.tokenProgramId ${to.tokenProgramId.toBase58()}`
+          );
+        }
+        fromTokenAccount = from.ata;
+        toTokenAccount = to.ata;
+        tokenProgram = from.tokenProgramId;
       }
 
       let _att = attObj;
@@ -488,9 +543,10 @@ export async function reClaim({
           fromTokenAccount: fromTokenAccount,
           toTokenAccount: toTokenAccount,
           mint: mint,
+          tokenProgram: tokenProgram,
         })
         .transaction();
-      
+
       tx.feePayer = userKey;
       tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
 
@@ -561,12 +617,21 @@ export async function reSenderWithdraw({
       let mint = null;
       let fromTokenAccount = null;
       let toTokenAccount = null;
+      let tokenProgram = TOKEN_PROGRAM_ID;
 
       if (reRecord.tokenType == ERC20_TYPE) {
         console.log("reRecord.tokenAddress:", reRecord.tokenAddress);
         mint = reRecord.tokenAddress;
-        fromTokenAccount = await getAssociatedTokenAddress(mint, redEnvelopePda, true);
-        toTokenAccount = await getAssociatedTokenAddress(mint, userKey);
+        const from = await getATAAndProgramId(provider.connection, mint, redEnvelopePda, true);
+        const to = await getATAAndProgramId(provider.connection, mint, userKey, false);
+        if (from.tokenProgramId != to.tokenProgramId) {
+          throw new Error(
+            `from.tokenProgramId ${from.tokenProgramId.toBase58()} not equal to.tokenProgramId ${to.tokenProgramId.toBase58()}`
+          );
+        }
+        fromTokenAccount = from.ata;
+        toTokenAccount = to.ata;
+        tokenProgram = from.tokenProgramId;
       }
       tx = await redEnvelopeProgram.methods
         .reSenderWithdraw(reId)
@@ -578,8 +643,9 @@ export async function reSenderWithdraw({
           fromTokenAccount: fromTokenAccount,
           toTokenAccount: toTokenAccount,
           mint: mint,
+          tokenProgram: tokenProgram,
         })
-      .transaction();
+        .transaction();
 
       tx.feePayer = userKey;
       tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
