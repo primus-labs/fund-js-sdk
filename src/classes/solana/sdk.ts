@@ -299,7 +299,6 @@ export async function reSend({
         space,
         programId: redEnvelopeProgram.programId,
       });
-      debugger
 
       // 2. init the spaceAccount
       const reRecordDataInitIx = await redEnvelopeProgram.methods
@@ -310,7 +309,6 @@ export async function reSend({
         })
         .signers([spaceAccount])
         .instruction();
-      debugger
       // 3. reSend
       // 1). get the id counter
       const [redEnvelopePda] = getPrimusRedEnvelopePda({ programId: redEnvelopeProgram.programId });
@@ -347,7 +345,6 @@ export async function reSend({
         toTokenAccount = to.ata;
         tokenProgram = from.tokenProgramId;
       }
-      debugger
       const reSendIx = await redEnvelopeProgram.methods
         .reSend(Array.from(reId), tipToken, reSendParam)
         .accounts({
@@ -453,7 +450,6 @@ export async function reClaim({
     // get token type
     const reRecord = await redEnvelopeProgram.account.reRecord.fetch(reRecordPda);
 
-
     let tx
     let signatureStr
     const dataBuffer = anchor.web3.Keypair.generate();
@@ -463,7 +459,6 @@ export async function reClaim({
     let storeInitialized = false;
     let useStoreVersion = false;
 
-    debugger // TODO
     if ((reRecord.tokenType == ERC20_TYPE && attBuffer.length > ERC20TOKENATTBUFFERMAXLEN) || (reRecord.tokenType != ERC20_TYPE && attBuffer.length > NATIVETOKENATTBUFFERMAXLEN)) {// exactly 719, update this if the parameters has changed
       useStoreVersion = true;
     }
@@ -549,7 +544,7 @@ export async function reClaim({
 
       tx.feePayer = userKey;
       tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
-
+      console.log("UnSigned tx size:", tx.serialize({ requireAllSignatures: false, verifySignatures: false }).length, "bytes")
       const signedTx = await provider.wallet.signTransaction(tx);
 
       signatureStr = getTxSigStrFromTx(signedTx)
@@ -559,6 +554,7 @@ export async function reClaim({
         return resolve(signatureStr)
       } else {
         const serializeSignedTx = signedTx.serialize()
+        console.log("Signed tx size:", serializeSignedTx.length, "bytes");
         signatureStr = await provider.connection.sendRawTransaction(serializeSignedTx);
         console.log("reClaim done ", signatureStr);
         return resolve(signatureStr)

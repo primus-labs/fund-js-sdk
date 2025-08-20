@@ -6,7 +6,7 @@ import {FundOnSolanaForRedPacket} from "./classes/FundOnSolanaForRedPacket";
 import { ZktlsSdk } from "./classes/ZktlsSdk";
 import { SUPPORTEDCHAINIDS, SUPPORTEDSOCIALPLATFORMS, SUPPORTEDSOLANACHAINIDS } from './config/constants'
 // import { testReSend, testReClaim, testReSenderWithdraw } from './classes/solana/test'
-console.log('SUPPORTEDCHAINIDS444', SUPPORTEDCHAINIDS)
+
 export * from './index.d'
 import { decodeReSendEvent, decodeClaimEvent } from './classes/solana/program';
 class PrimusFund {
@@ -27,6 +27,7 @@ class PrimusFund {
         if (!this.supportedChainIds.includes(chainId as number) && !SUPPORTEDSOLANACHAINIDS.includes(chainId as string)) {
           return reject('chainId is not supported')
         }
+        
         if (this.supportedChainIds.includes(chainId as number)) {
           let formatProvider;
           let signer;
@@ -54,7 +55,7 @@ class PrimusFund {
         } else if (SUPPORTEDSOLANACHAINIDS.includes(chainId as string)) {
           this.provider = provider;
           this._fundOnSolanaForRedPacket = new FundOnSolanaForRedPacket()
-          this._fundOnSolanaForRedPacket.init(provider, chainId)
+          await this._fundOnSolanaForRedPacket.init(provider, chainId)
         }
         if (appId) {
           this._zkTlsSdk = new ZktlsSdk();
