@@ -545,8 +545,13 @@ export async function reClaim({
       tx = new Transaction()
         .add(instruction);
 
+
       tx.feePayer = userKey;
       tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
+      
+      signatureStr = await provider.sendAndConfirm(tx)
+      return resolve(signatureStr)
+      
       console.log("UnSigned tx size:", tx.serialize({ requireAllSignatures: false, verifySignatures: false }).length, "bytes")
       const signedTx = await provider.wallet.signTransaction(tx);
       signedTx.partialSign();
