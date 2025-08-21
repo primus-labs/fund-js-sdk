@@ -378,10 +378,10 @@ export async function reSend({
       tx.feePayer = userKey;
       tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
 
-      // sign the transaction (browser wallet + newAccount)
-      tx.partialSign(spaceAccount);
+      
 
-      const signedTx = await provider.wallet.signTransaction(tx);
+      const signedTx = await provider.wallet.signTransaction(tx);// sign the transaction (browser wallet + newAccount)
+      signedTx.partialSign(spaceAccount);
 
       signatureStr = getTxSigStrFromTx(signedTx)
       const isOnChain = await getTxIsOnChain(signatureStr, provider.connection)
