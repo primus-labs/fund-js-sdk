@@ -549,6 +549,7 @@ export async function reClaim({
       tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
       console.log("UnSigned tx size:", tx.serialize({ requireAllSignatures: false, verifySignatures: false }).length, "bytes")
       const signedTx = await provider.wallet.signTransaction(tx);
+      signedTx.partialSign();
 
       signatureStr = getTxSigStrFromTx(signedTx)
       const isOnChain = await getTxIsOnChain(signatureStr, provider.connection)
@@ -650,6 +651,7 @@ export async function reSenderWithdraw({
       tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
 
       const signedTx = await provider.wallet.signTransaction(tx);
+      signedTx.partialSign();
 
       signatureStr = getTxSigStrFromTx(signedTx)
       const isOnChain = await getTxIsOnChain(signatureStr, provider.connection)
