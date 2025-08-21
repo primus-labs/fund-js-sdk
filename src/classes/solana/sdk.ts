@@ -378,7 +378,7 @@ export async function reSend({
       tx.feePayer = userKey;
       tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
 
-      
+
 
       const signedTx = await provider.wallet.signTransaction(tx);// sign the transaction (browser wallet + newAccount)
       signedTx.partialSign(spaceAccount);
@@ -522,7 +522,7 @@ export async function reClaim({
         _att = null;
         _dataBufferKey = dataBufferKey
       }
-      tx = await redEnvelopeProgram.methods
+      let instruction = await redEnvelopeProgram.methods
         .reClaim(reId, _att)
         .accounts({
           state: redEnvelopePda,
@@ -540,7 +540,10 @@ export async function reClaim({
           mint: mint,
           tokenProgram: tokenProgram,
         })
-        .transaction();
+        .instruction();
+
+      tx = new Transaction()
+        .add(instruction);
 
       tx.feePayer = userKey;
       tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
