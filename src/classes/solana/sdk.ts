@@ -655,20 +655,23 @@ export async function reSenderWithdraw({
       tx.feePayer = userKey;
       tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
 
-      const signedTx = await provider.wallet.signTransaction(tx);
-      signedTx.partialSign();
+      signatureStr = await provider.sendAndConfirm(tx)
+      return resolve(signatureStr)
 
-      signatureStr = getTxSigStrFromTx(signedTx)
-      const isOnChain = await getTxIsOnChain(signatureStr, provider.connection)
-      if (isOnChain) {
-        console.log("reSenderWithdraw done", signatureStr);
-        return resolve(signatureStr)
-      } else {
-        const serializeSignedTx = signedTx.serialize()
-        signatureStr = await provider.connection.sendRawTransaction(serializeSignedTx);
-        console.log("reSenderWithdraw done", signatureStr);
-        return resolve(signatureStr)
-      }
+      // const signedTx = await provider.wallet.signTransaction(tx);
+      // signedTx.partialSign();
+
+      // signatureStr = getTxSigStrFromTx(signedTx)
+      // const isOnChain = await getTxIsOnChain(signatureStr, provider.connection)
+      // if (isOnChain) {
+      //   console.log("reSenderWithdraw done", signatureStr);
+      //   return resolve(signatureStr)
+      // } else {
+      //   const serializeSignedTx = signedTx.serialize()
+      //   signatureStr = await provider.connection.sendRawTransaction(serializeSignedTx);
+      //   console.log("reSenderWithdraw done", signatureStr);
+      //   return resolve(signatureStr)
+      // }
     } catch (err) {
       if (getTxIsOnProcess(err)) {
         console.log("reSenderWithdraw done");
