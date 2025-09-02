@@ -34,8 +34,11 @@ class ZktlsSdk {
           platformDevice = "ios";
         }
         console.log('init appId', appId, platformDevice)
-        const uaHasPhantom = /Phantom/i.test(navigator.userAgent);
-        const openAndroidApp = platformDevice === "android" && uaHasPhantom
+        
+       
+        const walletNameArr = ['metamask', 'phantom', 'solflare', 'backpack', 'okx']
+        const uaInWalletApp = walletNameArr.some(i => navigator.userAgent.toLowerCase().includes(i))
+        const openAndroidApp = platformDevice === "android" && uaInWalletApp
         console.log('openAndroidApp', openAndroidApp)
         const extensionVersion = await this.zkTlsSdk.init(
           appId, '', { platform: platformDevice, openAndroidApp  }
