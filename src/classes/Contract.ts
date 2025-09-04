@@ -89,7 +89,7 @@ class Contract {
           return reject('no pending withdrawals')
         }
         
-        const insufficientBalanceErrStrArr = ['insufficient balance', 'INSUFFICIENT_FUNDS', 'The caller does not have enough funds for value transfer.'] // 'unpredictable_gas_limit'
+        const insufficientBalanceErrStrArr = ['insufficient balance', 'INSUFFICIENT_FUNDS', 'The caller does not have enough funds for value transfer.', 'insufficient lamports', 'Attempt to debit an account but found no record of a prior credit'] // 'unpredictable_gas_limit'
         const isInsufficientBalance = hasErrorFlagFn(curErrorStrArr, insufficientBalanceErrStrArr)
         if (isInsufficientBalance) {
           return reject('insufficient balance')
