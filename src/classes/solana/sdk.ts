@@ -548,13 +548,10 @@ export async function reClaim({
 
       tx.feePayer = userKey;
       tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
-      
-      signatureStr = await provider.sendAndConfirm(tx)
-      return resolve(signatureStr)
-      
+      // signatureStr = await provider.sendAndConfirm(tx)
+      // return resolve(signatureStr)
       console.log("UnSigned tx size:", tx.serialize({ requireAllSignatures: false, verifySignatures: false }).length, "bytes")
       const signedTx = await provider.wallet.signTransaction(tx);
-      signedTx.partialSign();
 
       signatureStr = getTxSigStrFromTx(signedTx)
       const isOnChain = await getTxIsOnChain(signatureStr, provider.connection)
@@ -564,7 +561,11 @@ export async function reClaim({
       } else {
         const serializeSignedTx = signedTx.serialize()
         console.log("Signed tx size:", serializeSignedTx.length, "bytes");
-        signatureStr = await provider.connection.sendRawTransaction(serializeSignedTx);
+        // const rpc = provider.connection.rpcEndpoint
+        const rpc = "https://unipay-solanam-6275.mainnet.rpcpool.com"
+        const rpcConnection = new Connection(rpc);
+        signatureStr = await rpcConnection.sendRawTransaction(serializeSignedTx);
+        // signatureStr = await provider.connection.sendRawTransaction(serializeSignedTx);
         console.log("reClaim done ", signatureStr);
         return resolve(signatureStr)
       }
