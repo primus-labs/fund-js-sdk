@@ -12,7 +12,7 @@ import { getPrimusZktlsPda, getPrimusRedEnvelopePda, getPrimusRERecordPda } from
 import { utils } from 'ethers';
 import { getAssociatedTokenAddress, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction } from "@solana/spl-token";
 import { formatErrFn } from '../../utils/utils'
-import { getTxSigStrFromTx, getTxIsOnChain, getTxIsOnProcess, getTokenProgramType } from './program'
+import { getTxSigStrFromTx, getTxIsOnChain, getTxIsOnProcess, isSolanaBalanceZero, getTokenProgramType } from './program'
 
 export const ERC20_TYPE = 0; //  SPL Token
 export const NATIVE_TYPE = 1; // SOL
@@ -440,6 +440,13 @@ export async function reClaim({
     console.log("reRecordPda:", reRecordPda.toBase58());
 
     const attRecipient = new PublicKey(attObj.recipient);
+    const isEmptyWallet = await isSolanaBalanceZero(provider.connection, attRecipient)
+    if (isEmptyWallet) {
+      const err = 'insufficient'
+      const formatErr = formatErrFn(err);
+      reject(formatErr)
+      return
+    }
 
     // get fee recipient
     const redEnvelopeState = await redEnvelopeProgram.account.redEnvelopeState.fetch(redEnvelopePda);

@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { hasErrorFlagFn } from '../utils/utils'
+import { formatErrFn } from '../utils/utils'
 class Contract {
   address: string;
   provider: any;
@@ -11,7 +11,7 @@ class Contract {
    */
   constructor(provider: any, address: string, abiJson: any) {
     if (!provider || !address || !abiJson) {
-        throw new Error('provider, address, and abiJson are required');
+      throw new Error('provider, address, and abiJson are required');
     }
     this.address = address;
     this.provider = provider;
@@ -57,59 +57,11 @@ class Contract {
       } catch (error: any) {
         // not expired
         console.log("sendTransaction error:", error);
-        // console.log('error-message',error?.message)
-        // console.log('error-message',error?.toString()?.toLowerCase().indexOf('user rejected') > -1)
-        // console.log('error-reason',error?.reason)
-        // console.log('error-data-message', error?.data?.message)
-        const errStr = error?.message || error?.toString()?.toLowerCase() || ''
-        const errorMsg1 = typeof error === 'string'
-          ? error
-            : error instanceof Error
-              ? error.message
-                : typeof (error as any).message === 'string'
-                  ? (error as any).message
-              : JSON.stringify(error);
-        const errorMsg2 = typeof error === 'object' ? JSON.stringify(error) : error?.toString();
-        const curErrorStrArr = [errorMsg1, errorMsg2]
-        
-
-        // Signer had insufficient balance
-        // const requestLImitMsg = "non-200 status code: '429'"
-        // if (errStr.indexOf(requestLImitMsg) > -1) {
-        //   await sendFn()
-        // }
-        const userRejectErrStrArr = ['user rejected', 'approval denied']
-        const isUserRejected = hasErrorFlagFn(curErrorStrArr,userRejectErrStrArr)
-        if (error?.code === 'ACTION_REJECTED' || isUserRejected) {
-          return reject('user rejected transaction')
-        }
-
-        const isNoPendingWithdrawals = hasErrorFlagFn(curErrorStrArr,['no pending withdrawals'])
-        if (isNoPendingWithdrawals) {
-          return reject('no pending withdrawals')
-        }
-        
-        const insufficientBalanceErrStrArr = ['insufficient balance', 'INSUFFICIENT_FUNDS', 'The caller does not have enough funds for value transfer.', 'insufficient lamports', 'Attempt to debit an account but found no record of a prior credit'] // 'unpredictable_gas_limit'
-        const isInsufficientBalance = hasErrorFlagFn(curErrorStrArr, insufficientBalanceErrStrArr)
-        if (isInsufficientBalance) {
-          return reject('insufficient balance')
-        }
-
-        const alreadyClaimedErrStrArr = ['Already claimed']
-        const isAlreadyClaimed = hasErrorFlagFn(curErrorStrArr, alreadyClaimedErrStrArr)
-        if (isAlreadyClaimed) {
-          return reject('already claimed')
-        }
-
-        const allClaimedErrStrArr = ['All claimed']
-        const isAllClaimed = hasErrorFlagFn(curErrorStrArr, allClaimedErrStrArr)
-        if (isAllClaimed) {
-          return reject('all claimed')
-        }
-        return reject(error)
+        const formatErr = formatErrFn(error);
+        return reject(formatErr)
       }
-    
-     
+
+
     });
   }
 }

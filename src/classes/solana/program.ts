@@ -265,3 +265,21 @@ export const getTxIsOnProcess = (err: any) => {
   const isOnProcess = hasErrorFlagFn(curErrorStrArr, strArr)
   return isOnProcess
 }
+
+
+/**
+ * Check if a Solana account’s balance is less than or equal to 0 SOL.
+ * @param {string} address - The Solana public address.
+ * @returns {Promise<boolean>} - Returns true if the balance is <= 0 SOL.
+ */
+export async function isSolanaBalanceZero(connection: Connection, userPK: PublicKey) {
+
+
+  // Get balance in lamports (1 SOL = 1 000 000 000 lamports)
+  const balanceLamports = await connection.getBalance(userPK);
+  const balanceSOL = balanceLamports / 1_000_000_000;
+
+  console.log(`Account balance: ${balanceSOL} SOL`);
+  // Return true if the account has zero or negative balance
+  return balanceSOL <= 0;
+}

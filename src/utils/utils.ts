@@ -50,10 +50,17 @@ export const formatErrFn = (error: any) => {
     formatError = 'no pending withdrawals'
   }
 
-  const insufficientBalanceErrStrArr = ['insufficient balance', 'INSUFFICIENT_FUNDS', 'The caller does not have enough funds for value transfer.', 'insufficient lamports', 'Attempt to debit an account but found no record of a prior credit'] // 'unpredictable_gas_limit'
+  // const insufficientBalanceErrStrArr = ['insufficient balance', 'INSUFFICIENT_FUNDS', 'The caller does not have enough funds for value transfer.', 'insufficient lamports', 'Attempt to debit an account but found no record of a prior credit'] // 'unpredictable_gas_limit'
+  const insufficientBalanceErrStrArr = ['insufficient', 'The caller does not have enough funds for value transfer.', 'insufficient lamports', 'Attempt to debit an account but found no record of a prior credit']
   const isInsufficientBalance = hasErrorFlagFn(curErrorStrArr, insufficientBalanceErrStrArr)
   if (isInsufficientBalance) {
     formatError = 'insufficient balance'
+  }
+
+  const mayInsufficientBalanceErrStrArr = ['unpredictable_gas_limit']
+  const isMayInsufficientBalance = hasErrorFlagFn(curErrorStrArr, mayInsufficientBalanceErrStrArr)
+  if (isMayInsufficientBalance) {
+    formatError = 'may insufficient balance'
   }
 
   const alreadyClaimedErrStrArr = ['Already claimed']
