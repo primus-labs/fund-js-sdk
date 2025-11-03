@@ -30,6 +30,7 @@ export const getErrArrFn = (error: any) => {
   return curErrorStrArr
 }
 export const formatErrFn = (error: any) => {
+  try { console.log('error:', JSON.stringify(error)) } catch { }
   let formatError = error
   const curErrorStrArr = getErrArrFn(error)
 

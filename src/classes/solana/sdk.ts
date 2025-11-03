@@ -12,7 +12,7 @@ import { getPrimusZktlsPda, getPrimusRedEnvelopePda, getPrimusRERecordPda } from
 import { utils } from 'ethers';
 import { getAssociatedTokenAddress, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction } from "@solana/spl-token";
 import { formatErrFn } from '../../utils/utils'
-import { getTxSigStrFromTx, getTxIsOnChain, getTxIsOnProcess, isSolanaBalanceZero, getTokenProgramType } from './program'
+import { getTxSigStrFromTx, getTxIsOnChain, getTxIsOnProcess, isSolanaBalanceZero, isInsufficentSolanaBalance, getPrimusFee, getRentExemption, getFee, getTokenProgramType } from './program'
 
 export const ERC20_TYPE = 0; //  SPL Token
 export const NATIVE_TYPE = 1; // SOL
@@ -424,6 +424,7 @@ export async function reClaim({
   zktlsProgram,
   reId,
   attObj,
+  walletName
 }: {
   redEnvelopeProgram: any;
   userKey: anchor.web3.PublicKey;
@@ -431,6 +432,7 @@ export async function reClaim({
   zktlsProgram: any;
   reId: any;
   attObj: any;
+  walletName?: string;
 }) {
   return new Promise(async (resolve, reject) => {
     const [redEnvelopePda] = getPrimusRedEnvelopePda({ programId: redEnvelopeProgram.programId });
@@ -440,13 +442,7 @@ export async function reClaim({
     console.log("reRecordPda:", reRecordPda.toBase58());
 
     const attRecipient = new PublicKey(attObj.recipient);
-    const isEmptyWallet = await isSolanaBalanceZero(provider.connection, attRecipient)
-    if (isEmptyWallet) {
-      const err = 'insufficient'
-      const formatErr = formatErrFn(err);
-      reject(formatErr)
-      return
-    }
+
 
     // get fee recipient
     const redEnvelopeState = await redEnvelopeProgram.account.redEnvelopeState.fetch(redEnvelopePda);
@@ -555,10 +551,23 @@ export async function reClaim({
 
       tx.feePayer = userKey;
       tx.recentBlockhash = (await provider.connection.getLatestBlockhash()).blockhash;
-      
+
+      if (walletName?.toLowerCase() == "phantom") {
+        let totalCost = reRecord.tokenType == ERC20_TYPE ? await getRentExemption(provider.connection, toTokenAccount, tokenProgram) : 0;
+        totalCost += getPrimusFee()
+        totalCost += getFee()
+        const isInsufficent = await isInsufficentSolanaBalance(provider.connection, attRecipient, totalCost)
+        
+        if (isInsufficent) {
+          const err = 'insufficient'
+          const formatErr = formatErrFn(err);
+          reject(formatErr)
+          return
+        }
+      }
       signatureStr = await provider.sendAndConfirm(tx)
       return resolve(signatureStr)
-      
+
       console.log("UnSigned tx size:", tx.serialize({ requireAllSignatures: false, verifySignatures: false }).length, "bytes")
       const signedTx = await provider.wallet.signTransaction(tx);
       signedTx.partialSign();

@@ -1,7 +1,7 @@
 import { Program, Idl } from "@coral-xyz/anchor";
 import * as anchor from "@coral-xyz/anchor";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { getMint, TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
+import { getMint, TOKEN_2022_PROGRAM_ID, getAccount } from "@solana/spl-token";
 import { encode as encodeBase58 } from 'micro-base58';
 import * as borsh from 'borsh'
 import { hasErrorFlagFn, getErrArrFn } from '../../utils/utils'
@@ -282,4 +282,58 @@ export async function isSolanaBalanceZero(connection: Connection, userPK: Public
   console.log(`Account balance: ${balanceSOL} SOL`);
   // Return true if the account has zero or negative balance
   return balanceSOL <= 0;
+}
+
+export async function getSolanaBalance(connection: Connection, userPK: PublicKey) {
+  // Get balance in lamports (1 SOL = 1 000 000 000 lamports)
+  const balanceLamports = await connection.getBalance(userPK);
+  return balanceLamports;
+}
+export async function isInsufficentSolanaBalance(connection: Connection, userPK: PublicKey, requireBalance: any) {
+  const balanceLamports = await getSolanaBalance(connection, userPK);
+  console.log('use balance:', balanceLamports)
+  const BIBalance = BigInt(balanceLamports)
+  const BIRequire = BigInt(requireBalance)
+  return BIBalance < BIRequire;
+}
+
+export const SOL_TO_LAMPORTS = 1_000_000_000;
+
+export function solToLamports(sol: number): number {
+  return sol * SOL_TO_LAMPORTS;
+}
+
+export function getPrimusFee(): number {
+  return solToLamports(0.0025);
+}
+export function getFee(): number {
+  return solToLamports(0.001);
+}
+
+export async function checkIfATAExists(connection: Connection, ata: any, tokenProgram: any) {
+  try {
+    const accountInfo = await getAccount(connection, ata, undefined, tokenProgram);
+    console.log("ATA exists, balance:", Number(accountInfo.amount) / 10 ** 9);
+    return true;
+  } catch (e: any) {
+    if (e.message.includes("TokenAccountNotFoundError")) {
+      console.log("ATA not found");
+      return false;
+    } else {
+      console.error("Unexpected error:", e);
+      return false;
+    }
+  }
+}
+
+export async function getRentExemption(connection: Connection, ata: any, tokenProgram: any) {
+  const isExist = await checkIfATAExists(connection, ata, tokenProgram)
+  if (!isExist) {
+    const TOKEN_ACCOUNT_SIZE = 165;
+    const rentExemption = await connection.getMinimumBalanceForRentExemption(TOKEN_ACCOUNT_SIZE);
+    console.log(`Estimated rentExemption:: ${rentExemption} lamports (${rentExemption.toFixed(6)} SOL)`)
+    return rentExemption
+  } else {
+    return 0
+  }
 }

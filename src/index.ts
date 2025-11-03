@@ -1,8 +1,8 @@
 import { ethers } from 'ethers';
-import { Attestation, ClaimParam, FundParam, RecipientBaseInfo, AttestParams, RefundParam, FundForRedPacketParam, RedPacketId, AttestCommonParams, FundERC20ForRedPacketParam,FundOnSolanaForRedPacketParam } from './index.d'
+import { Attestation, ClaimParam, FundParam, RecipientBaseInfo, AttestParams, RefundParam, FundForRedPacketParam, RedPacketId, AttestCommonParams, FundERC20ForRedPacketParam, FundOnSolanaForRedPacketParam } from './index.d'
 import { Fund } from "./classes/Fund";
 import { FundForRedPacket } from "./classes/FundForRedPacket";
-import {FundOnSolanaForRedPacket} from "./classes/FundOnSolanaForRedPacket";
+import { FundOnSolanaForRedPacket } from "./classes/FundOnSolanaForRedPacket";
 import { ZktlsSdk } from "./classes/ZktlsSdk";
 import { SUPPORTEDCHAINIDS, SUPPORTEDSOCIALPLATFORMS, SUPPORTEDSOLANACHAINIDS } from './config/constants'
 // import { testReSend, testReClaim, testReSenderWithdraw } from './classes/solana/test'
@@ -27,7 +27,7 @@ class PrimusFund {
         if (!this.supportedChainIds.includes(chainId as number) && !SUPPORTEDSOLANACHAINIDS.includes(chainId as string)) {
           return reject('chainId is not supported')
         }
-        
+
         if (this.supportedChainIds.includes(chainId as number)) {
           let formatProvider;
           let signer;
@@ -465,19 +465,19 @@ class PrimusFund {
     return new Promise(async (resolve, reject) => {
       try {
         const { tokenInfo, sendParam } = fundParam;
-        const result = await this._fundOnSolanaForRedPacket?.fund( tokenInfo, sendParam);
+        const result = await this._fundOnSolanaForRedPacket?.fund(tokenInfo, sendParam);
         return resolve(result)
       } catch (error) {
         return reject(error)
       }
     });
   }
-  async claimOnSolanaForRedPacket(redPacketId: RedPacketId, attestation: Attestation) {
+  async claimOnSolanaForRedPacket(redPacketId: RedPacketId, attestation: Attestation, walletName?: string) {
     return new Promise(async (resolve, reject) => {
       try {
         let formatAttestation = { ...attestation, responseResolve: attestation.reponseResolve }
         delete formatAttestation.reponseResolve
-        const result = await this._fundOnSolanaForRedPacket?.claim( redPacketId, formatAttestation);
+        const result = await this._fundOnSolanaForRedPacket?.claim(redPacketId, formatAttestation, walletName);
         return resolve(result)
       } catch (error) {
         return reject(error)

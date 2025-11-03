@@ -61,7 +61,7 @@ class FundOnSolanaForRedPacket {
     });
   }
 
-  async claim(redPacketId: RedPacketId, attestation: Attestation) {
+  async claim(redPacketId: RedPacketId, attestation: Attestation, walletName?: string) {
     return new Promise(async (resolve, reject) => {
       try {
         const zktlsProgram = getProgram(zktlsIdl, this.provider);
@@ -69,7 +69,7 @@ class FundOnSolanaForRedPacket {
         let formatReId = hexToUint8Array(redPacketId);
         const result = await reClaim({
           redEnvelopeProgram: this.fundContract, userKey: this.provider.publicKey, provider: this.provider, zktlsProgram: zktlsProgram
-          , reId: formatReId, attObj
+          , reId: formatReId, attObj, walletName
         });
         return resolve(result)
       } catch (error) {
