@@ -21,6 +21,17 @@ export const SUPPORTEDSOCIALPLATFORMS: string[] = Object.keys(DATASOURCETEMPLATE
 
 
 export const SUPPORTEDCHAINIDSMAP = {
+  143: {
+    chainId: 143,
+    chainName: "Monad Chain",
+    nativeCurrency: {
+      name: "MON",
+      symbol: "MON",
+      decimals: 18,
+    },
+    contractAddress: "0xa2e0700a269Be3158c81E4739518b324d4398588",
+    redPacketContractAddress: "0x50bd377EB8D4236Bb587AB3FB1eeafd888AEeC58"
+  },  // monad mainnet
   10143: {
     chainId: 10143,
     chainName: "Monad testnet",
