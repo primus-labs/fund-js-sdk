@@ -76,6 +76,17 @@ export const SUPPORTEDCHAINIDSMAP = {
     contractAddress: "0xD17512B7EC12880Bd94Eca9d774089fF89805F02",
     redPacketContractAddress: '0x673D74d95A35B26804475066d9cD1DA3947f4eC3'
   },
+  688689: {
+    chainId: 688689,
+    chainName: 'Pharos Atlantic Testnet',
+    nativeCurrency: {
+      decimals: 18,
+      name: 'PHRS',
+      symbol: 'PHRS',
+    },
+    contractAddress: "0x3A83cAB6da93210933D94fC68A093a6983c2BCD1",
+    redPacketContractAddress: '0x7460ba14e2Ba151eaFD2983eB56F76578C79cb47'
+  },
   84532: {
     chainId: 84532,
     chainName: 'Base Sepolia',
