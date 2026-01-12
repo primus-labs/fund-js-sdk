@@ -49,6 +49,7 @@ export const formatErrFn = (error: any) => {
   const isNoPendingWithdrawals = hasErrorFlagFn(curErrorStrArr, ['no pending withdrawals'])
   if (isNoPendingWithdrawals) {
     formatError = 'no pending withdrawals'
+    return formatError
   }
 
   // const insufficientBalanceErrStrArr = ['insufficient balance', 'INSUFFICIENT_FUNDS', 'The caller does not have enough funds for value transfer.', 'insufficient lamports', 'Attempt to debit an account but found no record of a prior credit'] // 'unpredictable_gas_limit'
