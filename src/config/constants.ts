@@ -120,7 +120,19 @@ export const SUPPORTEDCHAINIDSMAP = {
     contractAddress: "0xd62A24eF37a62d613f53595B9700DFfdE372701D",
     redPacketContractAddress: "0x018A793D8984d8ADcA5a7689273fFacBb131972E"
   },
+  177: {
+    chainId: 177,
+    chainName: 'HashKey Chain',
+    nativeCurrency: {
+      decimals: 18,
+      name: 'HSK',
+      symbol: 'HSK',
+    },
+    contractAddress: "0xa2e0700a269Be3158c81E4739518b324d4398588",
+    redPacketContractAddress: "0x50bd377EB8D4236Bb587AB3FB1eeafd888AEeC58"
+  },
 };
+console.log('version:163')
 
 
 export const NATIVETOKENS: Record<number, string> = Object.values(SUPPORTEDCHAINIDSMAP).reduce((prev, curr) => {
