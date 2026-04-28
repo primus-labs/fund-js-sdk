@@ -1,4 +1,5 @@
 import { PrimusZKTLS } from "@primuslabs/zktls-js-sdk";
+// import { PrimusZKTLS } from "@superorange/zka-js-sdk";
 import { DATASOURCETEMPLATESMAP } from "../config/constants";
 import { Attestation, AttestCommonParams, AttestParams } from '../index.d'
 
@@ -33,9 +34,14 @@ class ZktlsSdk {
           platformDevice = "ios";
         }
         console.log('init appId', appId, platformDevice)
-
+        
+       
+        const walletNameArr = ['metamask', 'phantom', 'solflare', 'backpack', 'okx']
+        const uaInWalletApp = walletNameArr.some(i => navigator.userAgent.toLowerCase().includes(i))
+        const openAndroidApp = platformDevice === "android" && uaInWalletApp
+        console.log('openAndroidApp', openAndroidApp)
         const extensionVersion = await this.zkTlsSdk.init(
-          appId, '', { platform: platformDevice }
+          appId, '', { platform: platformDevice, openAndroidApp  }
         );
         resolve(extensionVersion);
       } catch (error) {

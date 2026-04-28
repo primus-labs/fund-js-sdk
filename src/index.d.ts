@@ -32,13 +32,13 @@ declare global {
 
 // start
 //
-// ERC20_TYPE = 0;
-// NATIVE_TYPE = 1;
-// ERC721_TYPE = 2;
-export type TokenType = 0 | 1 | 2
-export type ERC20TokenInfo = { tokenType: 0; tokenAddress: string }
-export type NATIVETokenInfo = { tokenType: 1; tokenAddress?: string }
-export type NFTTokenInfo = { tokenType: 2; tokenAddress: string }
+export type  ERC20_TYPE = 0;
+export type  NATIVE_TYPE = 1;
+export type  ERC721_TYPE = 2;
+export type TokenType = ERC20_TYPE | NATIVE_TYPE | ERC721_TYPE
+export type ERC20TokenInfo = { tokenType: ERC20_TYPE; tokenAddress: string }
+export type NATIVETokenInfo = { tokenType: NATIVE_TYPE; tokenAddress?: string }
+export type NFTTokenInfo = { tokenType: ERC721_TYPE; tokenAddress: string }
 export type TokenInfo = ERC20TokenInfo | NATIVETokenInfo | NFTTokenInfo; 
 
 export type  RecipientBaseInfo = {
@@ -69,8 +69,9 @@ export type AttestParams = {
     address: string
 }
 
-
-export type RedPacketType = 0 | 1;// 0 means random red packet, 1 means average red packet.
+export type Random = 0;
+export type Average = 1;
+export type RedPacketType = Random | Average;// 0 means random red packet, 1 means average red packet.
 export type CheckParams = [bigint, string]
 export type SendForRedPacketParam = {
     reType: RedPacketType;
@@ -79,6 +80,7 @@ export type SendForRedPacketParam = {
     checkContract: string;// A contract used to check whether you are eligible to receive a red packet.
     checkParams: string;
 }
+
 export type FundForRedPacketParam = {
     tokenInfo: TokenInfo;
     sendParam: SendForRedPacketParam;
@@ -105,4 +107,22 @@ export type AttestCommonParams = {
 export type ApproveForRedPacketParams = {
     tokenInfo: ERC20TokenInfo;
     approveAmount: string;
+}
+
+export type CHECK_TYPE_X_FOLLOWING = 0;
+export type CHECK_TYPE_ACCOUNT = 1;
+export type SendOnSolanaForRedPacketParam = {
+    reType: RedPacketType;
+    number: bigint; // number indicates how many people the red packet is sent to.
+    amount: string; // The total amount of the red packet.
+    checkContract: string;// A contract used to check whether you are eligible to receive a red packet.
+    checkParams: {
+        checkType: CHECK_TYPE_X_FOLLOWING | CHECK_TYPE_ACCOUNT;
+        params: string;
+    };
+    emptyRatio: number; // empty rate of red packet, 0 means no empty envelope.
+}
+export type FundOnSolanaForRedPacketParam = {
+    tokenInfo: TokenInfo;
+    sendParam: SendOnSolanaForRedPacketParam;
 }

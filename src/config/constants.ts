@@ -21,6 +21,17 @@ export const SUPPORTEDSOCIALPLATFORMS: string[] = Object.keys(DATASOURCETEMPLATE
 
 
 export const SUPPORTEDCHAINIDSMAP = {
+  143: {
+    chainId: 143,
+    chainName: "Monad Chain",
+    nativeCurrency: {
+      name: "MON",
+      symbol: "MON",
+      decimals: 18,
+    },
+    contractAddress: "0xa2e0700a269Be3158c81E4739518b324d4398588",
+    redPacketContractAddress: "0x50bd377EB8D4236Bb587AB3FB1eeafd888AEeC58"
+  },  // monad mainnet
   10143: {
     chainId: 10143,
     chainName: "Monad testnet",
@@ -65,6 +76,17 @@ export const SUPPORTEDCHAINIDSMAP = {
     contractAddress: "0xD17512B7EC12880Bd94Eca9d774089fF89805F02",
     redPacketContractAddress: '0x673D74d95A35B26804475066d9cD1DA3947f4eC3'
   },
+  688689: {
+    chainId: 688689,
+    chainName: 'Pharos Atlantic Testnet',
+    nativeCurrency: {
+      decimals: 18,
+      name: 'PHRS',
+      symbol: 'PHRS',
+    },
+    contractAddress: "0x3A83cAB6da93210933D94fC68A093a6983c2BCD1",
+    redPacketContractAddress: '0x7460ba14e2Ba151eaFD2983eB56F76578C79cb47'
+  },
   84532: {
     chainId: 84532,
     chainName: 'Base Sepolia',
@@ -85,10 +107,32 @@ export const SUPPORTEDCHAINIDSMAP = {
       symbol: 'ETH',
     },
     contractAddress: "0xa2e0700a269Be3158c81E4739518b324d4398588",
-    redPacketContractAddress:"0x50bd377EB8D4236Bb587AB3FB1eeafd888AEeC58"
+    redPacketContractAddress: "0x50bd377EB8D4236Bb587AB3FB1eeafd888AEeC58"
+  },
+  133: {
+    chainId: 133,
+    chainName: 'HashKey Chain Testnet',
+    nativeCurrency: {
+      decimals: 18,
+      name: 'HSK',
+      symbol: 'HSK',
+    },
+    contractAddress: "0xd62A24eF37a62d613f53595B9700DFfdE372701D",
+    redPacketContractAddress: "0x018A793D8984d8ADcA5a7689273fFacBb131972E"
+  },
+  177: {
+    chainId: 177,
+    chainName: 'HashKey Chain',
+    nativeCurrency: {
+      decimals: 18,
+      name: 'HSK',
+      symbol: 'HSK',
+    },
+    contractAddress: "0xa2e0700a269Be3158c81E4739518b324d4398588",
+    redPacketContractAddress: "0x50bd377EB8D4236Bb587AB3FB1eeafd888AEeC58"
   },
 };
-
+console.log('version:163')
 
 
 export const NATIVETOKENS: Record<number, string> = Object.values(SUPPORTEDCHAINIDSMAP).reduce((prev, curr) => {
@@ -114,6 +158,7 @@ export const Fund_CONTRACTS: { [chainId: number]: string } = Object.values(SUPPO
   }
 }, {})
 export const SUPPORTEDCHAINIDS: number[] = Object.keys(Fund_CONTRACTS).map(i => Number(i))
+export const SUPPORTEDSOLANACHAINIDS: string[] = ['EtWTRABZaYq6iMfeYKouRu166VU2xqa1', '5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp']// TODO
 export const FundForRedPacket_CONTRACTS: { [chainId: number]: string } = Object.values(SUPPORTEDCHAINIDSMAP).filter(
   (item) => {
     return item.redPacketContractAddress

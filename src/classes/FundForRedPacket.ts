@@ -19,25 +19,11 @@ class FundForRedPacket {
   async init(provider: any, chainId: number) {
     return new Promise(async (resolve, reject) => {
       try {
-        // let formatProvider: any;
-        // if (provider instanceof ethers.providers.JsonRpcProvider) {
-        //   formatProvider = provider;
-        // } else {
-        //   formatProvider = new ethers.providers.Web3Provider(provider)
-        // }
-
-        // await provider.ready;
-        // const network = await provider.getNetwork();
-        // const providerChainId = network.chainId;
-        // console.log('init provider', provider, network)
-        // console.log('init providerChainId', providerChainId, chainId)
-        // if (providerChainId !== chainId) {
-        //   return reject(`Please connect to the chain with ID ${chainId} first.`)
-        // }
         const fundContractAddress = FundForRedPacket_CONTRACTS[chainId];
         if (!fundContractAddress) {
           return reject(`Unsupported chainId:${chainId}`)
         }
+        
         this.fundContract = new Contract(provider, fundContractAddress, abiJson);
         this.provider = provider;
         // this.formatProvider = formatProvider
@@ -148,7 +134,7 @@ class FundForRedPacket {
   async approveForRedPacket(tokenInfo: ERC20TokenInfo, approveAmount: string) {
     return new Promise(async (resolve, reject) => {
       try {
-        
+
         let approveParams: ApproveParams = {
           spenderAddress: this.fundContract.address,
           approveAmount
