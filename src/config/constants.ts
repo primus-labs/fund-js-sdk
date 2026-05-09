@@ -87,6 +87,17 @@ export const SUPPORTEDCHAINIDSMAP = {
     contractAddress: "0x3A83cAB6da93210933D94fC68A093a6983c2BCD1",
     redPacketContractAddress: '0x7460ba14e2Ba151eaFD2983eB56F76578C79cb47'
   },
+  1672: {
+    chainId: 1672,
+    chainName: 'Pharos Mainnet',
+    nativeCurrency: {
+      decimals: 18,
+      name: 'PROS',
+      symbol: 'PROS',
+    },
+    contractAddress: "0xa2e0700a269Be3158c81E4739518b324d4398588",
+    redPacketContractAddress: '0x50bd377EB8D4236Bb587AB3FB1eeafd888AEeC58'
+  },
   84532: {
     chainId: 84532,
     chainName: 'Base Sepolia',
