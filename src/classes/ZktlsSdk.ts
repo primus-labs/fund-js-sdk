@@ -1,5 +1,4 @@
 import { PrimusZKTLS } from "@primuslabs/zktls-js-sdk";
-// import { PrimusZKTLS } from "@superorange/zka-js-sdk";
 import { DATASOURCETEMPLATESMAP } from "../config/constants";
 import { Attestation, AttestCommonParams, AttestParams } from '../index.d'
 
