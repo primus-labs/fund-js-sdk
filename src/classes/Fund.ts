@@ -216,17 +216,19 @@ class Fund {
   async approve(tokenInfo: ERC20TokenInfo, recipientInfoList: RecipientInfo[]) {
     return new Promise(async (resolve, reject) => {
       try {
+        const tokenContract = new Erc20Contract(this.provider, tokenInfo.tokenAddress as string);
+        const decimals = await tokenContract.decimals();
         const approveAmount = recipientInfoList.reduce((acc, cur) =>
-          acc.add(parseUnits(cur.tokenAmount.toString(), 0)), ethers.BigNumber.from(0)).toString()
+          acc.add(parseUnits(cur.tokenAmount.toString(), decimals)), ethers.BigNumber.from(0))
+        const formatApproveAmount = formatUnits(approveAmount, decimals)
         let approveParams: ApproveParams = {
           spenderAddress: this.fundContract.address,
-          approveAmount
+          approveAmount: formatApproveAmount
         }
         if ([97, 56].includes(this.chainId)) {
           const gasPrice = await this.provider.getGasPrice();
           approveParams.otherParams = { gasPrice }
         }
-        const tokenContract = new Erc20Contract(this.provider, tokenInfo.tokenAddress as string);
         await tokenContract.approve(approveParams)
         resolve('Approved');
       } catch (error: any) {
